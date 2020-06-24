@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_pymongo import PyMongo
 from passlib.hash import pbkdf2_sha256
-from datetime import timedelta
+from datetime import timedelta, date
 from bson.json_util import dumps, loads
 
 app = Flask(__name__)
@@ -44,12 +44,31 @@ def register(name, username, password):
     mongo.db.users.insert_one({
         'name': name,
         'username': username,
-        'password': hashed
+        'password': hashed,
     })
     new_user = mongo.db.users.find_one({'username': username})
     store_session((new_user['_id']),
                   new_user['name'], new_user['username'])
     return True
+
+def add_vote(id, pred_model):
+    vote = mongo.db.votes.find_one(
+        {"user_id": id})
+    # user already voted
+    if vote:
+        # edit old_vote
+        vote['prediction_model'] = pred_model
+        vote['date'] = date
+    else: 
+        mongo.db.votes.insert_one({
+            'user_id': id,
+            'prediction_model': pred_model,
+            'date': date
+        })
+
+def fetch_votes(pred_model):
+    #check if valid arg
+    return mongo.db.votes.count({'prediction_model':pred_model})
 
 
 @app.before_request
