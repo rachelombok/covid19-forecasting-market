@@ -36,3 +36,10 @@ ReactDOM.render(
     <App />,
     document.getElementById('app')
 );
+
+var forecasts;
+
+$.get("/forecasts", function(data) {
+  forecasts = $.parseJSON(data);
+  console.log(forecasts);
+})

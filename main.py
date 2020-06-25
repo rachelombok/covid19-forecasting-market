@@ -4,6 +4,8 @@ from passlib.hash import pbkdf2_sha256
 from datetime import timedelta, date
 from bson.json_util import dumps, loads
 
+from get_estimates import get_forecasts
+
 app = Flask(__name__)
 app.secret_key = "super secret key"
 app.permanent_session_lifetime = timedelta(days=7)
@@ -130,6 +132,11 @@ def logout():
         session.pop('name')
         session.pop('username')
     return redirect(url_for('signin'))
+
+
+@app.route("/forecasts")
+def forecasts():
+    return get_forecasts()
 
 
 if __name__ == "__main__":
