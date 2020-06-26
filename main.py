@@ -11,7 +11,8 @@ app.secret_key = "super secret key"
 app.permanent_session_lifetime = timedelta(days=7)
 
 # set up pymongo
-app.config["MONGO_URI"] = "mongodb://localhost:27017/covid19-forecast"
+#app.config["MONGO_URI"] = "mongodb://localhost:27017/covid19-forecast"
+app.config['MONGO_URI'] = "mongodb+srv://test:test@cluster0-3qghj.mongodb.net/covid19-forecast?retryWrites=true&w=majority"
 mongo = PyMongo(app)
 # mongo.db.users.insert_one({"username":"john"})
 
