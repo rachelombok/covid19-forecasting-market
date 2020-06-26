@@ -12,10 +12,15 @@
     <script src='https://unpkg.com/babel-standalone@6.26.0/babel.js'></script>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js"></script>
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.css">-->
   </head>
 
   <body>
     <div id="app"></div>
+
+    <canvas id="myChart" width="400" height="400"></canvas>
     <script type='text/babel' src="{{ url_for('static', filename='javascript/home-page.js') }}"></script>
   </body>
 </html>

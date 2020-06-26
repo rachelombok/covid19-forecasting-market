@@ -17,8 +17,7 @@ def get_forecasts():
         df = df.loc[df['location_name'] == 'US']
         df = df.loc[df['type'] == 'point']
         df = df[['target_end_date', 'value']]
+        df = df.sort_values('target_end_date')
         JSON = df.to_json()
         models[orgs.pop()] = df.to_dict('list')
     return json.dumps(models)
-
-print(get_forecasts())
