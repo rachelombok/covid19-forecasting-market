@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_pymongo import PyMongo
+from pymongo import MongoClient, DESCENDING
 from passlib.hash import pbkdf2_sha256
 from datetime import timedelta, date
 from bson.json_util import dumps, loads
@@ -53,10 +54,11 @@ def register(name, username, password):
         'name': name,
         'username': username,
         'password': hashed,
+        'score': 0
     })
     new_user = mongo.db.users.find_one({'username': username})
     store_session((new_user['_id']),
-                  new_user['name'], new_user['username'])
+                  new_user['name'], new_user['username'],new_user['score'])
     return True
 
 def add_vote(id, pred_model):
@@ -78,6 +80,15 @@ def fetch_votes(pred_model):
     #check if valid arg
     return mongo.db.votes.count({'prediction_model':pred_model})
 
+def leaderboard(username):
+    user_scores = mongo.db.scores
+    all_users = mongo.db.users
+    
+    for user in all_users:
+        user_scores.insert({"username": username, "score":0})
+    
+    print (list(user_scores.find().sort("score",DESCENDING)))
+    
 
 @app.before_request
 def make_session_permanent():
