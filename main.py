@@ -6,9 +6,14 @@ from bson.json_util import dumps, loads
 
 from get_estimates import get_forecasts
 
+
 app = Flask(__name__)
 app.secret_key = "super secret key"
 app.permanent_session_lifetime = timedelta(days=7)
+
+# Get forecasts data when initially launching website
+forecast_data = get_forecasts()
+print(forecast_data)
 
 # set up pymongo
 #app.config["MONGO_URI"] = "mongodb://localhost:27017/covid19-forecast"
@@ -137,7 +142,8 @@ def logout():
 
 @app.route("/forecasts")
 def forecasts():
-    return get_forecasts()
+    print(forecast_data)
+    return forecast_data
 
 
 if __name__ == "__main__":
