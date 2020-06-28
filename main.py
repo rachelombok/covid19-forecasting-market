@@ -3,7 +3,8 @@ from flask_pymongo import PyMongo
 from passlib.hash import pbkdf2_sha256
 from datetime import timedelta, date
 from bson.json_util import dumps, loads
-
+#import json
+#import pandas as pd
 from get_estimates import get_forecasts
 
 app = Flask(__name__)
@@ -23,7 +24,6 @@ def store_session(id, name, username):
     session['id'] = str(id)
     session['name'] = name
     session['username'] = username
-
 
 def authenticate(username, password):
     user = mongo.db.users.find_one(
