@@ -208,5 +208,17 @@ def results():
     user = mongo.db.users.find_one({'username': session['username']})
     return "You voted for " + vote['prediction_model'] +". You now have " + str(user['score']) + " points."
 
+@app.route("/total")
+def total():
+    ucla = fetch_votes('UCLA')
+    tech = fetch_votes('Georgia Tech')
+    columbia = fetch_votes('Columbia')
+    temp = {'UCLA': ucla, 'Georgia Tech': tech, 'Columbia': columbia}
+    return json.dumps(temp)
+
+@app.route('/market')
+def market():
+    return render_template("market.html")
+
 if __name__ == "__main__":
     app.run(debug=True)
