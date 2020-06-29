@@ -22,6 +22,15 @@
     <canvas id="chart1" width="400" height="400"></canvas>
     <canvas id="chart2" width="400" height="400"></canvas>
     <canvas id="chart3" width="400" height="400"></canvas>
+    <div>
+      <form class="form-check" action="{{ url_for('home') }}" method='POST'>
+        <input type="radio" name="models" id="model1" value="UCLA"> UCLA </input><br>
+        <input type="radio" name="models" id="model2" value="Georgia Tech"> Georgia Tech </input><br>
+        <input type="radio" name="models" id="model3" value="Columbia"> Columbia </input><br>
+        <button type="submit" class="submit">Submit</button>
+      </form>
+      
+    </div>
     <script type='text/babel' src="{{ url_for('static', filename='javascript/home-page.js') }}"></script>
   </body>
 </html>

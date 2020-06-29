@@ -74,14 +74,19 @@ def add_vote(id, pred_model):
         {"user_id": id})
     # user already voted
     if vote:
+        print(vote)
         # edit old_vote
-        vote['prediction_model'] = pred_model
-        vote['date'] = date
+        mongo.db.votes.update_one({"user_id": id}, 
+        {'$set': 
+            { "prediction_model": pred_model, "date":str(date.today()) }
+        })
+        #vote['prediction_model'] = pred_model
+        #vote['date'] = str(date.today())
     else: 
         mongo.db.votes.insert_one({
             'user_id': id,
             'prediction_model': pred_model,
-            'date': date
+            'date': str(date.today())
         })
 
 def fetch_votes(pred_model):
@@ -110,9 +115,16 @@ def template():
     return render_template("template.html")
 
 
-@app.route("/home")
+@app.route("/home", methods=['POST','GET'])
 def home():
-    return render_template("home.html")
+    if request.method == 'POST':
+        model = request.form['models']
+        print(model)
+        print('model printed')
+        add_vote(session['id'], model)
+        return redirect(url_for('results'))
+    else:
+        return render_template("home.html")
 
 
 @app.route("/about")
@@ -160,16 +172,21 @@ def logout():
         session.pop('username')
     return redirect(url_for('signin'))
 
-
 @app.route("/forecasts")
 def forecasts():
     print(forecast_data)
     return forecast_data
 
+
 @app.route("/mse")
 def mse():
     return get_accuracy_for_all_models()
     print('errors calculated')
+
+@app.route("/results", methods=["POST", "GET"])
+def results():
+    vote = mongo.db.votes.find_one({'user_id': session['id']})
+    return vote['prediction_model']
 
 if __name__ == "__main__":
     app.run(debug=True)
