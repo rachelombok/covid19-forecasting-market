@@ -19,6 +19,7 @@ def get_forecasts():
         df = df.loc[df['target'].str.contains("cum")]
         df = df[['target_end_date', 'value']]
         df = df.sort_values('target_end_date')
+        df = df.drop_duplicates()
         JSON = df.to_json()
         models[orgs.pop()] = df.to_dict('list')
     return json.dumps(models)
