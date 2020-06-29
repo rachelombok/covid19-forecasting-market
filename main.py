@@ -4,9 +4,10 @@ from pymongo import MongoClient, DESCENDING
 from passlib.hash import pbkdf2_sha256
 from datetime import timedelta, date
 from bson.json_util import dumps, loads
+import json
 #import json
 #import pandas as pd
-from get_estimates import get_forecasts
+from get_estimates import get_forecasts, get_accuracy_for_all_models, get_daily_confirmed_df
 
 
 app = Flask(__name__)
@@ -16,6 +17,13 @@ app.permanent_session_lifetime = timedelta(days=7)
 # Get forecasts data when initially launching website
 forecast_data = get_forecasts()
 print(forecast_data)
+
+#get confirmed numbers
+#confirmed_data = get_daily_confirmed_df('2020-05-01', '2020-05-04')
+#print('confirmed data processed')
+
+#get model errors
+
 
 # set up pymongo
 #app.config["MONGO_URI"] = "mongodb://localhost:27017/covid19-forecast"
@@ -158,6 +166,10 @@ def forecasts():
     print(forecast_data)
     return forecast_data
 
+@app.route("/mse")
+def mse():
+    return get_accuracy_for_all_models()
+    print('errors calculated')
 
 if __name__ == "__main__":
     app.run(debug=True)
