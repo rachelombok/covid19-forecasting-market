@@ -80,15 +80,17 @@ def fetch_votes(pred_model):
     #check if valid arg
     return mongo.db.votes.count({'prediction_model':pred_model})
 
-def leaderboard(username):
-    user_scores = mongo.db.scores
-    all_users = mongo.db.users
+def leaderboard():
+    user_scores = mongo.db.score
+    all_users = mongo.db.users.find({})
     
     for user in all_users:
-        user_scores.insert({"username": username, "score":0})
+        user_scores.insert({"username": user, "score":0})
+        print(user)
+    print(list(user_scores.find().sort("score",DESCENDING)))
     
-    print (list(user_scores.find().sort("score",DESCENDING)))
-    
+ldbd = leaderboard()
+
 
 @app.before_request
 def make_session_permanent():
