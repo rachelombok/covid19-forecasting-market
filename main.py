@@ -49,7 +49,6 @@ def authenticate(username, password):
             return True
     return False
 
-
 def register(name, username, password):
     user = mongo.db.users.find_one(
         {"username": username})
@@ -66,7 +65,7 @@ def register(name, username, password):
     })
     new_user = mongo.db.users.find_one({'username': username})
     store_session((new_user['_id']),
-                  new_user['name'], new_user['username'],new_user['score'])
+                  new_user['name'], new_user['username'])
     return True
 
 def add_vote(id, pred_model):
@@ -93,6 +92,23 @@ def fetch_votes(pred_model):
     #check if valid arg
     return mongo.db.votes.count({'prediction_model':pred_model})
 
+def get_score(pred_model):
+    print(pred_model)
+    if pred_model == "Columbia":
+        print('correct')
+        return 50
+    else:
+        print('incorrect')
+        return 0
+
+def update_score(username, score):
+    mongo.db.users.update_one({"username": username}, 
+        {'$inc': 
+            { "score": score }
+        })
+    print("score updated")
+
+
 def leaderboard():
     user_scores = mongo.db.score
     all_users = mongo.db.users.find({})
@@ -118,10 +134,13 @@ def template():
 @app.route("/home", methods=['POST','GET'])
 def home():
     if request.method == 'POST':
-        model = request.form['models']
+        model = request.form['models'].strip()
         print(model)
         print('model printed')
         add_vote(session['id'], model)
+        gained = get_score(model)
+        print(gained)
+        update_score(session['username'], gained)
         return redirect(url_for('results'))
     else:
         return render_template("home.html")
@@ -186,7 +205,8 @@ def mse():
 @app.route("/results", methods=["POST", "GET"])
 def results():
     vote = mongo.db.votes.find_one({'user_id': session['id']})
-    return vote['prediction_model']
+    user = mongo.db.users.find_one({'username': session['username']})
+    return "You voted for " + vote['prediction_model'] +". You now have " + str(user['score']) + " points."
 
 if __name__ == "__main__":
     app.run(debug=True)
