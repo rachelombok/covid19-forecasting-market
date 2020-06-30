@@ -14,14 +14,10 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js"></script>
-    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.css">-->
   </head>
 
   <body>
     <div id="app"></div>
-    <canvas id="chart1" width="400" height="400"></canvas>
-    <canvas id="chart2" width="400" height="400"></canvas>
-    <canvas id="chart3" width="400" height="400"></canvas>
     <div>
       <form class="form-check" action="{{ url_for('home') }}" method='POST'>
         <input type="radio" name="models" id="model1" value="UCLA"> UCLA </input><br>
