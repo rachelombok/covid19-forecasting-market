@@ -9,8 +9,8 @@ function collectData() {
         data = $.parseJSON(response);
     } 
   });
-  
   var orgs = Object.keys(data);
+  
   var results = [];
   for (var i = 0; i < orgs.length; i++) {
     var forecast = data[orgs[i]];
@@ -22,7 +22,7 @@ function collectData() {
     results.push(result);
   }
 
-  return results;
+  return [results, orgs];
 }
 
 
@@ -73,6 +73,11 @@ class LineChart extends React.Component {
                       beginAtZero: true
                   }
               }]
+          },
+          title: {
+            display: true,
+            text: this.props.org,
+            fontSize: 30
           }
       }
     });
@@ -85,16 +90,28 @@ class LineChart extends React.Component {
 
 
 class App extends React.Component {
-  render () {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      data: collectData()[0],
+      orgs: collectData()[1]
+    };
+  }
+
+  render() {
     return (
       <div>
         <Navbar/>
         <div>
           [Page content here]
         </div>
-        <LineChart data={collectData()[0]} />
-        <LineChart data={collectData()[1]} />
-        <LineChart data={collectData()[2]} />
+        <LineChart data={this.state.data[0]} org={this.state.orgs[0]} />
+        <br></br>
+        <LineChart data={this.state.data[1]} org={this.state.orgs[1]} />
+        <br></br>
+        <LineChart data={this.state.data[2]} org={this.state.orgs[2]} />
+        <br></br>
       </div>
     )
   }
