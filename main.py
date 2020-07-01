@@ -7,7 +7,7 @@ from bson.json_util import dumps, loads
 import json
 #import json
 #import pandas as pd
-from get_estimates import get_forecasts, get_accuracy_for_all_models, get_daily_confirmed_df
+from get_estimates import get_forecasts, get_accuracy_for_all_models, get_daily_confirmed_df, get_us_confirmed
 
 
 app = Flask(__name__)
@@ -16,7 +16,9 @@ app.permanent_session_lifetime = timedelta(days=7)
 
 # Get forecasts data when initially launching website
 forecast_data = get_forecasts()
-print(forecast_data)
+
+# Get confirmed cases in US
+us_data = get_us_confirmed()
 
 #get confirmed numbers
 #confirmed_data = get_daily_confirmed_df('2020-05-01', '2020-05-04')
@@ -179,11 +181,15 @@ def logout():
         session.pop('username')
     return redirect(url_for('signin'))
 
+
 @app.route("/forecasts")
 def forecasts():
     print(forecast_data)
     return forecast_data
 
+@app.route("/us_confirmed")
+def us_confirmed():
+    return us_data
 
 @app.route("/mse")
 def mse():

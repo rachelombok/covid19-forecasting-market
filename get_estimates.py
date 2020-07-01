@@ -19,7 +19,7 @@ def get_forecasts():
         df = pd.read_csv(line.strip())
         df = df.loc[df['location_name'] == 'US']
         df = df.loc[df['type'] == 'point']
-        df = df.loc[df['target'].str.contains("cum")]
+        df = df.loc[df['target'].str.contains("cum death")]
         df = df[['target_end_date', 'value']]
         df = df.sort_values('target_end_date')
         df = df.drop_duplicates()
@@ -89,6 +89,18 @@ def get_daily_confirmed(d):
     return data['Confirmed'].sum()
     # catch error!!
 
+
+def get_us_confirmed():
+    df = pd.read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv")
+    df = df.loc[df['Country/Region'] == 'US']
+    df = df.drop(['Province/State', 'Country/Region', 'Lat', 'Long'], axis=1)
+    df.reset_index(drop=True, inplace=True)
+    cases_dict = dict()
+    for col in df.columns:
+        d = datetime.strptime(col, "%m/%d/%y")
+        d = d.strftime("%Y-%m-%d")
+        cases_dict[d] = str(df.at[0, col])
+    return json.dumps(cases_dict)
 
 # assume the predictional model dataframes are cleaned+sorted by dates
 '''def get_confirmed_cases():

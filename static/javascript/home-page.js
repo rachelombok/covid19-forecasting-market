@@ -12,17 +12,42 @@ function collectData() {
   var orgs = Object.keys(data);
   
   var results = [];
+  var confirmed = [];
   for (var i = 0; i < orgs.length; i++) {
     var forecast = data[orgs[i]];
     var dates = forecast.target_end_date;
     var values = forecast.value;
+
+    var cases = getConfirmed(dates);
+    confirmed.push(cases);
 
     var result = {};
     dates.forEach((key, i) => result[key] = values[i]);
     results.push(result);
   }
 
-  return [results, orgs];
+  return [results, orgs, confirmed];
+}
+
+
+function getConfirmed(input) {
+  var data = null;
+  $.ajax({
+    url: '/us_confirmed',
+    type: 'get',
+    dataType: 'html',
+    async: false,
+    success: function(response) {
+        data = $.parseJSON(response);
+    } 
+  });
+
+  var result = {};
+  for (var i = 0; i < input.length; i++) {
+    var date = input[i];
+    result[date] = data[date];
+  }
+  return result;
 }
 
 
@@ -64,6 +89,13 @@ class LineChart extends React.Component {
                   'rgba(255, 99, 132, 0.2)',
               ],
               borderWidth: 1
+          }, {
+              label: 'Confirmed Cases',
+              data: Object.values(this.props.confirmed),
+              backgroundColor: [
+                'rgba(132, 99, 255, 0.2)',
+              ],
+              borderWidth: 1
           }]
       },
       options: {
@@ -95,7 +127,8 @@ class App extends React.Component {
 
     this.state = {
       data: collectData()[0],
-      orgs: collectData()[1]
+      orgs: collectData()[1],
+      confirmed: collectData()[2]
     };
   }
 
@@ -106,11 +139,11 @@ class App extends React.Component {
         <div>
           [Page content here]
         </div>
-        <LineChart data={this.state.data[0]} org={this.state.orgs[0]} />
+        <LineChart data={this.state.data[0]} org={this.state.orgs[0]} confirmed={this.state.confirmed[0]} />
         <br></br>
-        <LineChart data={this.state.data[1]} org={this.state.orgs[1]} />
+        <LineChart data={this.state.data[1]} org={this.state.orgs[1]} confirmed={this.state.confirmed[1]} />
         <br></br>
-        <LineChart data={this.state.data[2]} org={this.state.orgs[2]} />
+        <LineChart data={this.state.data[2]} org={this.state.orgs[2]} confirmed={this.state.confirmed[2]} />
         <br></br>
       </div>
     )
