@@ -88,14 +88,16 @@ class LineChart extends React.Component {
               backgroundColor: [
                   'rgba(255, 99, 130, 0.2)',
               ],
-              borderWidth: 1
+              borderWidth: 1,
+              dragData: true,
           }, {
               label: 'Confirmed Deaths',
               data: Object.values(this.props.confirmed),
               backgroundColor: [
                 'rgba(130, 99, 255, 0.2)',
               ],
-              borderWidth: 1
+              borderWidth: 1,
+              dragData: false,
           }]
       },
       options: {
@@ -110,6 +112,27 @@ class LineChart extends React.Component {
             display: true,
             text: this.props.org,
             fontSize: 30
+          },
+          dragData: true,
+          dragDataRound: 1,
+          dragOptions: {
+            showTooltip: true
+          },
+          onDragStart: function(e) {
+            // console.log(e)
+          },
+          onDrag: function(e, datasetIndex, index, value) {
+            e.target.style.cursor = 'grabbing'
+          },
+          onDragEnd: function(e, datasetIndex, index, value) {
+            e.target.style.cursor = 'default' 
+          },
+          hover: {
+            onHover: function(e) {
+              const point = this.getElementAtEvent(e)
+              if (point.length) e.target.style.cursor = 'grab'
+              else e.target.style.cursor = 'default'
+            }
           }
       }
     });
