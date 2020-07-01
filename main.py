@@ -109,22 +109,10 @@ def update_score(username, score):
     print("score updated")
 
 
-def leaderboard():
-    user_scores = mongo.db.score
-    all_users = mongo.db.users.find({})
-    
-    for user in all_users:
-        user_scores.insert({"username": user, "score":0})
-        print(user)
-    print(list(user_scores.find().sort("score",DESCENDING)))
-    
-ldbd = leaderboard()
-
 
 @app.before_request
 def make_session_permanent():
     session.permanent = True
-
 
 @app.route("/")
 def template():
@@ -219,6 +207,12 @@ def total():
 @app.route('/market')
 def market():
     return render_template("market.html")
+    
+@app.route('/leaderboard')
+def leaderboard():
+    all_users = list(mongo.db.users.find({},{'name': 1, 'score': 1}).sort('score',-1))
+
+    return render_template("leaderboard.html", all_users=all_users)
 
 if __name__ == "__main__":
     app.run(debug=True)

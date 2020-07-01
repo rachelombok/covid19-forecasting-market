@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Leaderboard</title>
+	</head>
+	<body>
+		
+		<table>
+		<tr>
+			<th>Name</th>
+			<th>Score</th>
+		</tr>
+		{% for user in all_users %}
+		<tr>
+			<td>{{ user['name'] }}</td>
+			<td>{{ user['score'] }}</td>
+		</tr>
+		{% endfor %}
+		</table>
+		
+	</body>
+</html>
