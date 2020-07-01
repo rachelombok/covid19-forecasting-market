@@ -83,17 +83,17 @@ class LineChart extends React.Component {
       data: {
           labels: Object.keys(this.props.data),
           datasets: [{
-              label: 'Estimated Cases',
+              label: 'Estimated Deaths',
               data: Object.values(this.props.data),
               backgroundColor: [
-                  'rgba(255, 99, 132, 0.2)',
+                  'rgba(255, 99, 130, 0.2)',
               ],
               borderWidth: 1
           }, {
-              label: 'Confirmed Cases',
+              label: 'Confirmed Deaths',
               data: Object.values(this.props.confirmed),
               backgroundColor: [
-                'rgba(132, 99, 255, 0.2)',
+                'rgba(130, 99, 255, 0.2)',
               ],
               borderWidth: 1
           }]
@@ -144,6 +144,10 @@ class App extends React.Component {
         <LineChart data={this.state.data[1]} org={this.state.orgs[1]} confirmed={this.state.confirmed[1]} />
         <br></br>
         <LineChart data={this.state.data[2]} org={this.state.orgs[2]} confirmed={this.state.confirmed[2]} />
+        <br></br>
+        <LineChart data={this.state.data[3]} org={this.state.orgs[3]} confirmed={this.state.confirmed[3]} />
+        <br></br>
+        <LineChart data={this.state.data[4]} org={this.state.orgs[4]} confirmed={this.state.confirmed[4]} />
         <br></br>
       </div>
     )
