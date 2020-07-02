@@ -36,8 +36,8 @@ def get_mse(model_df):
 
 def get_accuracy_for_all_models():
     errors = []
-    start_date = '2020-05-01'
-    end_date = '2020-05-09'
+    start_date = '2020-05-02'
+    end_date = '2020-06-01'
     #end_date = str(date.today() - timedelta(days=2)) #2 days prior
     confirmed = get_daily_confirmed_df(start_date, end_date)
     data = requests.get('http://localhost:5000/forecasts').json()
