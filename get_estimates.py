@@ -86,7 +86,7 @@ def get_daily_confirmed(d):
     github_dir_path = 'https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_daily_reports_us/'
     file_path = github_dir_path + d + '.csv'
     data = pd.read_csv(file_path)
-    return data['Confirmed'].sum()
+    return data['Deaths'].sum()
     # catch error!!
 
 
