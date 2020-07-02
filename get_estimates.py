@@ -102,14 +102,5 @@ def get_us_confirmed():
         cases_dict[d] = str(df.at[0, col])
     return json.dumps(cases_dict)
 
-# assume the predictional model dataframes are cleaned+sorted by dates
-'''def get_confirmed_cases():
-    df = pd.read_csv(
-        'https://raw.githubusercontent.com/nytimes/covid-19-data/master/us.csv')
-    df = df.set_index(df['date'])
-    df = df.iloc[:, 1:2]
-    df = df['2020-05-02':'2020-06-26']
-    return df'''
-
 #print(get_accuracy_for_all_models())
 #print(get_daily_confirmed_df('2020-06-01', '2020-06-03'))
