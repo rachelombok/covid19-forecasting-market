@@ -226,11 +226,10 @@ def results():
 
 @app.route("/total")
 def total():
-    ucla = fetch_votes('UCLA')
-    tech = fetch_votes('Georgia Tech')
-    columbia = fetch_votes('Columbia')
-    temp = {'UCLA': ucla, 'Georgia Tech': tech, 'Columbia': columbia}
-    return json.dumps(temp)
+    results = {}
+    for model in forecast_data:
+        results[model] = fetch_votes(model)
+    return json.dumps(results)
 
 @app.route('/market')
 def market():
