@@ -190,6 +190,90 @@ class LineChart extends React.Component {
 
 
 
+class ModelsChart extends React.Component {
+  constructor(props) {
+    super(props);
+    this.chartRef = React.createRef();
+  }
+
+  componentDidMount() {
+    var options = {
+      scales: {
+        yAxes: [{
+          ticks: {
+            //beginAtZero: true
+          }
+        }],
+      },
+      title: {
+        display: true,
+        text: 'All Model Forecasts',
+        fontSize: 30
+      },
+      dragData: true,
+      dragDataRound: 1,
+      dragOptions: {
+        showTooltip: true
+      },
+      onDragStart: function(e) {
+        // console.log(e)
+      },
+      onDrag: function(e, datasetIndex, index, value) {
+        e.target.style.cursor = 'grabbing'
+      },
+      onDragEnd: function(e, datasetIndex, index, value) {
+        e.target.style.cursor = 'default' 
+      },
+      hover: {
+        onHover: function(e) {
+          const point = this.getElementAtEvent(e)
+          if (point.length) e.target.style.cursor = 'grab'
+          else e.target.style.cursor = 'default'
+        }
+      }
+    };
+
+    var datasets = [];
+    var colors = {
+      'Columbia': 'rgba(172, 204, 230, 0.2)',
+      'Georgia Tech': 'rgba(179, 163, 105​, 0.8)',
+      'UCLA': 'rgba(39, 116, 174, 0.2)',
+      'IHME': 'rgba(87, 175, 85, 0.2)',
+      'Youyang Gu': 'rgba(196, 129, 14, 0.2)'
+    }
+    for (var i = 0; i < this.props.data.length; i++) {
+      console.log(this.props.orgs[i]);
+      console.log(this.props.data[i]);
+      datasets.push({
+        label: this.props.orgs[i],
+        data: Object.values(this.props.data[i]),
+        backgroundColor: [
+          //'rgba(255, 99, 130, 0.2)',
+          colors[this.props.orgs[i]]
+        ],
+        borderWidth: 1,
+        dragData: true,
+      })
+    }
+
+    this.myChart = new Chart(this.chartRef.current, {
+      type: 'line',
+      data: {
+        labels: Object.keys(this.props.data[3]),
+        datasets: datasets
+      },
+      options: options
+    });
+
+  }
+
+  render() {
+    return <canvas ref={this.chartRef} />;
+  }
+}
+
+
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -217,6 +301,9 @@ class App extends React.Component {
         <LineChart data={this.state.data[3]} org={this.state.orgs[3]} confirmed={this.state.confirmed[3]} />
         <br></br>
         <LineChart data={this.state.data[4]} org={this.state.orgs[4]} confirmed={this.state.confirmed[4]} />
+        <br></br>
+
+        <ModelsChart data={this.state.data} orgs={this.state.orgs}/>
         <br></br>
       </div>
     )
