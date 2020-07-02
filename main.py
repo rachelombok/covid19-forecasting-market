@@ -14,17 +14,13 @@ app = Flask(__name__)
 app.secret_key = "super secret key"
 app.permanent_session_lifetime = timedelta(days=7)
 
-# Get forecasts data when initially launching website
+# Get forecasts data when initially launching website6
 forecast_data = get_forecasts()
 
 # Get confirmed cases in US
 us_data = get_us_confirmed()
 
-#get confirmed numbers
-#confirmed_data = get_daily_confirmed_df('2020-05-01', '2020-05-04')
-#print('confirmed data processed')
-
-#get model errors
+#get user pred
 
 
 # set up pymongo
@@ -75,7 +71,7 @@ def add_vote(id, pred_model):
         {"user_id": id})
     # user already voted
     if vote:
-        print(vote)
+        #print(vote)
         # edit old_vote
         mongo.db.votes.update_one({"user_id": id}, 
         {'$set': 
@@ -95,12 +91,12 @@ def fetch_votes(pred_model):
     return mongo.db.votes.count({'prediction_model':pred_model})
 
 def get_score(pred_model):
-    print(pred_model)
+    #(pred_model)
     if pred_model == "Columbia":
-        print('correct')
+        #print('correct')
         return 50
     else:
-        print('incorrect')
+        #print('incorrect')
         return 0
 
 def update_score(username, score):
@@ -108,13 +104,40 @@ def update_score(username, score):
         {'$inc': 
             { "score": score }
         })
-    print("score updated")
+    #print("score updated")
 
+#data: a list containing predicted number of deaths
+def update_user_prediction(username, model, data):
+    pred = mongo.db.predictions.find_one({"username": username, "model": model})
+    #print(pred)
+    if pred:
+        #print("already exists")
+        mongo.db.predictions.update_one({"username": username, "model": model}, 
+        {'$set': 
+            { "prediction": data }
+        })
+    else:
+        mongo.db.predictions.insert_one({"username": username, "model": model, "prediction": data})
+        #print("added new")
+
+def get_user_prediction(username):
+    user_prediction = {}
+    for model in forecast_data:
+        exists = mongo.db.predictions.find_one({"username": username, "model": model})
+        if exists:
+            #print('exists')
+            user_prediction[model] = exists['prediction']
+        else:
+            #print("doesn't exist")
+            user_prediction[model] = forecast_data[model]
+    #print(json.dumps(user_prediction['UCLA']))
+    return user_prediction
 
 
 @app.before_request
 def make_session_permanent():
     session.permanent = True
+
 
 @app.route("/")
 def template():
@@ -125,16 +148,16 @@ def template():
 def home():
     if request.method == 'POST':
         model = request.form['models'].strip()
-        print(model)
-        print('model printed')
+        #print(model)
+        #print('model printed')
         add_vote(session['id'], model)
         gained = get_score(model)
-        print(gained)
+        #print(gained)
         update_score(session['username'], gained)
         return redirect(url_for('results'))
     else:
-        return render_template("home.html")
-
+        user_prediction = get_user_prediction(session['username'])
+        return render_template("home.html", user_prediction=user_prediction)
 
 @app.route("/about")
 def about():
@@ -184,8 +207,7 @@ def logout():
 
 @app.route("/forecasts")
 def forecasts():
-    print(forecast_data)
-    return forecast_data
+    return json.dumps(forecast_data)
 
 @app.route("/us_confirmed")
 def us_confirmed():
@@ -194,7 +216,7 @@ def us_confirmed():
 @app.route("/mse")
 def mse():
     return get_accuracy_for_all_models()
-    print('errors calculated')
+    #print('errors calculated')
 
 @app.route("/results", methods=["POST", "GET"])
 def results():
@@ -219,6 +241,15 @@ def leaderboard():
     all_users = list(mongo.db.users.find({},{'name': 1, 'score': 1}).sort('score',-1))
 
     return render_template("leaderboard.html", all_users=all_users)
+
+@app.route('/update/', methods=['POST'])
+def update():
+    if request.method == 'POST':
+        data = request.json
+        #print(data['model'])
+        update_user_prediction(session['username'], data['model'], data['data'])
+        return "Success"
+    return 'None'
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -25,7 +25,7 @@ def get_forecasts():
         df = df.drop_duplicates()
         JSON = df.to_json()
         models[orgs.pop()] = df.to_dict('list')
-    return json.dumps(models)
+    return models
 
 
 #pass in the df containing confirmed and predicted values

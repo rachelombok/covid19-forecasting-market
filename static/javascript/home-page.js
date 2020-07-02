@@ -1,3 +1,15 @@
+//console.log(userPrediction);
+userPrediction = JSON.parse(userPrediction)
+console.log(userPrediction)
+
+//console.log(userPrediction)
+
+function addDays(date, days) {
+  var result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
+
 function collectData() {
   var data = null;
   $.ajax({
@@ -23,6 +35,7 @@ function collectData() {
 
     var result = {};
     dates.forEach((key, i) => result[key] = values[i]);
+    console.log(result)
     results.push(result);
   }
 
@@ -50,6 +63,18 @@ function getConfirmed(input) {
   return result;
 }
 
+function savePrediction(model, data) {
+  $.ajax({
+    type : 'POST',
+    url : "/update/",
+    contentType: 'application/json;charset=UTF-8',
+    data : JSON.stringify({"model": model, "data": data}),
+    /*success: function(){
+      window.location.href = "update";
+  }*/
+  });
+  console.log("done");
+}
 
 class Navbar extends React.Component {
     render() {
@@ -78,18 +103,31 @@ class LineChart extends React.Component {
   }
 
   componentDidMount() {
+    var data = this.props.data;
+    var model = this.props.org
+    console.log(userPrediction[model].value)
     this.myChart = new Chart(this.chartRef.current, {
       type: 'line',
       data: {
           labels: Object.keys(this.props.data),
-          datasets: [{
+          datasets: [
+            {
+              label: "User's Prediciton",
+              data: userPrediction[model].value,
+              backgroundColor: [
+                'rgba(64, 64, 64, 0.2)',
+              ],
+              borderWidth: 1,
+              dragData: true,
+          },
+          {
               label: 'Estimated Deaths',
               data: Object.values(this.props.data),
               backgroundColor: [
                   'rgba(255, 99, 130, 0.2)',
               ],
               borderWidth: 1,
-              dragData: true,
+              dragData: false,
           }, {
               label: 'Confirmed Deaths',
               data: Object.values(this.props.confirmed),
@@ -98,7 +136,8 @@ class LineChart extends React.Component {
               ],
               borderWidth: 1,
               dragData: false,
-          }]
+          }
+        ]
       },
       options: {
           scales: {
@@ -125,7 +164,13 @@ class LineChart extends React.Component {
             e.target.style.cursor = 'grabbing'
           },
           onDragEnd: function(e, datasetIndex, index, value) {
-            e.target.style.cursor = 'default' 
+            e.target.style.cursor = 'default';
+            console.log('value: ' + value);
+            console.log('index: ' + index);
+            //var date = addDays(Object.keys(data)[0], index).toISOString().slice(0,10);
+            console.log(userPrediction[model]);
+            //update user prediction
+            savePrediction(model, userPrediction[model]);
           },
           hover: {
             onHover: function(e) {
@@ -142,6 +187,7 @@ class LineChart extends React.Component {
     return <canvas ref={this.chartRef} />;
   }
 }
+
 
 
 class App extends React.Component {
