@@ -163,6 +163,9 @@ def home():
 def about():
     return render_template("about.html")
 
+@app.route("/mapportal")
+def mapportal():
+    return render_template("mapportal.html")
 
 @app.route("/signin", methods=["POST", "GET"])
 def signin():
