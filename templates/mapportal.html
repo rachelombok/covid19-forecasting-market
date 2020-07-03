@@ -62,18 +62,17 @@
     // render map
     var map = new Datamap({
         element: document.getElementById('container1'),
+        projection: 'mercator',
+        fills: { defaultFill: '#F5F5F5' },
+        data: dataset,
         done: function(datamap) {
             // done functions are for all events
 					datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
-						//alert(geography.properties.name);
                         //how to only redirect countries that have an ID
                         // redirect to the correct polls
                         return [window.location.href = "{{ url_for('home')}}"];
 					});
 				},
-        projection: 'mercator',
-        fills: { defaultFill: '#F5F5F5' },
-        data: dataset,
         geographyConfig: {
             borderColor: '#DEDEDE',
             highlightBorderWidth: 2,
@@ -89,9 +88,10 @@
                 // don't show tooltip if country don't present in dataset
                 if (!data) { return ; }
                 // tooltip content
+                //alert(data);
                 return ['<div class="hoverinfo">',
                     '<strong>', geo.properties.name, '</strong>',
-                    //'<br>Count: <strong>', data.numberOfThings, '</strong>',
+                    '<br>Count: <strong>', data.numberOfThings, '</strong>',
                     '</div>'].join('');
             }
         }
