@@ -1,5 +1,5 @@
 
-<div id="container1" style="position: relative; width: 90%; height: 600px;">
+<div id="container1" style="position: relative; width: 95%; height: 600px;">
 </div>
 
 <script src="https://d3js.org/d3.v5.js"></script>
@@ -9,6 +9,7 @@
   
 <script>
     // example data from server
+    // right now only USA data
     var series = [ ["USA", 10]];
     /*
     var series = [
@@ -29,6 +30,7 @@
         ["CAF",93],["COD",36],["CZE",77],["CYP",65],["CXR",14],["CRI",31],
         ["CUW",67],["CPV",63],["CUB",40],["SWZ",58],["SYR",96], ["SXM",31]];
     */
+    // examples of other country data
 
     // Datamaps expect data in format:
     // { "USA": { "fillColor": "#42a844", numberOfWhatever: 75},
@@ -45,23 +47,27 @@
     // create color palette function
     // color can be whatever you wish
     var paletteScale = d3.scale.linear()
-            .domain([minValue,maxValue])
-            .range(["#02386F","#ff0000"]);
+            .domain([minValue,maxValue]);;
+            //.range(["#02386F","#ff0000"]);
+            // if we wanted to color code based on polls, un-comment range
 
     // fill dataset in appropriate format
     series.forEach(function(item){ //
-        // item example value ["USA", 70]
+        // item example value ["USA", 10]
         var iso = item[0],
                 value = item[1];
         dataset[iso] = { numberOfThings: value, fillColor: paletteScale(value) };
     });
 
     // render map
-    new Datamap({
+    var map = new Datamap({
         element: document.getElementById('container1'),
-        done: function(datamap, data) {
+        done: function(datamap) {
+            // done functions are for all events
 					datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
 						//alert(geography.properties.name);
+                        //how to only redirect countries that have an ID
+                        // redirect to the correct polls
                         return [window.location.href = "{{ url_for('home')}}"];
 					});
 				},
@@ -77,6 +83,7 @@
             },
             // only change border
             highlightBorderColor: '#B7B7B7',
+            
             // show desired information in tooltip
             popupTemplate: function(geo, data) {
                 // don't show tooltip if country don't present in dataset
@@ -90,7 +97,7 @@
         }
     });
 
-console.log(countries[i].id, countries[i].properties.name)
+//console.log(countries[i].id, countries[i].properties.name)
 </script>
   
 
