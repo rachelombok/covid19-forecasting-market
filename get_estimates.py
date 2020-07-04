@@ -5,6 +5,7 @@ import requests
 from datetime import date, datetime, timedelta
 
 
+# Get forecast data for all models as linked in model-links.csv
 def get_forecasts():
     file = open('orgs.csv', 'r')
     orgs = []
@@ -90,6 +91,7 @@ def get_daily_confirmed(d):
     # catch error!!
 
 
+# get confirmed cumulative deaths in the us
 def get_us_confirmed():
     df = pd.read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv")
     df = df.loc[df['Country/Region'] == 'US']
