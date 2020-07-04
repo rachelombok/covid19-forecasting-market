@@ -10,6 +10,8 @@ function addDays(date, days) {
   return result;
 }
 
+
+// Retrieve all cumulative death data
 function collectData() {
   var data = null;
   $.ajax({
@@ -43,8 +45,11 @@ function collectData() {
 }
 
 
+// Get confirmed deaths (cumulative)
 function getConfirmed(input) {
   var data = null;
+
+  // Send data from Python to JavaScript
   $.ajax({
     url: '/us_confirmed',
     type: 'get',
@@ -76,6 +81,7 @@ function savePrediction(model, data) {
   console.log("done");
 }
 
+// Navbar component
 class Navbar extends React.Component {
     render() {
         return (
@@ -96,10 +102,12 @@ class Navbar extends React.Component {
 }
 
 
+
+// LineChart component
 class LineChart extends React.Component {
   constructor(props) {
     super(props);
-    this.chartRef = React.createRef();
+    this.chartRef = React.createRef(); // create reference for chart in class
   }
 
   componentDidMount() {
@@ -109,17 +117,19 @@ class LineChart extends React.Component {
     this.myChart = new Chart(this.chartRef.current, {
       type: 'line',
       data: {
-          labels: Object.keys(this.props.data),
-          datasets: [
-            {
+        labels: Object.keys(this.props.data),
+        datasets: [
+          // Settings for user prediction graph
+          {
               label: "User's Prediciton",
               data: userPrediction[model].value,
               backgroundColor: [
                 'rgba(64, 64, 64, 0.2)',
               ],
               borderWidth: 1,
-              dragData: true,
+              dragData: true, // User's predictions are draggable
           },
+          // Settings for graph of forecasted deaths
           {
               label: 'Estimated Deaths',
               data: Object.values(this.props.data),
@@ -128,7 +138,9 @@ class LineChart extends React.Component {
               ],
               borderWidth: 1,
               dragData: false,
-          }, {
+          }, 
+          // Settings for graph of confirmed deaths
+          {
               label: 'Confirmed Deaths',
               data: Object.values(this.props.confirmed),
               backgroundColor: [
@@ -189,7 +201,7 @@ class LineChart extends React.Component {
 }
 
 
-
+// ModelChart component
 class ModelsChart extends React.Component {
   constructor(props) {
     super(props);
@@ -210,30 +222,10 @@ class ModelsChart extends React.Component {
         text: 'All Model Forecasts',
         fontSize: 30
       },
-      dragData: true,
-      dragDataRound: 1,
-      dragOptions: {
-        showTooltip: true
-      },
-      onDragStart: function(e) {
-        // console.log(e)
-      },
-      onDrag: function(e, datasetIndex, index, value) {
-        e.target.style.cursor = 'grabbing'
-      },
-      onDragEnd: function(e, datasetIndex, index, value) {
-        e.target.style.cursor = 'default' 
-      },
-      hover: {
-        onHover: function(e) {
-          const point = this.getElementAtEvent(e)
-          if (point.length) e.target.style.cursor = 'grab'
-          else e.target.style.cursor = 'default'
-        }
-      }
     };
 
     var datasets = [];
+    // Set colors for each organization
     var colors = {
       'Columbia': 'rgba(172, 204, 230, 0.2)',
       'Georgia Tech': 'rgba(179, 163, 105​, 0.8)',
@@ -244,18 +236,18 @@ class ModelsChart extends React.Component {
     for (var i = 0; i < this.props.data.length; i++) {
       console.log(this.props.orgs[i]);
       console.log(this.props.data[i]);
+      // Add each models data to datasets
       datasets.push({
         label: this.props.orgs[i],
         data: Object.values(this.props.data[i]),
         backgroundColor: [
-          //'rgba(255, 99, 130, 0.2)',
           colors[this.props.orgs[i]]
         ],
         borderWidth: 1,
-        dragData: true,
       })
     }
 
+    // Create chart with all models
     this.myChart = new Chart(this.chartRef.current, {
       type: 'line',
       data: {
@@ -278,6 +270,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
+    // Store data in state
     this.state = {
       data: collectData()[0],
       orgs: collectData()[1],
