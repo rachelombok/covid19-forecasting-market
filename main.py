@@ -156,8 +156,11 @@ def home():
         update_score(session['username'], gained)
         return redirect(url_for('results'))
     else:
-        user_prediction = get_user_prediction(session['username'])
-        return render_template("home.html", user_prediction=user_prediction)
+        if 'username' in session:
+            user_prediction = get_user_prediction(session['username'])
+            return render_template("home.html", user_prediction=user_prediction)
+        else:
+            return redirect(url_for('signin'))
 
 @app.route("/about")
 def about():
