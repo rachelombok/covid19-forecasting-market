@@ -212,9 +212,14 @@ def forecasts():
 def us_confirmed():
     return data['us_cum_deaths']
 
-@app.route('/us-new-deaths')
+@app.route('/us-new-deaths-raw')
 def new_deaths():
     return data['us_new_deaths']
+
+@app.route('/us-new-deaths')
+def display_us_new_deaths():
+    return render_template('new-deaths.html')
+    print('new deaths done')
 
 @app.route("/mse")
 def mse():
