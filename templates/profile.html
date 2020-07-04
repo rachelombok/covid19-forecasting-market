@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+        <title></title>
+	</head>
+	<body>
+
+		<h1>Your Profile</h1>
+		{% for u in user %}
+		<div>
+			<p><b>Name: </b>{{ u['name'] }}</p>
+			<p><b>Poll score: </b>{{ u['score'] }}</ps>
+		</div>
+		{% endfor %}
+	</body>
+</html>
