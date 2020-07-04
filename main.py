@@ -8,35 +8,23 @@ import json
 #import json
 #import pandas as pd
 from get_estimates import get_forecasts, get_accuracy_for_all_models, get_daily_confirmed_df, get_us_confirmed
-
+from confirmed import get_us_new_deaths
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
 app.permanent_session_lifetime = timedelta(days=7)
-
-# Get forecasts data when initially launching website6
-forecast_data = get_forecasts()
-
-# Get confirmed cases in US
-us_data = get_us_confirmed()
-
-#get user pred
-
-
 # set up pymongo
 #app.config["MONGO_URI"] = "mongodb://localhost:27017/covid19-forecast"
 app.config['MONGO_URI'] = "mongodb+srv://test:test@cluster0-3qghj.mongodb.net/covid19-forecast?retryWrites=true&w=majority"
 mongo = PyMongo(app)
-# mongo.db.users.insert_one({"username":"john"})
-
-# methods for authentication and registration
-
+data = {}
 
 def store_session(id, name, username):
     session['id'] = str(id)
     session['name'] = name
     session['username'] = username
 
+# methods for authentication and registration
 def authenticate(username, password):
     user = mongo.db.users.find_one(
         {"username": username})
@@ -122,22 +110,27 @@ def update_user_prediction(username, model, data):
 
 def get_user_prediction(username):
     user_prediction = {}
-    for model in forecast_data:
+    for model in data['forecast_data']:
         exists = mongo.db.predictions.find_one({"username": username, "model": model})
         if exists:
             #print('exists')
             user_prediction[model] = exists['prediction']
         else:
             #print("doesn't exist")
-            user_prediction[model] = forecast_data[model]
+            user_prediction[model] = data['forecast_data'][model]
     #print(json.dumps(user_prediction['UCLA']))
     return user_prediction
 
 
-@app.before_request
+@app.before_first_request
 def make_session_permanent():
     session.permanent = True
-
+    # Get forecasts data when initially launching website6
+    data['forecast_data'] = get_forecasts()
+    # Get confirmed cases in US
+    data['us_cum_deaths'] = get_us_confirmed()
+    # Get new deaths in US
+    data['us_new_deaths'] = get_us_new_deaths('2020-05-01','2020-07-03')
 
 @app.route("/")
 def template():
@@ -213,11 +206,15 @@ def logout():
 
 @app.route("/forecasts")
 def forecasts():
-    return json.dumps(forecast_data)
+    return data['forecast_data']
 
-@app.route("/us_confirmed")
+@app.route("/us-cum-deaths")
 def us_confirmed():
-    return us_data
+    return data['us_cum_deaths']
+
+@app.route('/us-new-deaths')
+def new_deaths():
+    return data['us_new_deaths']
 
 @app.route("/mse")
 def mse():
@@ -233,7 +230,7 @@ def results():
 @app.route("/total")
 def total():
     results = {}
-    for model in forecast_data:
+    for model in data['forecast_data']:
         results[model] = fetch_votes(model)
     return json.dumps(results)
 
