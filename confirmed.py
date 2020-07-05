@@ -15,6 +15,6 @@ def get_us_new_deaths(start_date, end_date):
     df = df[df['date'] >= start_date]
     df = df[df['date'] <= end_date]
     df.reset_index(drop=True, inplace=True)
-    return df.to_json()
+    return df.to_dict('list')
 
 #print(get_us_new_deaths('2020-06-01', '2020-07-03'))
