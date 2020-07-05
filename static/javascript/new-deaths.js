@@ -10,5 +10,5 @@ function collectConfirmedData() {
         } 
     });
 
-    console.log(data);
+    return data;
 }
