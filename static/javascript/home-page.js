@@ -51,7 +51,7 @@ function getConfirmed(input) {
 
   // Send data from Python to JavaScript
   $.ajax({
-    url: '/us-cum-deaths',
+    url: '/us_cum_deaths',
     type: 'get',
     dataType: 'html',
     async: false,
