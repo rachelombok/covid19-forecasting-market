@@ -121,6 +121,7 @@ class LineChart extends React.Component {
             ],
             borderWidth: 1,
             dragData: true,
+            radius: 2.5
           },
           // Settings for graph of forecasted deaths
           {
@@ -131,6 +132,8 @@ class LineChart extends React.Component {
               ],
               borderWidth: 1,
               dragData: false,
+              pointStyle: 'cross',
+              rotation: 45,
           }, 
           // Settings for graph of confirmed deaths
           {
@@ -141,6 +144,8 @@ class LineChart extends React.Component {
               ],
               borderWidth: 1,
               dragData: false,
+              pointStyle: 'cross',
+              rotation: 45,
           }
         ]
       },

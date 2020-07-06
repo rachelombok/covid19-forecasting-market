@@ -1,7 +1,4 @@
-//console.log(userPrediction);
 userPrediction = JSON.parse(userPrediction)
-console.log(userPrediction)
-
 //console.log(userPrediction)
 
 function addDays(date, days) {
@@ -37,7 +34,7 @@ function collectData() {
 
     var result = {};
     dates.forEach((key, i) => result[key] = values[i]);
-    console.log(result)
+    //console.log(result)
     results.push(result);
   }
 
@@ -78,7 +75,7 @@ function savePrediction(model, data) {
       window.location.href = "update";
   }*/
   });
-  console.log("done");
+  //console.log("done");
 }
 
 // Navbar component
@@ -114,7 +111,7 @@ class LineChart extends React.Component {
   componentDidMount() {
     var data = this.props.data;
     var model = this.props.org
-    console.log(userPrediction[model])
+    //console.log(userPrediction[model])
     this.myChart = new Chart(this.chartRef.current, {
       type: 'line',
       data: {
@@ -129,6 +126,7 @@ class LineChart extends React.Component {
               ],
               borderWidth: 1,
               dragData: true, // User's predictions are draggable
+              radius: 2.5
           },
           // Settings for graph of forecasted deaths
           {
@@ -139,6 +137,8 @@ class LineChart extends React.Component {
               ],
               borderWidth: 1,
               dragData: false,
+              pointStyle: 'cross',
+              rotation: 45,
           }, 
           // Settings for graph of confirmed deaths
           {
@@ -149,6 +149,8 @@ class LineChart extends React.Component {
               ],
               borderWidth: 1,
               dragData: false,
+              pointStyle: 'cross',
+              rotation: 45,
           }
         ]
       },
@@ -178,10 +180,10 @@ class LineChart extends React.Component {
           },
           onDragEnd: function(e, datasetIndex, index, value) {
             e.target.style.cursor = 'default';
-            console.log('value: ' + value);
-            console.log('index: ' + index);
+            //console.log('value: ' + value);
+            //console.log('index: ' + index);
             //var date = addDays(Object.keys(data)[0], index).toISOString().slice(0,10);
-            console.log(userPrediction[model]);
+            //console.log(userPrediction[model]);
             //update user prediction
             savePrediction(model, userPrediction[model]);
           },
@@ -229,7 +231,7 @@ class ModelsChart extends React.Component {
     // Set colors for each organization
     var colors = {
       'Columbia': 'rgba(172, 204, 230, 0.2)',
-      'Georgia Tech': 'rgba(179, 163, 105​, 0.8)',
+      'Georgia Tech': 'rgba(179, 163, 105​, 0.2)',
       'UCLA': 'rgba(39, 116, 174, 0.2)',
       'IHME': 'rgba(87, 175, 85, 0.2)',
       'Youyang Gu': 'rgba(196, 129, 14, 0.2)'
@@ -237,14 +239,17 @@ class ModelsChart extends React.Component {
     for (var i = 0; i < this.props.data.length; i++) {
       console.log(this.props.orgs[i]);
       console.log(this.props.data[i]);
+      console.log(colors[this.props.orgs[i]]);
       // Add each models data to datasets
       datasets.push({
         label: this.props.orgs[i],
         data: Object.values(this.props.data[i]),
-        backgroundColor: [
-          colors[this.props.orgs[i]]
-        ],
-        borderWidth: 1,
+        borderColor: colors[this.props.orgs[i]],
+        borderWidth: 4,
+        fill: false,
+        pointStyle: 'cross',
+        rotation: 45,
+        pointBorderWidth: 1
       })
     }
 
