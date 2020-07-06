@@ -9,8 +9,18 @@ from math import exp, pow
 def get_gaussian(x, a, b, c):
     return a * exp(-pow(x - b,2)/(2 * pow(c,2)))
 
+
+def get_gaussian_for_all(data, b):
+    new_data = []
+    a = 1000
+    c = 10000
+    for x in data['new_deaths']:
+        gaussian = a * exp(-pow(x - b,2)/(2 * pow(c,2)))
+        new_data.append(gaussian)
+    return new_data
+
 #print(gaussian(108507,1000,119733,10000))
-print(get_gaussian(108179,1000,119733,10000))
+#print(get_gaussian(108179,119733))
 
 #11226
 
