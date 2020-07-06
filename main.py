@@ -7,8 +7,8 @@ from bson.json_util import dumps, loads
 import json
 #import json
 #import pandas as pd
-from get_estimates import get_forecasts, get_accuracy_for_all_models, get_daily_confirmed_df, get_us_confirmed, get_daily_forecasts
-from confirmed import get_us_new_deaths
+from get_estimates import get_forecasts, get_accuracy_for_all_models, get_daily_confirmed_df, get_daily_forecasts
+from confirmed import get_us_new_deaths, get_us_confirmed
 
 
 app = Flask(__name__)
