@@ -32,8 +32,8 @@ function collectData() {
     var dates = forecast.target_end_date;
     var values = forecast.value;
 
-    var cases = getConfirmed(dates);
-    confirmed.push(cases);
+    //var cases = getConfirmed(dates);
+    //confirmed.push(cases);
 
     var result = {};
     dates.forEach((key, i) => result[key] = values[i]);
@@ -41,7 +41,7 @@ function collectData() {
     results.push(result);
   }
 
-  return [results, orgs, confirmed];
+  return [results, orgs];
 }
 
 
@@ -118,8 +118,7 @@ class LineChart extends React.Component {
       type: 'line',
       data: {
         labels: Object.keys(this.props.data),
-        datasets: [
-          // Settings for user prediction graph
+        datasets: [ // Settings for user prediction graph
           {
               label: "User's Prediciton",
               data: userPrediction[model].value,
@@ -140,15 +139,15 @@ class LineChart extends React.Component {
               dragData: false,
           }, 
           // Settings for graph of confirmed deaths
-          {
-              label: 'Confirmed Deaths',
-              data: Object.values(this.props.confirmed),
-              backgroundColor: [
-                'rgba(130, 99, 255, 0.2)',
-              ],
-              borderWidth: 1,
-              dragData: false,
-          }
+          //{
+              //label: 'Confirmed Deaths',
+              //data: Object.values(this.props.confirmed),
+              //backgroundColor: [
+                //'rgba(130, 99, 255, 0.2)',
+              //],
+              //borderWidth: 1,
+              //dragData: false,
+          //}
         ]
       },
       options: {
@@ -264,42 +263,32 @@ class ModelsChart extends React.Component {
   }
 }
 
+function LineCharts({ dataSet, orgs }) {
+  return dataSet.map((data, index) => {
+    return (
+      <LineChart data={data} org={orgs[index]} />
+     );
+  })
+}
 
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
-    // Store data in state
-    this.state = {
-      data: collectData()[0],
-      orgs: collectData()[1],
-      confirmed: collectData()[2]
-    };
+    const data = collectData();
+    this.state = { data: data[0], orgs: data[1] };
   }
 
   render() {
+    const { data, orgs } = this.state;
     return (
       <div>
         <Navbar/>
-        <div>
-          [Page content here]
-        </div>
-        <LineChart data={this.state.data[0]} org={this.state.orgs[0]} confirmed={this.state.confirmed[0]} />
-        <br></br>
-        <LineChart data={this.state.data[1]} org={this.state.orgs[1]} confirmed={this.state.confirmed[1]} />
-        <br></br>
-        <LineChart data={this.state.data[2]} org={this.state.orgs[2]} confirmed={this.state.confirmed[2]} />
-        <br></br>
-        <LineChart data={this.state.data[3]} org={this.state.orgs[3]} confirmed={this.state.confirmed[3]} />
-        <br></br>
-        <LineChart data={this.state.data[4]} org={this.state.orgs[4]} confirmed={this.state.confirmed[4]} />
-        <br></br>
-
-        <ModelsChart data={this.state.data} orgs={this.state.orgs}/>
-        <br></br>
+        <LineCharts dataSet={data} orgs={orgs} />
+        <ModelsChart data={data} orgs={orgs} />
       </div>
-    )
+    );
   }
 }
 
@@ -307,7 +296,3 @@ ReactDOM.render(
     <App />,
     document.getElementById('app')
 );
-
-
-
-
