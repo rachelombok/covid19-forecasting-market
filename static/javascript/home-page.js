@@ -73,7 +73,7 @@ function savePrediction(model, data) {
     type : 'POST',
     url : "/update/",
     contentType: 'application/json;charset=UTF-8',
-    data : JSON.stringify({"model": model, "data": data}),
+    data : JSON.stringify({"model": model, "category": "cum", "data": data}),
     /*success: function(){
       window.location.href = "update";
   }*/
@@ -114,7 +114,7 @@ class LineChart extends React.Component {
   componentDidMount() {
     var data = this.props.data;
     var model = this.props.org
-    console.log(userPrediction[model].value)
+    console.log(userPrediction[model])
     this.myChart = new Chart(this.chartRef.current, {
       type: 'line',
       data: {
@@ -123,7 +123,7 @@ class LineChart extends React.Component {
           // Settings for user prediction graph
           {
               label: "User's Prediciton",
-              data: userPrediction[model].value,
+              data: userPrediction[model],
               backgroundColor: [
                 'rgba(64, 64, 64, 0.2)',
               ],

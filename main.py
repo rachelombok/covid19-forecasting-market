@@ -9,16 +9,17 @@ import json
 #import pandas as pd
 from get_estimates import get_forecasts, get_accuracy_for_all_models, get_daily_confirmed_df, get_daily_forecasts
 from confirmed import get_us_new_deaths, get_us_confirmed
+from gaussian import get_gaussian_for_all
 
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
 app.permanent_session_lifetime = timedelta(days=7)
 
-us_cum_forecasts = get_forecasts()
-us_cum_confirmed = get_us_confirmed()
-us_inc_forecasts = get_daily_forecasts()
-us_inc_confirmed = get_us_new_deaths()
+#us_cum_forecasts = get_forecasts()
+#us_cum_confirmed = get_us_confirmed()
+#us_inc_forecasts = get_daily_forecasts()
+#us_inc_confirmed = get_us_new_deaths()
 
 # set up pymongo
 #app.config["MONGO_URI"] = "mongodb://localhost:27017/covid19-forecast"
@@ -103,29 +104,40 @@ def update_score(username, score):
     #print("score updated")
 
 #data: a list containing predicted number of deaths
-def update_user_prediction(username, model, data):
-    pred = mongo.db.predictions.find_one({"username": username, "model": model})
+def update_user_prediction(username, model, data, category, b=None, higher=False, index=None):
+    #Get gaussian bump
+    if category == "daily":
+        print("get gaussian")
+        print(data)
+        data = get_gaussian_for_all(data, index, higher)
+        print(data)
+    pred = mongo.db.predictions.find_one({"username": username, "category": category, "model": model})
     #print(pred)
     if pred:
         #print("already exists")
-        mongo.db.predictions.update_one({"username": username, "model": model}, 
+        mongo.db.predictions.update_one({"username": username, "category": category, "model": model}, 
         {'$set': 
             { "prediction": data }
         })
     else:
-        mongo.db.predictions.insert_one({"username": username, "model": model, "prediction": data})
+        mongo.db.predictions.insert_one({"username": username, "category": category, "model": model, "prediction": data})
         #print("added new")
 
-def get_user_prediction(username):
+def get_user_prediction(username, category):
     user_prediction = {}
-    for model in data['forecast_data']:
-        exists = mongo.db.predictions.find_one({"username": username, "model": model})
+    for model in data['us_cum_forecasts']:
+        exists = mongo.db.predictions.find_one({"username": username, "category": category, "model": model})
         if exists:
-            #print('exists')
+            print('exists')
             user_prediction[model] = exists['prediction']
         else:
-            #print("doesn't exist")
-            user_prediction[model] = data['forecast_data'][model]
+            print(category)
+            if category is "daily":
+                print("is daily")
+                print(data['us_inc_forecasts'][model]['value'])
+                user_prediction[model] = data['us_inc_forecasts'][model]['value']
+            else: 
+                user_prediction[model] = data['us_cum_forecasts'][model]['value']
     #print(json.dumps(user_prediction['UCLA']))
     return user_prediction
 
@@ -134,12 +146,17 @@ def get_user_prediction(username):
 def make_session_permanent():
     session.permanent = True
     # Get forecasts data when initially launching website6
-    data['forecast_data'] = get_forecasts()
+    data['us_cum_forecasts'] = get_forecasts()
+    print("cum forecasts")
     # Get confirmed cases in US
-    data['us_cum_deaths'] = get_us_confirmed()
+    data['us_cum_confirmed'] = get_us_confirmed()
+    print("cum confirmed")
+    data['us_inc_forecasts'] = get_daily_forecasts()
+    print("inc forecasts")
     # Get new deaths in US
-    #data['us_new_deaths'] = get_us_new_deaths('2020-05-01','2020-07-03')
-    data['us_new_deaths'] = get_us_new_deaths()
+    data['us_inc_confirmed'] = get_us_new_deaths()
+    print("inc confirmed")
+
     #print(data)
 
 @app.route("/")
@@ -160,7 +177,7 @@ def home():
         return redirect(url_for('results'))
     else:
         if 'username' in session:
-            user_prediction = get_user_prediction(session['username'])
+            user_prediction = get_user_prediction(session['username'], 'cum')
             return render_template("home.html", user_prediction=user_prediction)
         else:
             return redirect(url_for('signin'))
@@ -202,7 +219,7 @@ def signup():
             flash("Username is already taken")
             return redirect(url_for("signin"))
     else:
-        return render_template("signin.html")
+        return redirect(url_for("signin"))
 
 
 @app.route("/logout")
@@ -216,28 +233,34 @@ def logout():
 
 @app.route("/forecasts")
 def forecasts():
-    return us_cum_forecasts
+    return data['us_cum_forecasts']
     #return data['forecast_data']
 
 @app.route("/daily_forecasts")
 def daily_forecasts():
-    return us_inc_forecasts
+    return data['us_inc_forecasts']
     #return data['daily_forecast_data']
 
 @app.route("/us_cum_deaths")
 def us_confirmed():
-    return us_cum_confirmed
+    return data['us_cum_confirmed']
     #return data['us_cum_deaths']
 
 @app.route('/us-new-deaths-raw')
 def new_deaths():
     #print(us_inc_confirmed)
-    return us_inc_confirmed
+    return data['us_inc_confirmed']
     #return data['us_new_deaths']
 
 @app.route('/us_daily_deaths')
 def us_daily_deaths():
-    return render_template('new-deaths.html')
+    if 'username' in session:
+            user_prediction = get_user_prediction(session['username'], 'daily')
+            print(user_prediction)
+            print("printed!")
+            return render_template('new-deaths.html', user_prediction=user_prediction)
+    else:
+        return redirect(url_for('signin'))
 
 @app.route("/mse")
 def mse():
@@ -253,7 +276,7 @@ def results():
 @app.route("/total")
 def total():
     results = {}
-    for model in data['forecast_data']:
+    for model in data['us_cum_forecasts']:
         results[model] = fetch_votes(model)
     return json.dumps(results)
 
@@ -275,8 +298,14 @@ def profile():
 def update():
     if request.method == 'POST':
         data = request.json
-        #print(data['model'])
-        update_user_prediction(session['username'], data['model'], data['data'])
+        print(type(data['category']))
+        print("category printed")
+        if data['category'] == 'daily':
+            update_user_prediction(session['username'], data['model'], data['data'], data['category'], data['changed_value'], data['higher'], data['index'])
+            #user_prediction = get_user_prediction(session['username'], "daily")
+            #render_template('new-deaths.html', user_prediction=user_prediction)
+        else:
+            update_user_prediction(session['username'], data['model'], data['data'], data['category'])
         return "Success"
     return 'None'
 

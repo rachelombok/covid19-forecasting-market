@@ -22,6 +22,9 @@
 
   <body>
     <div id="app"></div>
+    <script type="text/javascript">
+      var userPrediction = '{{ user_prediction | tojson}}';
+    </script>
     <script type='text/babel' src="{{ url_for('static', filename='javascript/new-deaths.js') }}"></script>
   </body>
 </html>

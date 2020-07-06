@@ -1,3 +1,7 @@
+//Get User's Prediction
+userPrediction = JSON.parse(userPrediction)
+console.log(userPrediction)
+
 // Retrieve all daily death data
 function collectData() {
   var data = null;
@@ -54,7 +58,20 @@ function getConfirmed(input) {
   return result;
 }
 
+//Send user's prediction to python
+function savePrediction(model, data, index, changedValue, higher) {
+  console.log(data);
+  $.ajax({
+    type : 'POST',
+    url : "/update/",
+    contentType: 'application/json;charset=UTF-8',
+    data : JSON.stringify({"model": model, "category": "daily","index": index,"data": data, "changed_value": changedValue, "higher": higher}),
+    success: function(){
+      window.location.href = "us_daily_deaths";
+  }
+  });
 
+}
 // Navbar component
 class Navbar extends React.Component {
     render() {
@@ -87,12 +104,24 @@ class LineChart extends React.Component {
 
   componentDidMount() {
     var data = this.props.data;
-    var model = this.props.org
+    var model = this.props.org;
+    var userPredictionDataCopy = userPrediction[model].slice();
+    console.log(userPredictionDataCopy)
     this.myChart = new Chart(this.chartRef.current, {
       type: 'line',
       data: {
         labels: Object.keys(this.props.data),
         datasets: [
+          //Settings for graph of user's prediction
+          {
+            label: "User's Prediction",
+            data: userPrediction[model],
+            backgroundColor: [
+                'rgba(100, 99, 130, 0.2)',
+            ],
+            borderWidth: 1,
+            dragData: true,
+          },
           // Settings for graph of forecasted deaths
           {
               label: 'Estimated Daily Deaths',
@@ -141,6 +170,17 @@ class LineChart extends React.Component {
           },
           onDragEnd: function(e, datasetIndex, index, value) {
             e.target.style.cursor = 'default';
+            //value increased
+            var originalValue = userPredictionDataCopy[index]
+            console.log(originalValue)
+            if (value > originalValue) {
+              console.log("higher")
+              savePrediction(model, userPredictionDataCopy, index, value, true)
+            }
+            else if (value < originalValue) {
+              console.log("lower")
+              savePrediction(model, userPredictionDataCopy, index, value, false)
+            }
           },
           hover: {
             onHover: function(e) {
