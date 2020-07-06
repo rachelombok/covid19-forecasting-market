@@ -104,12 +104,12 @@ def update_score(username, score):
     #print("score updated")
 
 #data: a list containing predicted number of deaths
-def update_user_prediction(username, model, data, category, b=None, higher=False, index=None):
+def update_user_prediction(username, model, data, category, a=None, higher=False, index=None):
     #Get gaussian bump
     if category == "daily":
         print("get gaussian")
         print(data)
-        data = get_gaussian_for_all(data, index, higher)
+        data = get_gaussian_for_all(data, a, index, higher)
         print(data)
     pred = mongo.db.predictions.find_one({"username": username, "category": category, "model": model})
     #print(pred)
@@ -301,6 +301,8 @@ def update():
         print(type(data['category']))
         print("category printed")
         if data['category'] == 'daily':
+            print('index')
+            print(data['index'])
             update_user_prediction(session['username'], data['model'], data['data'], data['category'], data['changed_value'], data['higher'], data['index'])
             #user_prediction = get_user_prediction(session['username'], "daily")
             #render_template('new-deaths.html', user_prediction=user_prediction)

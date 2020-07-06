@@ -175,11 +175,11 @@ class LineChart extends React.Component {
             console.log(originalValue)
             if (value > originalValue) {
               console.log("higher")
-              savePrediction(model, userPredictionDataCopy, index, value, true)
+              savePrediction(model, userPredictionDataCopy, index, value - originalValue, true)
             }
             else if (value < originalValue) {
               console.log("lower")
-              savePrediction(model, userPredictionDataCopy, index, value, false)
+              savePrediction(model, userPredictionDataCopy, index, originalValue - value, false)
             }
           },
           hover: {
