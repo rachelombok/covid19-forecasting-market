@@ -51,7 +51,7 @@ function getConfirmed(input) {
 
   // Send data from Python to JavaScript
   $.ajax({
-    url: '/us-cum-deaths',
+    url: '/us_cum_deaths',
     type: 'get',
     dataType: 'html',
     async: false,
@@ -93,6 +93,7 @@ class Navbar extends React.Component {
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
                     <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-item nav-link" href="#">Daily Deaths <span class="sr-only">(current)</span></a>
                     <a class="nav-item nav-link" href="#">About</a>
                 </div>
                 </div>

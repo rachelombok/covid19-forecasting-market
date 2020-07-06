@@ -7,14 +7,18 @@ from bson.json_util import dumps, loads
 import json
 #import json
 #import pandas as pd
-from get_estimates import get_forecasts, get_accuracy_for_all_models, get_daily_confirmed_df, get_us_confirmed
-from confirmed import get_us_new_deaths
+from get_estimates import get_forecasts, get_accuracy_for_all_models, get_daily_confirmed_df, get_daily_forecasts
+from confirmed import get_us_new_deaths, get_us_confirmed
 
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
 app.permanent_session_lifetime = timedelta(days=7)
 
+us_cum_forecasts = get_forecasts()
+us_cum_confirmed = get_us_confirmed()
+us_inc_forecasts = get_daily_forecasts()
+us_inc_confirmed = get_us_new_deaths()
 
 # set up pymongo
 #app.config["MONGO_URI"] = "mongodb://localhost:27017/covid19-forecast"
@@ -134,7 +138,9 @@ def make_session_permanent():
     # Get confirmed cases in US
     data['us_cum_deaths'] = get_us_confirmed()
     # Get new deaths in US
-    data['us_new_deaths'] = get_us_new_deaths('2020-05-01','2020-07-03')
+    #data['us_new_deaths'] = get_us_new_deaths('2020-05-01','2020-07-03')
+    data['us_new_deaths'] = get_us_new_deaths()
+    #print(data)
 
 @app.route("/")
 def template():
@@ -210,20 +216,28 @@ def logout():
 
 @app.route("/forecasts")
 def forecasts():
-    return data['forecast_data']
+    return us_cum_forecasts
+    #return data['forecast_data']
 
-@app.route("/us-cum-deaths")
+@app.route("/daily_forecasts")
+def daily_forecasts():
+    return us_inc_forecasts
+    #return data['daily_forecast_data']
+
+@app.route("/us_cum_deaths")
 def us_confirmed():
-    return data['us_cum_deaths']
+    return us_cum_confirmed
+    #return data['us_cum_deaths']
 
 @app.route('/us-new-deaths-raw')
 def new_deaths():
-    return data['us_new_deaths']
+    #print(us_inc_confirmed)
+    return us_inc_confirmed
+    #return data['us_new_deaths']
 
-@app.route('/us-new-deaths')
-def display_us_new_deaths():
+@app.route('/us_daily_deaths')
+def us_daily_deaths():
     return render_template('new-deaths.html')
-    print('new deaths done')
 
 @app.route("/mse")
 def mse():
