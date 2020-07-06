@@ -18,7 +18,7 @@ app.permanent_session_lifetime = timedelta(days=7)
 us_cum_forecasts = get_forecasts()
 us_cum_confirmed = get_us_confirmed()
 us_inc_forecasts = get_daily_forecasts()
-us_inc_confirmed = get_us_new_deaths('2020-05-01','2020-07-03')
+us_inc_confirmed = get_us_new_deaths()
 
 # set up pymongo
 #app.config["MONGO_URI"] = "mongodb://localhost:27017/covid19-forecast"
@@ -138,8 +138,9 @@ def make_session_permanent():
     # Get confirmed cases in US
     data['us_cum_deaths'] = get_us_confirmed()
     # Get new deaths in US
-    data['us_new_deaths'] = get_us_new_deaths('2020-05-01','2020-07-03')
-    print(data)
+    #data['us_new_deaths'] = get_us_new_deaths('2020-05-01','2020-07-03')
+    data['us_new_deaths'] = get_us_new_deaths()
+    #print(data)
 
 @app.route("/")
 def template():
@@ -230,6 +231,7 @@ def us_confirmed():
 
 @app.route('/us-new-deaths-raw')
 def new_deaths():
+    #print(us_inc_confirmed)
     return us_inc_confirmed
     #return data['us_new_deaths']
 

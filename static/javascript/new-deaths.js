@@ -1,26 +1,4 @@
-/*function collectConfirmedData() {
-    var data = null;
-    $.ajax({
-        url: '/us-new-deaths-raw',
-        type: 'GET',
-        dataType: 'html',
-        async: false,
-        success: function(response) {
-            data = $.parseJSON(response);
-        } 
-    });
-    console.log(data);
-    return data;
-}*/
-
-function addDays(date, days) {
-  var result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
-}
-
-
-// Retrieve all cumulative death data
+// Retrieve all daily death data
 function collectData() {
   var data = null;
   $.ajax({
@@ -33,7 +11,6 @@ function collectData() {
     } 
   });
   var orgs = Object.keys(data);
-  console.log(data);
   
   var results = [];
   var confirmed = [];
@@ -47,7 +24,6 @@ function collectData() {
 
     var result = {};
     dates.forEach((key, i) => result[key] = values[i]);
-    //console.log(result)
     results.push(result);
   }
 
@@ -55,7 +31,7 @@ function collectData() {
 }
 
 
-// Get confirmed deaths (cumulative)
+// Get confirmed deaths (daily)
 function getConfirmed(input) {
   var data = null;
 
@@ -215,8 +191,6 @@ class ModelsChart extends React.Component {
       'Youyang Gu': 'rgba(196, 129, 14, 0.2)'
     }
     for (var i = 0; i < this.props.data.length; i++) {
-      //console.log(this.props.orgs[i]);
-      //console.log(this.props.data[i]);
       // Add each models data to datasets
       datasets.push({
         label: this.props.orgs[i],
