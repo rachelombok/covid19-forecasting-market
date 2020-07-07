@@ -13,7 +13,7 @@ def get_gaussian(x, a, b, c):
 def get_gaussian_for_all(data, a, b, higher):
     b *= 10
     new_data = []
-    c = 60
+    c = 7
     #for x in data:
     for x in range(0, len(data)):
         x *= 10
