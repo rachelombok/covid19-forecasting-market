@@ -18,7 +18,7 @@ def get_forecasts():
     models = dict()
     for line in file:
         df = pd.read_csv(line.strip())
-        df = df.loc[df['location_name'] == 'US']
+        df = df.loc[df['location'] == 'US']
         df = df.loc[df['type'] == 'point']
         df = df.loc[df['target'].str.contains("cum death")]
         df = df[['target_end_date', 'value']]
