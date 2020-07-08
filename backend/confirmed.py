@@ -26,5 +26,5 @@ def get_us_confirmed():
         d = datetime.strptime(col, "%m/%d/%y")
         d = d.strftime("%Y-%m-%d")
         cases_dict[d] = str(df.at[0, col])
-    return json.dumps(cases_dict)
+    return cases_dict
 
