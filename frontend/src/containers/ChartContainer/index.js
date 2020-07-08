@@ -22,16 +22,17 @@ class ChartContainer extends React.Component {
   }
 
   componentDidMount() {
-    fetch('/forecasts').then(res => res.json()).then(data => {
+    fetch('/us-cum-deaths-forecasts').then(res => res.json()).then(data => {
       const [results, orgs] = organizeData(data);
       this.setState({ data: results, orgs });
     });
     fetch('/user-prediction').then(res => res.json()).then(data => {
       this.setState({ userPrediction: data });
     });
-    fetch('/us_confirmed').then(res => res.json()).then(data => {
-      const result = JSON.parse(data);
-      this.setState({ confirmed: result });
+    fetch('/us-cum-deaths-confirmed').then(res => res.json()).then(data => {
+      console.log(typeof data)
+      //const result = JSON.parse(data);
+      this.setState({ confirmed: data });
     });
   }
 
