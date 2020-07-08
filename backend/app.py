@@ -14,10 +14,10 @@ app.secret_key = "super secret key"
 app.permanent_session_lifetime = timedelta(days=7)
 
 # Get forecasts data when initially launching website6
-#forecast_data = get_forecasts()
+forecast_data = get_forecasts()
 
 # Get confirmed cases in US
-#us_data = get_us_confirmed()
+us_data = get_us_confirmed()
 
 # set up pymongo
 #app.config["MONGO_URI"] = "mongodb://localhost:27017/covid19-forecast"
@@ -105,7 +105,8 @@ def home():
 
 @app.route("/us-cum-deaths-forecasts")
 def us_cum_deaths_forecasts():
-    return data['us_cum_forecasts']
+    return forecast_data
+    #return data['us_cum_forecasts']
 
 @app.route("/us-inc-deaths-forecasts")
 def us_inc_deaths_forecasts():
@@ -113,7 +114,8 @@ def us_inc_deaths_forecasts():
 
 @app.route("/us-cum-deaths-confirmed")
 def us_cum_deaths_confirmed():
-    return data['us_cum_confirmed']
+    return us_data
+    #return data['us_cum_confirmed']
 
 @app.route('/us-inc-deaths-confirmed')
 def us_inc_deaths_confirmed():
