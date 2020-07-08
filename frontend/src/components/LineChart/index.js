@@ -2,6 +2,7 @@ import React from 'react';
 import Chart from 'chart.js';
 import 'chartjs-plugin-dragdata';
 import PropTypes from 'prop-types';
+import { cleanConfirmedData } from '../../utils/data';
 
 class LineChart extends React.Component {
   constructor(props) {
@@ -27,7 +28,9 @@ class LineChart extends React.Component {
   renderChart() {
     const { data, org, userPrediction, confirmed } = this.props;
     const model = org;
+    const confirmedResult = cleanConfirmedData(confirmed, Object.keys(data));
     const savePrediction = this.savePrediction;
+    
     this.myChart = new Chart(this.chartRef.current, {
       type: 'line',
       data: {
@@ -55,7 +58,7 @@ class LineChart extends React.Component {
           // Settings for graph of confirmed deaths
           {
               label: 'Confirmed Deaths',
-              data: Object.values(confirmed),
+              data: Object.values(confirmedResult),
               backgroundColor: [
                 'rgba(130, 99, 255, 0.2)',
               ],

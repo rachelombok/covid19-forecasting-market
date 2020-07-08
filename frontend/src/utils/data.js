@@ -1,8 +1,7 @@
-export const cleanConfirmedData = (data) => {
+export const cleanConfirmedData = (data, dates) => {
   var result = {};
-  for (var i = 0; i < data.length; i++) {
-    var date = data[i];
-    result[date] = data[date];
+  for (var i = 0; i < dates.length; i++) {
+    result[dates[i]] = data[dates[i]];
   }
   return result;
 };
@@ -18,7 +17,6 @@ export const organizeData = (data) => {
 
     var result = {};
     dates.forEach((key, i) => result[key] = values[i]);
-    console.log(result)
     results.push(result);
   }
 

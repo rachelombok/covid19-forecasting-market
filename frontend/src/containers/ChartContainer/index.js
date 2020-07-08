@@ -30,7 +30,7 @@ class ChartContainer extends React.Component {
       this.setState({ userPrediction: data });
     });
     fetch('/us_confirmed').then(res => res.json()).then(data => {
-      const result = cleanConfirmedData(data);
+      const result = JSON.parse(data);
       this.setState({ confirmed: result });
     });
   }
