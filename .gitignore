@@ -5,5 +5,4 @@ flask/
 __pycache__/
 .flaskenv
 .DS_Store
-static/javascript/gaussian.js
-templates/gaussian.html
+*.pyc 
