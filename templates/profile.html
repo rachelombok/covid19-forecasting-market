@@ -2,11 +2,14 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-        <title></title>
+		<title></title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
 	</head>
 	<body>
 
 		<h1>Your Profile</h1>
+		<div id="App"></div>
+		<script type='text/babel' src="{{ url_for('static', filename='javascript/file-upload-component.js') }}"></script>
 		{% for u in user %}
 		<div>
 			<p><b>Name: </b>{{ u['name'] }}</p>

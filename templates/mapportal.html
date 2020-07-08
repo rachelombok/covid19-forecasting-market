@@ -10,6 +10,7 @@
    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
    crossorigin=""></script>
    <script src="{{url_for('static', filename='javascript/countries.js')}}"></script>
+   <script src="{{url_for('static', filename='javascript/us-states.js')}}"></script>
     </head>
     <style>
         #mapid { width: 100%;
@@ -35,7 +36,17 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
     tileSize: 512,
     zoomOffset: -1
 }).addTo(map);
-
+/*
+L.tileLayer.USA = L.tileLayer.extend({
+    getTileUrl: function(coords) {
+        return 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicmFjaGVsb21ib2siLCJhIjoiY2tjODZ6c3UzMTh3ZTJyb2JndHN0dXhlOSJ9.h8aubFClamI3kiUsjIgNTg';
+    },
+    id: 'mapbox/light-v9',
+    attribution: "bloop",
+    tileSize: 512,
+    zoomOffset: -1
+});
+*/
 function getColor(d) {
     return d > 1000 ? '#800026' :
            d > 500  ? '#BD0026' :
@@ -77,8 +88,31 @@ function resetHighlight(e){
     geojson.resetStyle(e.target);
 }
 
+function zoomToFeature(e) {
+    map.fitBounds(e.target.getBounds());
+}
+
 function redirectFeature(e) {
-    window.location.href = '/home';
+    var marker = e.target;
+    layer = window[e.target.geoJson.id];
+    window.alert(layer._leaflet_id);
+    //console.log(e.target.layer.id);
+    if (e.layer.id == 'USA'){
+        zoomToFeature;
+
+    }
+    else{
+        window.location.href = '/home';
+    }
+    
+}
+
+function clickOnMapItem(itemId) {
+    var id = parseInt(itemId);
+    //get target layer by it's id
+    var layer = geojson.getLayer(id);
+    //fire event 'click' on target layer 
+    layer.fireEvent('click');  
 }
 
 function onEachFeature(feature, layer) {
@@ -88,9 +122,12 @@ function onEachFeature(feature, layer) {
         mouseout: resetHighlight,
         click: redirectFeature
     });
+    layer._leaflet_id = feature.id;
 }
 
 geojson = L.geoJson(countries, {style: style, onEachFeature: onEachFeature}).addTo(map);
+//L.geoJson(statesData).addTo(map);
+
      </script>
 	</body>
 </html>
