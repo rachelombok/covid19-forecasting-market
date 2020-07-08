@@ -29,6 +29,30 @@ def get_forecasts():
     return models
 
 
+# Get forecast data for all models as linked in model-links.csv
+def get_daily_forecasts():
+    file = open('orgs.csv', 'r')
+    orgs = []
+    for line in file:
+        orgs.append(line.strip())
+    orgs = orgs[::-1]
+    print(orgs)
+
+    file = open('model-links.csv', 'r')
+    models = dict()
+    for line in file:
+        df = pd.read_csv(line.strip())
+        df = df.loc[df['location'] == 'US']
+        df = df.loc[df['type'] == 'point']
+        df = df.loc[df['target'].str.contains("inc death")]
+        df = df[['target_end_date', 'value']]
+        df = df.sort_values('target_end_date')
+        df = df.drop_duplicates()
+        JSON = df.to_json()
+        models[orgs.pop()] = df.to_dict('list')
+    return models
+
+
 #pass in the df containing confirmed and predicted values
 def get_mse(model_df):
     confirmed = model_df['confirmed']
@@ -91,18 +115,8 @@ def get_daily_confirmed(d):
     # catch error!!
 
 
-# get confirmed cumulative deaths in the us
-def get_us_confirmed():
-    df = pd.read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv")
-    df = df.loc[df['Country/Region'] == 'US']
-    df = df.drop(['Province/State', 'Country/Region', 'Lat', 'Long'], axis=1)
-    df.reset_index(drop=True, inplace=True)
-    cases_dict = dict()
-    for col in df.columns:
-        d = datetime.strptime(col, "%m/%d/%y")
-        d = d.strftime("%Y-%m-%d")
-        cases_dict[d] = str(df.at[0, col])
-    return json.dumps(cases_dict)
 
 #print(get_accuracy_for_all_models())
 #print(get_daily_confirmed_df('2020-06-01', '2020-06-03'))
+
+#print(get_daily_forecasts())
