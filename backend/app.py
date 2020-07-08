@@ -19,6 +19,9 @@ forecast_data = get_forecasts()
 # Get confirmed cases in US
 us_data = get_us_confirmed()
 
+us_inc_forecasts = get_daily_forecasts()
+us_inc_confirmed = get_us_new_deaths()
+
 # set up pymongo
 #app.config["MONGO_URI"] = "mongodb://localhost:27017/covid19-forecast"
 app.config['MONGO_URI'] = "mongodb+srv://test:test@cluster0-3qghj.mongodb.net/covid19-forecast?retryWrites=true&w=majority"
@@ -110,7 +113,8 @@ def us_cum_deaths_forecasts():
 
 @app.route("/us-inc-deaths-forecasts")
 def us_inc_deaths_forecasts():
-    return data['us_inc_forecasts']
+    return us_inc_forecasts
+    #return data['us_inc_forecasts']
 
 @app.route("/us-cum-deaths-confirmed")
 def us_cum_deaths_confirmed():
@@ -119,7 +123,8 @@ def us_cum_deaths_confirmed():
 
 @app.route('/us-inc-deaths-confirmed')
 def us_inc_deaths_confirmed():
-    return data['us_inc_confirmed']
+    return us_inc_confirmed
+    #return data['us_inc_confirmed']
 
 @app.route('/update/', methods=['POST'])
 def update():
