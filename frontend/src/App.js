@@ -10,6 +10,7 @@ import {
   Switch,
   Route
 } from "react-router-dom";
+import Mapportal from './components/Mapportal';
 
 class App extends React.Component {
   render() {
@@ -20,6 +21,7 @@ class App extends React.Component {
           <Switch>
             <Route exact path={ROUTES.LANDING} component={LandingPage} />
             <Route exact path={ROUTES.US_NATIONAL} component={ChartContainer} />
+            <Route exact path={ROUTES.MAP_PORTAL} component={Mapportal} />
             <Route exact path="/blah">
               "BLAH PAGE"
             </Route>
