@@ -2,6 +2,9 @@ import React from 'react';
 import './App.css';
 import Navbar from './components/Navbar';
 import ChartContainer from './containers/ChartContainer';
+import LandingPage from './pages/LandingPage';
+import * as ROUTES from "./constants/routes";
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -15,9 +18,8 @@ class App extends React.Component {
         <div className="App">
           <Navbar />
           <Switch>
-            <Route exact path="/">
-              <ChartContainer />
-            </Route>
+            <Route exact path={ROUTES.LANDING} component={LandingPage} />
+            <Route exact path={ROUTES.US_NATIONAL} component={ChartContainer} />
             <Route exact path="/blah">
               "BLAH PAGE"
             </Route>
