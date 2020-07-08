@@ -5,24 +5,25 @@ from passlib.hash import pbkdf2_sha256
 from datetime import timedelta, date
 from bson.json_util import dumps, loads
 import json
-from get_estimates import get_forecasts, get_accuracy_for_all_models, get_daily_confirmed_df, get_us_confirmed
-
+from get_estimates import get_forecasts, get_accuracy_for_all_models, get_daily_confirmed_df, get_daily_forecasts
+from confirmed import get_us_new_deaths, get_us_confirmed
+from gaussian import get_gaussian_for_all
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
 app.permanent_session_lifetime = timedelta(days=7)
 
 # Get forecasts data when initially launching website6
-forecast_data = get_forecasts()
+#forecast_data = get_forecasts()
 
 # Get confirmed cases in US
-us_data = get_us_confirmed()
+#us_data = get_us_confirmed()
 
 # set up pymongo
 #app.config["MONGO_URI"] = "mongodb://localhost:27017/covid19-forecast"
 app.config['MONGO_URI'] = "mongodb+srv://test:test@cluster0-3qghj.mongodb.net/covid19-forecast?retryWrites=true&w=majority"
 mongo = PyMongo(app)
-
+data = {}
 
 def add_vote(id, pred_model):
     vote = mongo.db.votes.find_one(
@@ -72,26 +73,51 @@ def update_user_prediction(username, model, data):
 
 def get_user_prediction(username):
     user_prediction = {}
-    for model in forecast_data:
+    for model in data['us_cum_forecasts']:
         exists = mongo.db.predictions.find_one({"username": username, "model": model})
         if exists:
             user_prediction[model] = exists['prediction']
         else:
-            user_prediction[model] = forecast_data[model]
+            user_prediction[model] = data['us_cum_forecasts'][model]
     return user_prediction
+
+
+@app.before_first_request
+def make_session_permanent():
+    session.permanent = True
+    # Get forecasts data when initially launching website6
+    data['us_cum_forecasts'] = get_forecasts()
+    print("cum forecasts")
+    # Get confirmed cases in US
+    data['us_cum_confirmed'] = get_us_confirmed()
+    print("cum confirmed")
+    data['us_inc_forecasts'] = get_daily_forecasts()
+    print("inc forecasts")
+    # Get new deaths in US
+    data['us_inc_confirmed'] = get_us_new_deaths()
+    print("inc confirmed")
+
 
 @app.route("/user-prediction", methods=['POST','GET'])
 def home():
     user_prediction = get_user_prediction('testUsername')
     return json.dumps(user_prediction)
 
-@app.route("/forecasts")
-def forecasts():
-    return json.dumps(forecast_data)
+@app.route("/us-cum-deaths-forecasts")
+def us_cum_deaths_forecasts():
+    return data['us_cum_forecasts']
 
-@app.route("/us_confirmed")
-def us_confirmed():
-    return json.dumps(us_data)
+@app.route("/us-inc-deaths-forecasts")
+def us_inc_deaths_forecasts():
+    return data['us_inc_forecasts']
+
+@app.route("/us-cum-deaths-confirmed")
+def us_cum_deaths_confirmed():
+    return data['us_cum_confirmed']
+
+@app.route('/us-inc-deaths-confirmed')
+def us_inc_deaths_confirmed():
+    return data['us_inc_confirmed']
 
 @app.route('/update/', methods=['POST'])
 def update():
