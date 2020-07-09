@@ -29,12 +29,25 @@ class Leaderboard extends React.Component {
   }
 
   render() {
+    const tableStyle = {
+      width: "50%",
+      textAlign: "center",
+      margin: "0 25%"
+    };
+
     const { users } = this.state;
     if (!users) return 'Loading...';
 
     return (
       <div>
-        <table>
+        <h2>Leaderboard</h2>
+        <table style={tableStyle} className="table table-bordered table-hover table-sm">
+          <thead className="thead-dark">
+            <tr>
+              <th>User</th>
+              <th>Score</th>
+            </tr>
+          </thead>
           <tbody>
             {this.renderTable()}
           </tbody>
