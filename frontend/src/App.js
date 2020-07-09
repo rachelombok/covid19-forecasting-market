@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import ChartContainer from './containers/ChartContainer';
 import newDeathsContainer from './containers/newDeathsContainer';
 import LandingPage from './pages/LandingPage';
+import Leaderboard from './components/Leaderboard';
 import * as ROUTES from "./constants/routes";
 
 import {
@@ -24,6 +25,7 @@ class App extends React.Component {
             <Route exact path={ROUTES.US_NATIONAL_CUM} component={ChartContainer} />
             <Route exact path={ROUTES.US_NATIONAL_INC} component={newDeathsContainer} />
             <Route exact path={ROUTES.MAP_PORTAL} component={Mapportal} />
+            <Route exact path={ROUTES.LEADERBOARD} component={Leaderboard} />
             <Route exact path="/blah">
               "BLAH PAGE"
             </Route>

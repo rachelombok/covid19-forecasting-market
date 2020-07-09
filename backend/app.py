@@ -134,5 +134,10 @@ def update():
         return "Success"
     return 'None'
 
+@app.route('/leaderboard-data')
+def leaderboard():
+    all_users = list(mongo.db.users.find({},{'name': 1, 'score': 1}).sort('score',-1))
+    return dumps(all_users)
+
 if __name__ == "__main__":
     app.run(debug=True)
