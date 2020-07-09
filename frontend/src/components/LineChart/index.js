@@ -1,6 +1,7 @@
 import React from 'react';
 import Chart from 'chart.js';
 import 'chartjs-plugin-dragdata';
+import 'chartjs-plugin-zoom';
 import PropTypes from 'prop-types';
 import { cleanConfirmedData } from '../../utils/data';
 
@@ -101,13 +102,35 @@ class LineChart extends React.Component {
               if (point.length) e.target.style.cursor = 'grab'
               else e.target.style.cursor = 'default'
             }
+          },
+          responsive: true,
+          plugins: {
+            zoom: {
+              // Pan options
+              pan: {
+                enabled: true,
+                // Panning directions
+                mode: 'x',
+              },
+          
+              // Zoom options
+              zoom: {
+                enabled: true,
+                // Zooming directions,
+                mode: 'x',
+              }
+            }
           }
       }
     });
   }
 
   render() {
-    return <canvas ref={this.chartRef} />;
+    return (
+      <div class="chart-container" style={{position: "relative", width: "80vw", margin: "0 10%"}}>
+        <canvas ref={this.chartRef} />
+      </div>
+    );
   }
 }
 
