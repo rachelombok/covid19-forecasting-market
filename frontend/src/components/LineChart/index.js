@@ -45,6 +45,7 @@ class LineChart extends React.Component {
               ],
               borderWidth: 1,
               dragData: true, // User's predictions are draggable
+              radius: 2.5
           },
           // Settings for graph of forecasted deaths
           {
@@ -53,8 +54,11 @@ class LineChart extends React.Component {
               backgroundColor: [
                   'rgba(255, 99, 130, 0.2)',
               ],
-              borderWidth: 1,
+              borderWidth: 0.2,
               dragData: false,
+              pointStyle: 'cross',
+              rotation: 45,
+              pointBorderColor: 'black'
           }, 
           // Settings for graph of confirmed deaths
           {
@@ -63,8 +67,11 @@ class LineChart extends React.Component {
               backgroundColor: [
                 'rgba(130, 99, 255, 0.2)',
               ],
-              borderWidth: 1,
+              borderWidth: 0.2,
               dragData: false,
+              pointStyle: 'cross',
+              rotation: 45,
+              pointBorderColor: 'black'
           }
         ]
       },
@@ -129,6 +136,7 @@ class LineChart extends React.Component {
     return (
       <div class="chart-container" style={{position: "relative", width: "80vw", margin: "0 10%"}}>
         <canvas ref={this.chartRef} />
+        <br></br>
       </div>
     );
   }
