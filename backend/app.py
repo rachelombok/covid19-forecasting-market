@@ -134,10 +134,15 @@ def update():
         return "Success"
     return 'None'
 
-@app.route('/leaderboard-data')
+@app.route('/user-data')
 def leaderboard():
     all_users = list(mongo.db.users.find({},{'name': 1, 'score': 1}).sort('score',-1))
     return dumps(all_users)
+
+@app.route('/user')
+def profile():
+    user = mongo.db.users.find({'username': session['username']})
+    return json.dumps(user)
 
 if __name__ == "__main__":
     app.run(debug=True)
