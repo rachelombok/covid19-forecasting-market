@@ -1,5 +1,6 @@
 import React from 'react';
 import LineChart from '../../components/LineChart';
+import ModelsChart from '../../components/ModelsChart';
 import { cleanConfirmedData, organizeData } from '../../utils/data';
 
 function LineCharts({ dataSet, orgs, userPrediction, confirmed }) {
@@ -48,6 +49,10 @@ class ChartContainer extends React.Component {
           orgs={orgs}
           userPrediction={userPrediction}
           confirmed={confirmed}
+        />
+        <ModelsChart 
+          data={data} 
+          orgs={orgs} 
         />
       </div>
     );
