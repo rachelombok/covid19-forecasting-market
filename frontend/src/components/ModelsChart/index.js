@@ -47,11 +47,15 @@ class ModelsChart extends React.Component {
           label: orgs[i],
           data: Object.values(data[i]),
           borderColor: colors[orgs[i]],
-          borderWidth: 4,
+          borderWidth: 3,
           fill: false,
-          pointStyle: 'cross',
+          //pointStyle: 'cross',
           rotation: 45,
-          pointBorderWidth: 1
+          pointBackgroundColor: colors[orgs[i]],
+          pointRadius: 4,
+          pointBorderWidth: 1,
+          pointHoverRadius: 7,
+          pointHoverBorderColor: 'black'
         })
       }
   
