@@ -103,12 +103,6 @@ class Mapportal extends React.Component {
   
   }
 
-  zoomToFeature = (e) => {
-    //map.fitBounds(e.target.getBounds());
-    window.location.href = '/home';
-}
-
-
 
   render() {
     return <div id="map" style={style} />;
