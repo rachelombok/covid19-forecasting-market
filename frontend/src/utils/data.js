@@ -33,7 +33,7 @@ function addDays(date, days) {
 
 export const getDates = () => {
   var current = new Date(2020, 2, 28);
-  var end = new Date(2020, 6, 9);
+  var end = new Date(2020, 6, 10);
   var dateArray = [];
   while (current <= end) {
       dateArray.push(new Date(current).toISOString().slice(0,10));

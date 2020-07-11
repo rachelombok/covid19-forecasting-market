@@ -2,7 +2,7 @@ import React from 'react';
 import Chart from 'chart.js';
 import 'chartjs-plugin-dragdata';
 import 'chartjs-plugin-zoom';
-import { getDates } from '../../utils/data'
+import { getDates, cleanConfirmedData } from '../../utils/data'
 
 
 class ModelsChart extends React.Component {
@@ -16,7 +16,8 @@ class ModelsChart extends React.Component {
     }
   
     renderChart() {
-      const { data, orgs } = this.props;
+      const { data, orgs, confirmed } = this.props;
+      console.log(confirmed);
 
       var options = {
         scales: {
@@ -79,6 +80,21 @@ class ModelsChart extends React.Component {
           pointHoverBorderColor: 'black'
         })
       }
+
+      // Add confirmed data to chart
+      const confirmedResult = cleanConfirmedData(confirmed, dates);
+      datasets.push({
+        label: 'Confirmed Deaths',
+        data: Object.values(confirmedResult),
+        borderColor: 'black',
+        fill: false,
+        pointBackgroundColor: 'clear',
+        pointBorderColor: 'clear',
+        pointStyle: 'dash',
+        pointHoverRadius: 7,
+        pointHoverBorderColor: 'black',
+        borderDash: [10, 10]
+      })
   
       // Create chart with all models
       this.myChart = new Chart(this.chartRef.current, {

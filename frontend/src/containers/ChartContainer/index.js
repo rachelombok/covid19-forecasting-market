@@ -52,7 +52,8 @@ class ChartContainer extends React.Component {
         />
         <ModelsChart 
           data={data} 
-          orgs={orgs} 
+          orgs={orgs}
+          confirmed={confirmed} 
         />
       </div>
     );
