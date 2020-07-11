@@ -48,6 +48,10 @@ def add_vote(id, pred_model):
             'date': str(date.today())
         })
 
+def fetch_votes(pred_model):
+    #check if valid arg
+    return mongo.db.votes.count({'prediction_model':pred_model})
+
 def get_score(pred_model):
     #(pred_model)
     if pred_model == "Columbia":
@@ -143,6 +147,13 @@ def leaderboard():
 def profile():
     user = mongo.db.users.find({'username': session['username']})
     return json.dumps(user)
+
+@app.route("/total")
+def total():
+    results = {}
+    for model in forecast_data:
+        results[model] = fetch_votes(model)
+    return json.dumps(results)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -39,12 +39,12 @@ class ModelsChart extends React.Component {
       // Set colors for each organization
       var colors = {
         'Columbia': 'rgba(172, 204, 230, 0.2)',
-        'Georgia Tech': 'rgba(179, 163, 105​, 0.2)',
+        'Georgia Tech': 'rgba(179, 163, 105, 0.2)',
         'UCLA': 'rgba(39, 116, 174, 0.2)',
         'IHME': 'rgba(87, 175, 85, 0.2)',
         'Youyang Gu': 'rgba(196, 129, 14, 0.2)'
       }
-      
+
       for (var i = 0; i < data.length; i++) {
         const modelDates = Object.keys(data[i]);
         for (var j = 0; j < dates.length; j++) {
@@ -97,7 +97,7 @@ class ModelsChart extends React.Component {
         if (!data || !orgs) return 'Loading...';
 
         return (
-            <div class="chart-container" style={{position: "relative", width: "80vw", margin: "0 10%"}}>
+            <div className="chart-container" style={{position: "relative", width: "80vw", margin: "0 10%"}}>
                 <canvas ref={this.chartRef} />
             </div>
         );
