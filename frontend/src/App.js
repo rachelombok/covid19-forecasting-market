@@ -6,6 +6,7 @@ import newDeathsContainer from './containers/newDeathsContainer';
 import LandingPage from './pages/LandingPage';
 import Leaderboard from './components/Leaderboard';
 import ProfilePage from './pages/ProfilePage';
+import InteractiveChartContainer from './containers/InteractiveChartContainer';
 import * as ROUTES from "./constants/routes";
 
 import {
@@ -31,6 +32,7 @@ class App extends React.Component {
             <Route exact path="/blah">
               "BLAH PAGE"
             </Route>
+            <Route exact path="/interactive-chart" component={InteractiveChartContainer}/>
           </Switch>
         </div>
       </Router>

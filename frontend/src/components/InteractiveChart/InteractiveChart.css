@@ -1,0 +1,11 @@
+path {
+    fill: none;
+}
+
+#confirmed{
+    stroke-width: 0.5;
+    stroke: steelblue;
+    stroke-width : 1.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
