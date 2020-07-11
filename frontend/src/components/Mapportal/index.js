@@ -1,73 +1,94 @@
 import React, { Component } from 'react'
 import { render } from 'react-dom'
+import L from 'leaflet';
 import {Map, TileLayer, Marker, Popup, GeoJSON} from 'react-leaflet';
 import countries from './countries.json';
 
+const style = {
+  width: "100%",
+  height: "600px"
+};
+
+const getColor = (d) => {
+  return d > 1000 ? '#800026' :
+         d > 500  ? '#BD0026' :
+         d > 200  ? '#E31A1C' :
+         d > 100  ? '#FC4E2A' :
+         d > 50   ? '#FD8D3C' :
+         d > 20   ? '#FEB24C' :
+         d > 10   ? '#FED976' :
+                    '#FFEDA0';
+}
+
+const mapstyle = (feature) => {
+  return {
+    fillColor: getColor(feature.properties.density),
+    weight: 2,
+    opacity: 1,
+    color: 'white',
+    dashArray: '3',
+    fillOpacity: 0.7
+  };
+};
 class Mapportal extends React.Component {
-    constructor() {
-      super()
-      this.state = {
-        lat: 51.505,
-        lng: -0.09,
-        zoom: 13
-      }
-    }
+  componentDidMount() {
+    this.map = L.map("map", {
+      center: [37.8, -96],
+      zoom: 4,
+      layers: [
+        L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicmFjaGVsb21ib2siLCJhIjoiY2tjODZ6c3UzMTh3ZTJyb2JndHN0dXhlOSJ9.h8aubFClamI3kiUsjIgNTg",
+        {
+          maxZoom: 18,
+          attribution:
+            'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+          id: "mapbox/dark-v10"
+        })
+      ]
+    });
 
-    style(feature) {
-      return {
-        color: '#4a83ec',
-        weight: 0.5,
-        fillColor: "#1a1d62",
-        fillOpacity: 1
-      };
-    };
-
-    highlightFeature(e) {
-      var layer = e.target;
-    
-      layer.setStyle({
-          weight: 5,
-          color: '#666',
-          dashArray: '',
-          fillOpacity: 0.7
-      });
-    }
+    this.geojson = L.geoJson(countries, {
+      style: mapstyle,
+      onEachFeature: this.onEachFeature
+    }).addTo(this.map);
 
   
 
-    resetHighlight(e) {
-      this.refs.geojson.leafletElement.resetStyle(e.target);
+
   }
 
+  onEachFeature = (feature, layer) => {
+    layer.bindTooltip(feature.properties.name.toString(),{noHide:true}).openTooltip();
+    layer.on({
+      mouseover: this.highlightFeature,
+      mouseout: this.resetHighlight
+      //click: this.zoomToFeature
+    });
+  }
 
+  highlightFeature = (e) => {
+    var layer = e.target;
+    layer.setStyle({
+      weight: 5,
+      color: "#666",
+      dashArray: "",
+      fillOpacity: 0.7
+    });
+
+    layer.bringToFront();
+
+  }
+
+  resetHighlight = (event) => {
+    this.geojson.resetStyle(event.target);
   
-    render() {
-      const position = [this.state.lat, this.state.lng];
-      return (
-        <Map center={position} zoom={13} style={{ width: '100%', height: '600px' }}
-        >
-          <TileLayer
-            attribution='bloop'
-            url='https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicmFjaGVsb21ib2siLCJhIjoiY2tjODZ6c3UzMTh3ZTJyb2JndHN0dXhlOSJ9.h8aubFClamI3kiUsjIgNTg'
-            id= 'mapbox/dark-v10'
-          />
-          <GeoJSON data={countries} 
-          style={this.style.bind(this)}
-          onEachFeature= {this.onEachFeature}
-          ref='geojson'
-          ></GeoJSON>
-        </Map>
-      );
-    }
+  }
+
+  render() {
+    return <div id="map" style={style} />;
+  }
 
     // `component` is now the first argument, since it's passed through the Function.bind method, we'll need to pass it through here to the relevant handlers
-onEachFeature (component, feature, layer) {
-  layer.on({
-    mouseover: this.highlightFeature,
-    mouseout: this.resetHighlight.bind(null, component)
-    //click: zoomToFeature
-  });
-}
+
   }
   
 
