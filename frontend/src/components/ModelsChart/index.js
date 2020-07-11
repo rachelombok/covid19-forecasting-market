@@ -2,6 +2,7 @@ import React from 'react';
 import Chart from 'chart.js';
 import 'chartjs-plugin-dragdata';
 import 'chartjs-plugin-zoom';
+import { getDates } from '../../utils/data'
 
 
 class ModelsChart extends React.Component {
@@ -30,8 +31,10 @@ class ModelsChart extends React.Component {
           text: 'All Model Forecasts',
           fontSize: 30
         },
+        spanGaps: true
       };
-  
+
+      const dates = getDates();  
       var datasets = [];
       // Set colors for each organization
       var colors = {
@@ -41,17 +44,39 @@ class ModelsChart extends React.Component {
         'IHME': 'rgba(87, 175, 85, 0.2)',
         'Youyang Gu': 'rgba(196, 129, 14, 0.2)'
       }
+      
       for (var i = 0; i < data.length; i++) {
+        const modelDates = Object.keys(data[i]);
+        for (var j = 0; j < dates.length; j++) {
+            if (modelDates.includes(dates[j]) == false) {
+                data[i][dates[j]] = null;
+            }
+        }
+
+        // Sort key-value pairs by key (dates)
+        var keys = Object.keys(data[i]);
+        var newDict = {}; 
+        keys.sort(); 
+        for (var k = 0; k < keys.length; k++) {
+            var key = keys[k];
+            var value = data[i][key];
+            newDict[key] = value;
+        } 
+        data[i] = newDict;
+
         // Add each models data to datasets
         datasets.push({
           label: orgs[i],
           data: Object.values(data[i]),
           borderColor: colors[orgs[i]],
-          borderWidth: 4,
+          borderWidth: 3,
           fill: false,
-          pointStyle: 'cross',
           rotation: 45,
-          pointBorderWidth: 1
+          pointBackgroundColor: colors[orgs[i]],
+          pointRadius: 4,
+          pointBorderWidth: 1,
+          pointHoverRadius: 7,
+          pointHoverBorderColor: 'black'
         })
       }
   
@@ -59,7 +84,7 @@ class ModelsChart extends React.Component {
       this.myChart = new Chart(this.chartRef.current, {
         type: 'line',
         data: {
-          labels: Object.keys(data[3]),
+          labels: dates,
           datasets: datasets
         },
         options: options
