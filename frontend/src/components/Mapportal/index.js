@@ -3,6 +3,7 @@ import { render } from 'react-dom'
 import L from 'leaflet';
 import {Map, TileLayer, Marker, Popup, GeoJSON} from 'react-leaflet';
 import countries from './countries.json';
+import states from './us-states.json';
 
 const style = {
   width: "100%",
@@ -22,7 +23,7 @@ const getColor = (d) => {
 
 const mapstyle = (feature) => {
   return {
-    fillColor: getColor(feature.properties.density),
+    fillColor: getColor(feature.properties.bloop),
     weight: 2,
     opacity: 1,
     color: 'white',
@@ -32,6 +33,9 @@ const mapstyle = (feature) => {
 };
 class Mapportal extends React.Component {
   componentDidMount() {
+    var country;
+
+
     this.map = L.map("map", {
       center: [37.8, -96],
       zoom: 4,
@@ -46,15 +50,27 @@ class Mapportal extends React.Component {
       ]
     });
 
+ 
+
     this.geojson = L.geoJson(countries, {
       style: mapstyle,
       onEachFeature: this.onEachFeature
     }).addTo(this.map);
 
-  
+    this.states = L.geoJSON(states, {
+      style: mapstyle,
+      onEachFeature: this.onEachFeature
+    }).addTo(this.map);
 
+    var overlay = {
+      "Countries": this.geojson,
+      "States" : this.states
+  };
+  L.control.layers(overlay).addTo(this.map);
 
   }
+
+  
 
   onEachFeature = (feature, layer) => {
     layer.bindTooltip(feature.properties.name.toString(),{noHide:true}).openTooltip();
@@ -82,6 +98,8 @@ class Mapportal extends React.Component {
     this.geojson.resetStyle(event.target);
   
   }
+
+
 
   render() {
     return <div id="map" style={style} />;
