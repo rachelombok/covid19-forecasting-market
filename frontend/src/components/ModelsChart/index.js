@@ -17,7 +17,6 @@ class ModelsChart extends React.Component {
   
     renderChart() {
       const { data, orgs, confirmed } = this.props;
-      console.log(confirmed);
 
       var options = {
         scales: {
@@ -72,7 +71,6 @@ class ModelsChart extends React.Component {
           borderColor: colors[orgs[i]],
           borderWidth: 3,
           fill: false,
-          rotation: 45,
           pointBackgroundColor: colors[orgs[i]],
           pointRadius: 4,
           pointBorderWidth: 1,
@@ -93,7 +91,7 @@ class ModelsChart extends React.Component {
         pointStyle: 'dash',
         pointHoverRadius: 7,
         pointHoverBorderColor: 'black',
-        borderDash: [10, 10]
+        borderDash: [15, 15]
       })
   
       // Create chart with all models

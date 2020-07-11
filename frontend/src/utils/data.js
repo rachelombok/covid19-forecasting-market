@@ -9,7 +9,6 @@ export const cleanConfirmedData = (data, dates) => {
 export const organizeData = (data) => {
   var orgs = Object.keys(data);
   var results = [];
-  var confirmed = [];
   for (var i = 0; i < orgs.length; i++) {
     var forecast = data[orgs[i]];
     var dates = forecast.target_end_date;
@@ -33,7 +32,7 @@ function addDays(date, days) {
 
 export const getDates = () => {
   var current = new Date(2020, 2, 28);
-  var end = new Date(2020, 6, 10);
+  var end = new Date();
   var dateArray = [];
   while (current <= end) {
       dateArray.push(new Date(current).toISOString().slice(0,10));

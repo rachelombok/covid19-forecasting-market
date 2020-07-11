@@ -31,8 +31,6 @@ class ChartContainer extends React.Component {
       this.setState({ userPrediction: data });
     });
     fetch('/us-cum-deaths-confirmed').then(res => res.json()).then(data => {
-      console.log(typeof data)
-      //const result = JSON.parse(data);
       this.setState({ confirmed: data });
     });
   }
