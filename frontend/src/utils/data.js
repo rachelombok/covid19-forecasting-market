@@ -22,3 +22,22 @@ export const organizeData = (data) => {
 
   return [results, orgs];
 }
+
+
+function addDays(date, days) {
+  var result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
+
+
+export const getDates = () => {
+  var current = new Date(2020, 2, 28);
+  var end = new Date(2020, 6, 9);
+  var dateArray = [];
+  while (current <= end) {
+      dateArray.push(new Date(current).toISOString().slice(0,10));
+      current = addDays(current, 1);
+  }
+  return dateArray;
+}

@@ -134,7 +134,7 @@ class LineChart extends React.Component {
 
   render() {
     return (
-      <div class="chart-container" style={{position: "relative", width: "80vw", margin: "0 10%"}}>
+      <div className="chart-container" style={{position: "relative", width: "80vw", margin: "0 10%"}}>
         <canvas ref={this.chartRef} />
         <br></br>
       </div>
