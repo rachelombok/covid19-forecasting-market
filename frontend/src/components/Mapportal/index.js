@@ -71,14 +71,18 @@ class Mapportal extends React.Component {
   }
 
   
-
   onEachFeature = (feature, layer) => {
     layer.bindTooltip(feature.properties.name.toString(),{noHide:true}).openTooltip();
     layer.on({
       mouseover: this.highlightFeature,
       mouseout: this.resetHighlight
-      //click: this.zoomToFeature
     });
+    layer.on("click",function(e){
+      // this gets the id for each country, and we can use that to redirect to different pages since each 
+      // json layer has different ids. the states are 1-50, and the countries are their official code
+      //window.alert(layer.feature.id);
+  });
+  
   }
 
   highlightFeature = (e) => {
@@ -98,7 +102,6 @@ class Mapportal extends React.Component {
     this.geojson.resetStyle(event.target);
   
   }
-
 
 
   render() {

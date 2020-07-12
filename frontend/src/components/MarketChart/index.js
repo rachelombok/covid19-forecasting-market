@@ -20,9 +20,21 @@ class MarketChart extends React.Component {
     }
 
     renderChart() {
+        var colors = {
+            'Columbia': 'rgb(172, 204, 230)',
+            'Georgia Tech': 'rgb(179, 163, 105)',
+            'UCLA': 'rgb(39, 116, 174)',
+            'IHME': 'rgb(87, 175, 85)',
+            'Youyang Gu': 'rgb(196, 129, 14)'
+        };
+        var colorArr = [];
+        for (var i = 0; i < this.state.orgs.length; i++) {
+            colorArr.push(colors[this.state.orgs[i]]);
+        }
         var data = {
             datasets: [{
-                data: this.state.data
+                data: this.state.data,
+                backgroundColor: colorArr,
             }],
             labels: this.state.orgs
         };
@@ -41,7 +53,7 @@ class MarketChart extends React.Component {
         if (!data || !orgs) return 'Loading...';
 
         return (
-            <div>
+            <div className="chart-container" style={{position: "relative", width: "80vw", margin: "0 10%"}}>
                 <canvas ref={this.chartRef} />
             </div>
         );

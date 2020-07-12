@@ -2,7 +2,7 @@ import React from 'react';
 import Chart from 'chart.js';
 import 'chartjs-plugin-dragdata';
 import 'chartjs-plugin-zoom';
-import { getDates } from '../../utils/data'
+import { getDates, cleanConfirmedData } from '../../utils/data'
 
 
 class ModelsChart extends React.Component {
@@ -16,7 +16,7 @@ class ModelsChart extends React.Component {
     }
   
     renderChart() {
-      const { data, orgs } = this.props;
+      const { data, orgs, confirmed } = this.props;
 
       var options = {
         scales: {
@@ -38,11 +38,11 @@ class ModelsChart extends React.Component {
       var datasets = [];
       // Set colors for each organization
       var colors = {
-        'Columbia': 'rgba(172, 204, 230, 0.2)',
-        'Georgia Tech': 'rgba(179, 163, 105, 0.2)',
-        'UCLA': 'rgba(39, 116, 174, 0.2)',
-        'IHME': 'rgba(87, 175, 85, 0.2)',
-        'Youyang Gu': 'rgba(196, 129, 14, 0.2)'
+        'Columbia': 'rgb(172, 204, 230)',
+        'Georgia Tech': 'rgb(179, 163, 105)',
+        'UCLA': 'rgb(39, 116, 174)',
+        'IHME': 'rgb(87, 175, 85)',
+        'Youyang Gu': 'rgb(196, 129, 14)'
       }
 
       for (var i = 0; i < data.length; i++) {
@@ -71,7 +71,6 @@ class ModelsChart extends React.Component {
           borderColor: colors[orgs[i]],
           borderWidth: 3,
           fill: false,
-          rotation: 45,
           pointBackgroundColor: colors[orgs[i]],
           pointRadius: 4,
           pointBorderWidth: 1,
@@ -79,6 +78,21 @@ class ModelsChart extends React.Component {
           pointHoverBorderColor: 'black'
         })
       }
+
+      // Add confirmed data to chart
+      const confirmedResult = cleanConfirmedData(confirmed, dates);
+      datasets.push({
+        label: 'Confirmed Deaths',
+        data: Object.values(confirmedResult),
+        borderColor: 'black',
+        fill: false,
+        pointBackgroundColor: 'clear',
+        pointBorderColor: 'clear',
+        pointStyle: 'dash',
+        pointHoverRadius: 7,
+        pointHoverBorderColor: 'black',
+        borderDash: [15, 15]
+      })
   
       // Create chart with all models
       this.myChart = new Chart(this.chartRef.current, {
