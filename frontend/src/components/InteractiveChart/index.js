@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3'
 import './InteractiveChart.css';
-import { cleanConfirmedData } from '../../utils/data';
+import { cleanConfirmedData, clamp } from '../../utils/data';
 import { elementType } from 'prop-types';
 import { addDays } from '../../utils/date';
 
@@ -77,10 +77,18 @@ class InteractiveChart extends Component {
             .domain([0, d3.max(confirmedData, function(d) { return +d.value; })])
             .range([ height, 0 ])
             .nice();
-         svg.append("g")
+        svg.append("g")
             .call(d3.axisLeft(y));
         
-        var line = d3.line()
+        var lineGenerator = d3.line()
+            .curve(d3.curveCatmullRom)
+            
+        var predLineGenerator = d3.line()
+            .curve(d3.curveBasis);
+            //d3.curveMonotoneX
+            //d3.curveBasis
+            //d3.curveCardinal
+        var line = lineGenerator
             .x(function(d) { return x(d.date) })
             .y(function(d) { return y(d.value) })
         
@@ -115,35 +123,45 @@ class InteractiveChart extends Component {
            .style("pointer-events","visible");
         var clickArea = d3.select("#click-area");
         
-        var predLine = d3.line()
+        var predLine = predLineGenerator
                     .defined(d => d.defined)
                     .x(function(d) { return x(d.date) })
                     .y(function(d) { return y(d.value) })
        
         var yourLine = svg.append("path")
                       .attr("id", "your-line");
+        /*var gapLine = svg.append("path")
+                            .attr("id", "gap-line");*/
 
         var drag = d3.drag()
                      .on("drag", function() {
                         var pos = d3.mouse(this);
-                        var date = x.invert(pos[0]);
-                        var value = y.invert(pos[1]);
+                        var date = clamp(predStartDate, endDate, x.invert(pos[0]));
+                        var value = clamp(0, 5000, y.invert(pos[1]));
+                        //var date = x.invert(pos[0]);
+                        //var value = y.invert(pos[1]);
                         console.log(value);
                 
                         predictionData.forEach(function(d){
-                        if (+d3.timeDay.round(d.date) == +d3.timeDay.round(date) && (+d3.timeDay.round(d.date) != +predStartDate)){
-                            d.value = value;
-                            d.defined = true
-                        }
-                        predictionData[0].value = confirmedLastVal;
+                            if (+d3.timeDay.round(d.date) == +d3.timeDay.round(date) && (+d3.timeDay.round(d.date) != +predStartDate)){
+                                d.value = value;
+                                d.defined = true
+                            }
+                            predictionData[0].value = confirmedLastVal;
+                            
+                            /*yourLine.datum(predictionData)
+                                    .attr('d', predLine)*/
+                            var filteredData = predictionData.filter(predLine.defined())
 
-                        yourLine.datum(predictionData)
-                                .attr('d', predLine)
-                    });
-        })
+                            yourLine.datum(filteredData)
+                                    .attr('d', predLine)
+                            
+                            /*gapLine.datum(filteredData)
+                                    .attr('d', predLine(filteredData));*/
+                        });
+                    })
         
         svg.call(drag)
-        
         
     }
         

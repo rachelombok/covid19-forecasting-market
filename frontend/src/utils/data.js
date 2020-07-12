@@ -41,3 +41,7 @@ export const getDates = () => {
   }
   return dateArray;
 }
+
+export const clamp = (a, b, c) => { 
+  return Math.max(a, Math.min(b, c)) 
+}
