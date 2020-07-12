@@ -91,7 +91,7 @@ class ModelsChart extends React.Component {
         pointStyle: 'dash',
         pointHoverRadius: 7,
         pointHoverBorderColor: 'black',
-        borderDash: [15, 15]
+        borderDash: [15, 10]
       })
   
       // Create chart with all models

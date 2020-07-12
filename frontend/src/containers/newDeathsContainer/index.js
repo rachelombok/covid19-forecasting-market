@@ -1,5 +1,6 @@
 import React from 'react';
 import LineChart from '../../components/LineChart';
+import ModelsChart from '../../components/ModelsChart';
 import { cleanConfirmedData, organizeData } from '../../utils/data';
 
 function LineCharts({ dataSet, orgs, userPrediction, confirmed }) {
@@ -30,8 +31,6 @@ class newDeathsContainer extends React.Component {
       this.setState({ userPrediction: data });
     });
     fetch('/us-inc-deaths-confirmed').then(res => res.json()).then(data => {
-      console.log(typeof data)
-      //const result = JSON.parse(data);
       this.setState({ confirmed: data });
     });
   }
@@ -48,6 +47,11 @@ class newDeathsContainer extends React.Component {
           orgs={orgs}
           userPrediction={userPrediction}
           confirmed={confirmed}
+        />
+        <ModelsChart 
+          data={data} 
+          orgs={orgs}
+          confirmed={confirmed} 
         />
       </div>
     );
