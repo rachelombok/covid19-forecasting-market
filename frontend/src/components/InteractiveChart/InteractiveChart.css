@@ -1,13 +1,10 @@
-path {
-    fill: none;
-}
-
 #confirmed{
     stroke-width: 0.5;
     stroke: steelblue;
     stroke-width : 1.5;
     stroke-linejoin: round;
     stroke-linecap: round;
+    fill: none;
 }
 
 #your-line{
@@ -17,4 +14,5 @@ path {
     stroke-linejoin: round;
     stroke-linecap: round;
     stroke-dasharray: 3, 3;
+    fill: none;
 }

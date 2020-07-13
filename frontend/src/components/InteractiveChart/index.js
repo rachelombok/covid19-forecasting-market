@@ -45,7 +45,7 @@ class InteractiveChart extends Component {
                         .attr("height", height + margin.top + margin.bottom)
                     .append("g")
                         .attr("transform",
-                        "translate(" + margin.left + "," + margin.top + ")")
+                        "translate(" + margin.left + "," + margin.top + ")");
         //console.log(svg);
 
         //line function        
@@ -207,10 +207,16 @@ class InteractiveChart extends Component {
             text.attr("transform", `translate(${-w / 2},${15 - y})`);
             path.attr("d", `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`);
         }
-        console.log(totalData);
         const tooltip = svg.append("g");
+        const mouseArea = svg.append("rect")
+                            .attr("width", width)
+                            .attr("height", height)
+                            .attr("fill", "none")
+                            .style("pointer-events","visible");
+
 
         svg.on("touchmove mousemove", function() {
+            console.log("yep");
             var date = x.invert(d3.mouse(this)[0]);
             const index = d3.bisector(d => d.date).left(totalData, date, 1);
             const a = totalData[index - 1];
@@ -219,12 +225,13 @@ class InteractiveChart extends Component {
             var d = b && (date - a.date > b.date - date) ? b : a;
             date = d.date;
             var value = Math.round(d.value);
+            if (value != 0) {
+                tooltip
+                    .attr("transform", `translate(${x(date)},${y(value)})`)
+                    .call(callout, `${value}
+                    ${formatDate(date)}`);
 
-            tooltip
-                .attr("transform", `translate(${x(date)},${y(value)})`)
-                .call(callout, `${value}
-                ${formatDate(date)}`);
-
+            }
         });
 
         svg.on("touchend mouseleave", () => tooltip.call(callout, null));
