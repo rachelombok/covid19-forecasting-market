@@ -3,7 +3,7 @@ import * as d3 from 'd3'
 import './InteractiveChart.css';
 import { cleanConfirmedData, clamp } from '../../utils/data';
 import { elementType } from 'prop-types';
-import { addDays } from '../../utils/date';
+import { addDays, formatDate } from '../../utils/date';
 
 
 class InteractiveChart extends Component {
@@ -109,7 +109,6 @@ class InteractiveChart extends Component {
             defined = 0;
             value = 0;
         }
-
         //append click area rect
         var confirmedAreaWidth = path.node().getBoundingClientRect().width;
         var clickAreaWidth = width - confirmedAreaWidth;
@@ -132,6 +131,8 @@ class InteractiveChart extends Component {
                       .attr("id", "your-line");
         /*var gapLine = svg.append("path")
                             .attr("id", "gap-line");*/
+        
+        var totalData = confirmedData.concat(predictionData);
 
         var drag = d3.drag()
                      .on("drag", function() {
@@ -148,7 +149,8 @@ class InteractiveChart extends Component {
                                 d.defined = true
                             }
                             predictionData[0].value = confirmedLastVal;
-                            
+                            //update totalData everytime predictionData is updated
+                            totalData = confirmedData.concat(predictionData);
                             /*yourLine.datum(predictionData)
                                     .attr('d', predLine)*/
                             var filteredData = predictionData.filter(predLine.defined())
@@ -162,7 +164,70 @@ class InteractiveChart extends Component {
                     })
         
         svg.call(drag)
-        
+
+        //finds the datapoint closest to the mouse (along x)
+        var bisect = () => {
+            const bisectDate = d3.bisector(d => d.date).left;
+            return mx => {
+                const date = x.invert(mx);
+                const index = bisectDate(totalData, date, 1);
+                const a = totalData[index - 1];
+                const b = totalData[index];
+                return b && (date - a.date > b.date - date) ? b : a;
+            };
+        }
+        var callout = (g, value) => {
+            if (!value) return g.style("display", "none");
+          
+            g
+                .style("display", null)
+                .style("pointer-events", "none")
+                .style("font", "10px sans-serif");
+          
+            const path = g.selectAll("path")
+              .data([null])
+              .join("path")
+                .attr("fill", "white")
+                .attr("stroke", "black");
+          
+            const text = g.selectAll("text")
+              .data([null])
+              .join("text")
+              .call(text => text
+                .selectAll("tspan")
+                .data((value + "").split(/\n/))
+                .join("tspan")
+                  .attr("x", 0)
+                  .attr("y", (d, i) => `${i * 1.1}em`)
+                  .style("font-weight", (_, i) => i ? null : "bold")
+                  .text(d => d));
+          
+            const {x, y, width: w, height: h} = text.node().getBBox();
+          
+            text.attr("transform", `translate(${-w / 2},${15 - y})`);
+            path.attr("d", `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`);
+        }
+        console.log(totalData);
+        const tooltip = svg.append("g");
+
+        svg.on("touchmove mousemove", function() {
+            var date = x.invert(d3.mouse(this)[0]);
+            const index = d3.bisector(d => d.date).left(totalData, date, 1);
+            const a = totalData[index - 1];
+            const b = totalData[index];
+            //d = the data object corresponding to date and value pointed by the cursors
+            var d = b && (date - a.date > b.date - date) ? b : a;
+            date = d.date;
+            var value = Math.round(d.value);
+
+            tooltip
+                .attr("transform", `translate(${x(date)},${y(value)})`)
+                .call(callout, `${value}
+                ${formatDate(date)}`);
+
+        });
+
+        svg.on("touchend mouseleave", () => tooltip.call(callout, null));
     }
         
     render() {

@@ -44,3 +44,10 @@ export const getDates = () => {
 export const clamp = (a, b, c) => { 
   return Math.max(a, Math.min(b, c)) 
 }
+
+export const formatValue = (value) => {
+  return value.toLocaleString("en", {
+    style: "currency",
+    currency: "USD"
+  });
+}
