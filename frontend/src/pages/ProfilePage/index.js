@@ -1,8 +1,5 @@
 import React from 'react';
 
-
-
-
 class ProfilePage extends React.Component {
   constructor(props) {
     super(props);
@@ -24,6 +21,8 @@ class ProfilePage extends React.Component {
             <p><b>Poll score: </b>{ this.state.user['score'] }</p>
             <p><b>Country/Location: </b></p>
             <p><b>Bio: </b></p>
+
+          
         </div>
     );
   }

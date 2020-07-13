@@ -143,7 +143,7 @@ def leaderboard():
     all_users = list(mongo.db.users.find({},{'name': 1, 'score': 1}).sort('score',-1))
     return dumps(all_users)
 
-@app.route('/user')
+@app.route('/user', methods=["POST", "GET"])
 def profile():
     user = mongo.db.users.find({'username': session['username']})
     return json.dumps(user)

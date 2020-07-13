@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.css';
+import ReactDOM from 'react-dom'
 import Navbar from './components/Navbar';
 import ChartContainer from './containers/ChartContainer';
 import newDeathsContainer from './containers/newDeathsContainer';
@@ -9,13 +10,14 @@ import MarketChart from './components/MarketChart';
 import ProfilePage from './pages/ProfilePage';
 import InteractiveChartContainer from './containers/InteractiveChartContainer';
 import * as ROUTES from "./constants/routes";
-
+import 'leaflet/dist/leaflet.css';
+import Mapportal from './components/Mapportal';
 import {
   BrowserRouter as Router,
   Switch,
   Route
 } from "react-router-dom";
-import Mapportal from './components/Mapportal';
+
 
 class App extends React.Component {
   render() {
