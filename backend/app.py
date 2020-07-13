@@ -143,10 +143,19 @@ def leaderboard():
     all_users = list(mongo.db.users.find({},{'name': 1, 'score': 1}).sort('score',-1))
     return dumps(all_users)
 
-@app.route('/user', methods=["POST", "GET"])
+@app.route('/user')
 def profile():
     user = mongo.db.users.find({'username': session['username']})
     return json.dumps(user)
+
+@app.route('/action', methods=["POST"])
+def addbio():
+    if request.method == 'POST':
+        bio = request.values.get('bio')
+        location = request.values.get('location')
+    user = mongo.db.users.find({'username': session['username']})
+    user.insert({'bio':bio, 'location':location})
+    redirect('/user')
 
 @app.route("/total")
 def total():

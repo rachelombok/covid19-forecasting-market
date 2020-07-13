@@ -22,6 +22,12 @@ class ProfilePage extends React.Component {
             <p><b>Country/Location: </b></p>
             <p><b>Bio: </b></p>
 
+            <p>Edit your page:</p>
+            <form action='/action' method='POST'>
+            <input type="text" name="bio" placeholder="Bio..." />
+            <input type="text" name="location" placeholder="Location..." />
+            <button type='submit'>Create</button>
+            </form>
           
         </div>
     );

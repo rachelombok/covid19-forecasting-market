@@ -17,6 +17,7 @@ const mapStyle = (feature) => {
     dashArray: "3",
     fillOpacity: 0.7,
     fillColor: "#FFEDA0"
+
   });
 }
 
@@ -42,7 +43,7 @@ class Mapportal extends React.Component {
       onEachFeature: this.onEachFeature
     }).addTo(this.map);
 
-    this.countries = L.geoJSON(countriesData, {
+    this.countries = L.geoJson(countriesData, {
 		style: mapStyle,
 		onEachFeature: this.onEachFeature
     }).addTo(this.map);
@@ -55,7 +56,7 @@ class Mapportal extends React.Component {
 
 
     // add layer
-    //this.layer = L.layerGroup().addTo(this.map);
+    this.layer = L.layerGroup().addTo(this.map);
   }
   onEachFeature = (feature, layer) => {
 	layer.bindTooltip(feature.properties.name.toString(),{noHide:true}).openTooltip();
@@ -71,14 +72,19 @@ class Mapportal extends React.Component {
   }
   highlightFeature = (e) => {
     var layer = e.target;
+
     layer.setStyle({
+      fillColor: "#FFEDA0",
       weight: 5,
       color: "#666",
       dashArray: "",
       fillOpacity: 0.7
     });
 
-    layer.bringToFront();
+    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+      layer.bringToFront();
+    }
+    //layer.bringToFront();
 
   
   }
