@@ -68,24 +68,38 @@ def update_score(username, score):
         })
     #print("score updated")
 
-def update_user_prediction(username, model, data):
-    pred = mongo.db.predictions.find_one({"username": username, "model": model})
+def update_user_prediction(username, data, category, a=None, higher=False, index=None):
+    #Get gaussian bump
+    '''if category == "us_daily_deaths":
+        print("get gaussian")
+        print(data)
+        data = get_gaussian_for_all(data, a, index, higher)
+        print(data)'''
+    pred = mongo.db.predictions.find_one({"username": username, "category": category})
+    #print(pred)
+    if pred:
+        #print("already exists")
+        mongo.db.predictions.update_one({"username": username, "category": category}, 
+        {'$set': 
+            { "prediction": data }
+        })
+    else:
+        mongo.db.predictions.insert_one({"username": username, "category": category, "prediction": data})
+       
+    '''pred = mongo.db.predictions.find_one({"username": username, "model": model})
     if pred:
         mongo.db.predictions.update_one({"username": username, "model": model}, 
         {'$set': 
             { "prediction": data }
         })
     else:
-        mongo.db.predictions.insert_one({"username": username, "model": model, "prediction": data})
+        mongo.db.predictions.insert_one({"username": username, "model": model, "prediction": data})'''
 
-def get_user_prediction(username):
+def get_user_prediction(username, category):
     user_prediction = {}
-    for model in data['us_cum_forecasts']:
-        exists = mongo.db.predictions.find_one({"username": username, "model": model})
-        if exists:
-            user_prediction[model] = exists['prediction']
-        else:
-            user_prediction[model] = data['us_cum_forecasts'][model]
+    exists = mongo.db.predictions.find_one({"username": username, "category": category})
+    if exists:
+        user_prediction = exists['prediction']
     return user_prediction
 
 
@@ -107,7 +121,10 @@ def make_session_permanent():
 
 @app.route("/user-prediction", methods=['POST','GET'])
 def home():
-    user_prediction = get_user_prediction('testUsername')
+    pred_category = request.args.get('category')
+    print(pred_category)
+    print("done")
+    user_prediction = get_user_prediction('testUsername', pred_category)
     return json.dumps(user_prediction)
 
 @app.route("/us-cum-deaths-forecasts")
@@ -134,7 +151,8 @@ def us_inc_deaths_confirmed():
 def update():
     if request.method == 'POST':
         data = request.json
-        update_user_prediction('testUsername', data['model'], data['data'])
+        print(data)
+        update_user_prediction('testUsername', data['data'], data['category'])
         return "Success"
     return 'None'
 

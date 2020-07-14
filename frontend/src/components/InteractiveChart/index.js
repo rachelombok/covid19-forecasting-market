@@ -9,7 +9,7 @@ import { addDays, formatDate } from '../../utils/date';
 class InteractiveChart extends Component {
     constructor(props) {
         super(props);
-        this.state = { userPrediction: null };
+        this.state = { category: "us_daily_deaths" };
         this.chartRef = React.createRef();
     }
     componentDidMount() {
@@ -17,13 +17,14 @@ class InteractiveChart extends Component {
         this.renderChart();
     }
 
-    savePrediction(model, data) {
+    //move to utils
+    savePrediction(data, category) {
         fetch('/update/',{
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({"model": model, "data": data}),
+          body: JSON.stringify({"data": data, "category": category}),
         });
     }
 
@@ -33,6 +34,7 @@ class InteractiveChart extends Component {
         //console.log(model);
         const confirmedResult = cleanConfirmedData(confirmed, Object.keys(forecast));
         const savePrediction = this.savePrediction;
+        const category = this.state.category;
         
         //set up margin, width, height of chart
         var legendWidth = 180;
@@ -64,16 +66,29 @@ class InteractiveChart extends Component {
                 value: f[key]
             }))
         });
+        console.log(userPrediction)
+        var predictionData = [];
+        if(userPrediction) {
+            predictionData = userPrediction.map(p => ({
+                date: d3.timeParse("%Y-%m-%d")((p.date).substring(0,10)),
+                value: p.value,
+                defined: p.defined
+                })
+            );
+        }
+        console.log(predictionData)
+
 
         //get data starting 2020-02-01
         confirmedData = confirmedData.filter(d => +d.date >= +new Date("2020-02-01"));
 
         //draw x-axis
-        var predStartDate = confirmedData[0].date;
+        var startDate = confirmedData[0].date; //confirmed data start day
+        var predStartDate = confirmedData[confirmedData.length - 1].date; //prediction start day
         var predLength = 63;
-        var endDate = addDays(new Date(), predLength);
+        var predEndDate = addDays(new Date(), predLength);
         var x = d3.scaleTime()
-            .domain([predStartDate, endDate])
+            .domain([startDate, predEndDate])
             .range([ 0, width ])
             .nice();
          svg.append("g")
@@ -124,7 +139,6 @@ class InteractiveChart extends Component {
         //draw forecasts
 
         forecastData.map((f, index) => {
-            console.log(f);
             svg
                 .append("path")
                     .attr("class", "forecast")
@@ -159,17 +173,50 @@ class InteractiveChart extends Component {
                     .attr("text-anchor", "left")
                     .style("alignment-baseline", "middle")
 
-        var predictionData = [];
-        var currDate = confirmedData[confirmedData.length - 1].date;
+        var currDate = predStartDate;
         var defined = true;
         var value = confirmedData[confirmedData.length - 1].value;
-        var confirmedLastVal = value;
-        for (var i = 0; i < predLength; i++) {            
+        var confirmedLastVal = value; //used to make sure the first data point of prediction stays the same
+
+        //check if userPrediction already exists in db
+        console.log(predStartDate, predEndDate);
+        console.log(predictionData)
+
+        var predLine = predLineGenerator
+                    .defined(d => d.defined)
+                    .x(function(d) { return x(d.date) })
+                    .y(function(d) { return y(d.value) })
+       
+        var yourLine = svg.append("path")
+                      .attr("id", "your-line");
+
+        if (userPrediction) {
+            predictionData = predictionData.filter(d => (+d.date >= +predStartDate) && (+d.date <= +predEndDate));
+            predictionData[0].value = value;
+            defined = false;
+            value = 0;
+            currDate = addDays(predictionData[predictionData.length - 1].date, 1);
+            console.log(predictionData)
+        }
+        
+        while (+currDate <= +predEndDate) {            
             predictionData.push({date: currDate, value: value, defined: defined});
             currDate = addDays(currDate, 1);
             defined = 0;
             value = 0;
         }
+        console.log(predictionData)
+        var filteredData = null;
+        
+        var totalData = confirmedData.concat(predictionData);
+
+        if(userPrediction) {
+            filteredData = predictionData.filter(predLine.defined())
+            yourLine.datum(filteredData)
+                    .attr('d', predLine)
+        }
+
+
         //append click area rect
         var confirmedAreaWidth = confirmedLine.node().getBoundingClientRect().width;
         var clickAreaWidth = width - confirmedAreaWidth;
@@ -183,22 +230,13 @@ class InteractiveChart extends Component {
            .style("pointer-events","visible");
         var clickArea = d3.select("#click-area");
         
-        var predLine = predLineGenerator
-                    .defined(d => d.defined)
-                    .x(function(d) { return x(d.date) })
-                    .y(function(d) { return y(d.value) })
-       
-        var yourLine = svg.append("path")
-                      .attr("id", "your-line");
         /*var gapLine = svg.append("path")
                             .attr("id", "gap-line");*/
         
-        var totalData = confirmedData.concat(predictionData);
-
         var drag = d3.drag()
                      .on("drag", function() {
                         var pos = d3.mouse(this);
-                        var date = clamp(predStartDate, endDate, x.invert(pos[0]));
+                        var date = clamp(predStartDate, predEndDate, x.invert(pos[0]));
                         var value = clamp(0, yAxisMax, y.invert(pos[1]));
                         //var date = x.invert(pos[0]);
                         //var value = y.invert(pos[1]);
@@ -210,6 +248,7 @@ class InteractiveChart extends Component {
                                 d.defined = true
                             }
                             predictionData[0].value = confirmedLastVal;
+                            //save prediction data
                             //update totalData everytime predictionData is updated
                             totalData = confirmedData.concat(predictionData);
                             /*yourLine.datum(predictionData)
@@ -223,6 +262,9 @@ class InteractiveChart extends Component {
                                     .attr('d', predLine(filteredData));*/
                         });
                     })
+                    .on("end", function () {
+                        savePrediction(predictionData, category);
+                    });
         
         svg.call(drag)
 

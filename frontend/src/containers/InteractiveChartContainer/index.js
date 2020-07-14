@@ -26,7 +26,7 @@ class InteractiveChartContainer extends Component {
             const [results, orgs] = organizeData(data);
             this.setState({ forecast: results, orgs });
         });
-            fetch('/user-prediction').then(res => res.json()).then(data => {
+            fetch('/user-prediction?category=us_daily_deaths').then(res => res.json()).then(data => {
             this.setState({ userPrediction: data });
         });
         fetch('/us-inc-deaths-confirmed').then(res => res.json()).then(data => {
