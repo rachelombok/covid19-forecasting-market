@@ -28,9 +28,9 @@ class InteractiveChart extends Component {
     }
 
     renderChart() {
-        const { forecast, org, userPrediction, confirmed } = this.props;
-        console.log(confirmed);
-        const model = org;
+        const { forecast, orgs, userPrediction, confirmed } = this.props;
+        console.log(forecast);
+        const model = orgs;
         //console.log(model);
         const confirmedResult = cleanConfirmedData(confirmed, Object.keys(forecast));
         const savePrediction = this.savePrediction;
@@ -42,7 +42,7 @@ class InteractiveChart extends Component {
         var svg = d3.select(this.chartRef.current)
                     .append("svg")
                         .attr("width", width + margin.left + margin.right)
-                        .attr("height", height + margin.top + margin.bottom)
+                        .attr("height", height + margin.top + margin.bottom + 50)
                     .append("g")
                         .attr("transform",
                         "translate(" + margin.left + "," + margin.top + ")");

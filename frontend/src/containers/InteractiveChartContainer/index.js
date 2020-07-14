@@ -41,8 +41,8 @@ class InteractiveChartContainer extends Component {
 
         return (
             <div className="chartContainer">
-                <InteractiveCharts
-                    dataSet={forecast}
+                <InteractiveChart
+                    forecast={forecast}
                     orgs={orgs}
                     userPrediction={userPrediction}
                     confirmed={confirmed}
