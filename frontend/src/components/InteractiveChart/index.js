@@ -107,21 +107,21 @@ class InteractiveChart extends Component {
         var line = lineGenerator
             .x(function(d) { return x(d.date) })
             .y(function(d) { return y(d.value) })
-        
-        console.log(confirmedData);
-        var confirmedLine = svg
-            .append("path")
-            .attr("id", "confirmed")    
-            .datum(confirmedData)    
-            .attr('d', line);
-        
-        //draw forecasts
+
         var legendString = orgs.concat(["Daily Confirmed Deaths", "User Prediction"]);
 
         var color = d3
                         .scaleOrdinal()
                         .domain(legendString)
                         .range(d3.schemeSet2);
+        var confirmedLine = svg
+            .append("path")
+            .attr("id", "confirmed")    
+            .datum(confirmedData)    
+            .attr('d', line)
+            .attr("stroke", color(legendString[legendString.length - 2]))
+        
+        //draw forecasts
 
         forecastData.map((f, index) => {
             console.log(f);
