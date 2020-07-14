@@ -41,13 +41,14 @@ class ChartContainer extends React.Component {
     if (!data || !orgs || !userPrediction || !confirmed) return 'Loading...';
 
     return (
-      <div className="chartContainer">
+      /*
         <LineCharts
           dataSet={data}
           orgs={orgs}
           userPrediction={userPrediction}
           confirmed={confirmed}
-        />
+        />*/
+      <div className="chartContainer">
         <ModelsChart 
           data={data} 
           orgs={orgs}
