@@ -6,6 +6,14 @@
     stroke-linecap: round;
     fill: none;
 }
+.forecast {
+    stroke-width: 0.5;
+    stroke: green;
+    stroke-width : 1.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    fill: none
+}
 
 #your-line{
     stroke-width: 0.5;

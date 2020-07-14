@@ -29,20 +29,21 @@ class InteractiveChart extends Component {
 
     renderChart() {
         const { forecast, orgs, userPrediction, confirmed } = this.props;
-        console.log(forecast);
         const model = orgs;
         //console.log(model);
         const confirmedResult = cleanConfirmedData(confirmed, Object.keys(forecast));
         const savePrediction = this.savePrediction;
         
         //set up margin, width, height of chart
+        var legendWidth = 180;
+        var toolTipHeight = 50;
         var margin = {top: 20, right: 30, bottom: 20, left: 60},
             width = 800 - margin.left - margin.right,
             height = 400 - margin.top - margin.bottom;
         var svg = d3.select(this.chartRef.current)
                     .append("svg")
-                        .attr("width", width + margin.left + margin.right)
-                        .attr("height", height + margin.top + margin.bottom + 50)
+                        .attr("width", width + margin.left + margin.right + legendWidth)
+                        .attr("height", height + margin.top + margin.bottom + toolTipHeight)
                     .append("g")
                         .attr("transform",
                         "translate(" + margin.left + "," + margin.top + ")");
@@ -57,6 +58,12 @@ class InteractiveChart extends Component {
             date: d3.timeParse("%Y-%m-%d")(key),
             value: confirmed[key]
         }))
+        var forecastData = forecast.map(f => {
+            return Object.keys(f).map(key => ({
+                date: d3.timeParse("%Y-%m-%d")(key),
+                value: f[key]
+            }))
+        });
 
         //get data starting 2020-02-01
         confirmedData = confirmedData.filter(d => +d.date >= +new Date("2020-02-01"));
@@ -72,9 +79,18 @@ class InteractiveChart extends Component {
          svg.append("g")
             .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(x));
-      // Add Y axis
+        
+        //find max val in confirmedData and forecastData to determine the max of y-axis
+        var confirmedMax = d3.max(confirmedData, function(d) { return +d.value; });
+        var forecastMax = 0;
+        forecastData.map(f => {
+            var currMax = d3.max(f, d => {return d.value;})
+            forecastMax = currMax > forecastMax ? currMax : forecastMax;
+        })
+        var yAxisMax = Math.max(confirmedMax, forecastMax);
+        // Add Y axis
         var y = d3.scaleLinear()
-            .domain([0, d3.max(confirmedData, function(d) { return +d.value; })])
+            .domain([0, yAxisMax])
             .range([ height, 0 ])
             .nice();
         svg.append("g")
@@ -92,11 +108,56 @@ class InteractiveChart extends Component {
             .x(function(d) { return x(d.date) })
             .y(function(d) { return y(d.value) })
         
-        var path = svg
+        console.log(confirmedData);
+        var confirmedLine = svg
             .append("path")
             .attr("id", "confirmed")    
             .datum(confirmedData)    
             .attr('d', line);
+        
+        //draw forecasts
+        var legendString = orgs.concat(["Daily Confirmed Deaths", "User Prediction"]);
+
+        var color = d3
+                        .scaleOrdinal()
+                        .domain(legendString)
+                        .range(d3.schemeSet2);
+
+        forecastData.map((f, index) => {
+            console.log(f);
+            svg
+                .append("path")
+                    .attr("class", "forecast")
+                    .attr("id", orgs[index])
+                    .style("stroke", color(orgs[index]))
+                .datum(f)
+                    .attr("d", line);
+        })
+        //draw legend
+        var legend = svg.append('g')
+                        .attr("id", "legend")
+        var size = 10;
+
+        legend.selectAll("rect")
+            .data(legendString)
+            .enter()
+            .append("circle")
+                .attr('cx', width + 30)
+                .attr("cy", function(d,i){ return 20 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
+                .attr("r", 6)
+                //.attr("width", size)
+                //.attr("height", size)
+                .style("fill", function(d){ return color(d)})
+        legend.selectAll("labels")
+            .data(legendString)
+            .enter()
+            .append("text")
+                .attr("x", width + 45)
+                .attr("y", function(d,i){ return 20 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
+                .style("fill", function(d){ return color(d)})
+                .text(function(d){ return d})
+                    .attr("text-anchor", "left")
+                    .style("alignment-baseline", "middle")
 
         var predictionData = [];
         var currDate = confirmedData[confirmedData.length - 1].date;
@@ -110,9 +171,9 @@ class InteractiveChart extends Component {
             value = 0;
         }
         //append click area rect
-        var confirmedAreaWidth = path.node().getBoundingClientRect().width;
+        var confirmedAreaWidth = confirmedLine.node().getBoundingClientRect().width;
         var clickAreaWidth = width - confirmedAreaWidth;
-        console.log(path.node().getBoundingClientRect().left);
+        //console.log(confirmedLine.node().getBoundingClientRect().left);
         svg.append("rect")
            .attr("id", "click-area")
            .attr("width", clickAreaWidth)
@@ -138,7 +199,7 @@ class InteractiveChart extends Component {
                      .on("drag", function() {
                         var pos = d3.mouse(this);
                         var date = clamp(predStartDate, endDate, x.invert(pos[0]));
-                        var value = clamp(0, 5000, y.invert(pos[1]));
+                        var value = clamp(0, yAxisMax, y.invert(pos[1]));
                         //var date = x.invert(pos[0]);
                         //var value = y.invert(pos[1]);
                         console.log(value);
@@ -225,13 +286,13 @@ class InteractiveChart extends Component {
             var d = b && (date - a.date > b.date - date) ? b : a;
             date = d.date;
             var value = Math.round(d.value);
-            if (value != 0) {
-                tooltip
-                    .attr("transform", `translate(${x(date)},${y(value)})`)
-                    .call(callout, `${value}
-                    ${formatDate(date)}`);
+            //if (value != 0) {
+            tooltip
+                .attr("transform", `translate(${x(date)},${y(value)})`)
+                .call(callout, `${value}
+                ${formatDate(date)}`);
 
-            }
+            //}
         });
 
         svg.on("touchend mouseleave", () => tooltip.call(callout, null));
