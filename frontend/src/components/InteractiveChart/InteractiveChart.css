@@ -14,7 +14,7 @@
     fill: none
 }
 
-#your-line{
+#your-line {
     stroke-width: 0.5;
     stroke: red;
     stroke-width : 1.5;
@@ -24,3 +24,6 @@
     fill: none;
 }
 
+#click-area {
+    cursor: pointer;
+}

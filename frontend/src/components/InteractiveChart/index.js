@@ -208,6 +208,12 @@ class InteractiveChart extends Component {
             yourLine.datum(filteredData)
                     .attr('d', predLine)
         }
+    //append new rect  
+        const mouseArea = svg.append("rect")
+            .attr("width", width)
+            .attr("height", height)
+            .attr("fill", "none")
+            .style("pointer-events","visible");
 
         //append click area rect
         var confirmedAreaWidth = confirmedLine.node().getBoundingClientRect().width; //get width of path element containing confirmed data
@@ -220,6 +226,17 @@ class InteractiveChart extends Component {
            .attr("fill", "none")
            .style("pointer-events","visible");
         //var clickArea = d3.select("#click-area");
+
+        //append draw your guess text
+        if(!userPrediction) {
+            svg.append("text")
+                .attr("id", "draw-guess")
+                .attr("x", confirmedAreaWidth + (clickAreaWidth / 2))             
+                .attr("y", height - 60)
+                .attr("text-anchor", "middle")  
+                .style("font-size", "16px") 
+                .text("Draw your guess");
+        }
 
         var drag = d3.drag()
                      .on("drag", function() {
@@ -265,12 +282,6 @@ class InteractiveChart extends Component {
         }*/
 
         const tooltip = svg.append("g");
-        const mouseArea = svg.append("rect")
-                            .attr("width", width)
-                            .attr("height", height)
-                            .attr("fill", "none")
-                            .style("pointer-events","visible");
-
 
         svg.on("touchmove mousemove", function() {
             console.log("working");
