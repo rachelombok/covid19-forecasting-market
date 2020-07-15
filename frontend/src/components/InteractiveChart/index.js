@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3'
 import './InteractiveChart.css';
-import { cleanConfirmedData, clamp } from '../../utils/data';
+import { clamp, callout } from '../../utils/data';
 import { elementType } from 'prop-types';
 import { addDays, formatDate } from '../../utils/date';
 
@@ -30,15 +30,13 @@ class InteractiveChart extends Component {
 
     renderChart() {
         const { forecast, orgs, userPrediction, confirmed } = this.props;
-        const model = orgs;
-        //console.log(model);
-        const confirmedResult = cleanConfirmedData(confirmed, Object.keys(forecast));
+        var predictionData = [];//where we will store formatted userPrediction
         const savePrediction = this.savePrediction;
         const category = this.state.category;
         
         //set up margin, width, height of chart
         var legendWidth = 180;
-        var toolTipHeight = 50;
+        var toolTipHeight = 50; //to make sure there's room for the tooltip when the value is 0
         var margin = {top: 20, right: 30, bottom: 20, left: 60},
             width = 800 - margin.left - margin.right,
             height = 400 - margin.top - margin.bottom;
@@ -49,13 +47,8 @@ class InteractiveChart extends Component {
                     .append("g")
                         .attr("transform",
                         "translate(" + margin.left + "," + margin.top + ")");
-        //console.log(svg);
-
-        //line function        
-        /*var drawLine = d3.line()
-            .x(function(d) { return x(d.year) })
-            .y(function(d) { return y(d.debt) })*/
-        //process data
+        
+        //format confirmedData, forecastData, and predictionData into a list of js objects, convert date from string to js date object
         var confirmedData = Object.keys(confirmed).map(key => ({
             date: d3.timeParse("%Y-%m-%d")(key),
             value: confirmed[key]
@@ -66,8 +59,6 @@ class InteractiveChart extends Component {
                 value: f[key]
             }))
         });
-        console.log(userPrediction)
-        var predictionData = [];
         if(userPrediction) {
             predictionData = userPrediction.map(p => ({
                 date: d3.timeParse("%Y-%m-%d")((p.date).substring(0,10)),
@@ -76,21 +67,22 @@ class InteractiveChart extends Component {
                 })
             );
         }
-        console.log(predictionData)
 
+        //set other dates
+        var confirmedStartDate = d3.timeParse("%Y-%m-%d")("2020-02-01"); //date format: y-m-d
+        var predStartDate = confirmedData[confirmedData.length - 1].date; //last date of confirmedData
+        var predLength = 365;
+        var predEndDateString = addDays(new Date(), predLength).toISOString().substring(0, 10);
+        var predEndDate = d3.timeParse("%Y-%m-%d")(predEndDateString)
+        
+        //get confirmedData starting from confirmedStartDate
+        confirmedData = confirmedData.filter(d => +d.date >= +confirmedStartDate);
 
-        //get data starting 2020-02-01
-        confirmedData = confirmedData.filter(d => +d.date >= +new Date("2020-02-01"));
-
-        //draw x-axis
-        var startDate = confirmedData[0].date; //confirmed data start day
-        var predStartDate = confirmedData[confirmedData.length - 1].date; //prediction start day
-        var predLength = 63;
-        var predEndDate = addDays(new Date(), predLength);
+        //draw x-axis        
         var x = d3.scaleTime()
-            .domain([startDate, predEndDate])
+            .domain([confirmedStartDate, predEndDate])
             .range([ 0, width ])
-            .nice();
+            //.nice(); //rounds up/down the max and mind of x axis
          svg.append("g")
             .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(x));
@@ -103,55 +95,26 @@ class InteractiveChart extends Component {
             forecastMax = currMax > forecastMax ? currMax : forecastMax;
         })
         var yAxisMax = Math.max(confirmedMax, forecastMax);
-        // Add Y axis
+        //draw y-axis
         var y = d3.scaleLinear()
             .domain([0, yAxisMax])
             .range([ height, 0 ])
             .nice();
         svg.append("g")
             .call(d3.axisLeft(y));
-        
-        var lineGenerator = d3.line()
-            .curve(d3.curveCatmullRom)
-            
-        var predLineGenerator = d3.line()
-            .curve(d3.curveBasis);
-            //d3.curveMonotoneX
-            //d3.curveBasis
-            //d3.curveCardinal
-        var line = lineGenerator
-            .x(function(d) { return x(d.date) })
-            .y(function(d) { return y(d.value) })
-
+   
+        //list of data displayed in graph - for legend
         var legendString = orgs.concat(["Daily Confirmed Deaths", "User Prediction"]);
-
+        //color function that assigns random colors to each data
         var color = d3
                         .scaleOrdinal()
                         .domain(legendString)
                         .range(d3.schemeSet2);
-        var confirmedLine = svg
-            .append("path")
-            .attr("id", "confirmed")    
-            .datum(confirmedData)    
-            .attr('d', line)
-            .attr("stroke", color(legendString[legendString.length - 2]))
-        
-        //draw forecasts
 
-        forecastData.map((f, index) => {
-            svg
-                .append("path")
-                    .attr("class", "forecast")
-                    .attr("id", orgs[index])
-                    .style("stroke", color(orgs[index]))
-                .datum(f)
-                    .attr("d", line);
-        })
-        //draw legend
+         //draw legend
         var legend = svg.append('g')
                         .attr("id", "legend")
         var size = 10;
-
         legend.selectAll("rect")
             .data(legendString)
             .enter()
@@ -173,30 +136,62 @@ class InteractiveChart extends Component {
                     .attr("text-anchor", "left")
                     .style("alignment-baseline", "middle")
 
+        //create line generator for confirmed/forecast data and prediction data
+        var lineGenerator = d3.line()
+            .curve(d3.curveCatmullRom)//curve that goes through all data points
+        var predLineGenerator = d3.line()
+            .curve(d3.curveBasis); //curve doesn't go through all data points (it's smoothed out)
+            //d3.curveMonotoneX
+            //d3.curveBasis
+            //d3.curveCardinal
+        
+        //function that draws curve
+        var line = lineGenerator
+            .x(function(d) { return x(d.date) })
+            .y(function(d) { return y(d.value) })
+        
+        //display confirmed data
+        var confirmedLine = svg
+            .append("path")
+            .attr("id", "confirmed")    
+            .datum(confirmedData)    
+            .attr('d', line)
+            .attr("stroke", color(legendString[legendString.length - 2]))
+        
+        //display forecast data
+        forecastData.map((f, index) => {
+            svg
+                .append("path")
+                    .attr("class", "forecast")
+                    .attr("id", orgs[index])
+                    .style("stroke", color(orgs[index]))
+                .datum(f)
+                    .attr("d", line);
+        })
+        
+        //function that generates the prediction curve
+        var predLine = predLineGenerator
+            .defined(d => d.defined)
+            .x(function(d) { return x(d.date) })
+            .y(function(d) { return y(d.value) })
+
+        //append path for prediction data
+        var yourLine = svg.append("path")
+                .attr("id", "your-line");
+        
+        //variables used to initialize user prediction data if it doesn't exist in the db
         var currDate = predStartDate;
         var defined = true;
         var value = confirmedData[confirmedData.length - 1].value;
         var confirmedLastVal = value; //used to make sure the first data point of prediction stays the same
 
         //check if userPrediction already exists in db
-        console.log(predStartDate, predEndDate);
-        console.log(predictionData)
-
-        var predLine = predLineGenerator
-                    .defined(d => d.defined)
-                    .x(function(d) { return x(d.date) })
-                    .y(function(d) { return y(d.value) })
-       
-        var yourLine = svg.append("path")
-                      .attr("id", "your-line");
-
         if (userPrediction) {
             predictionData = predictionData.filter(d => (+d.date >= +predStartDate) && (+d.date <= +predEndDate));
             predictionData[0].value = value;
             defined = false;
             value = 0;
             currDate = addDays(predictionData[predictionData.length - 1].date, 1);
-            console.log(predictionData)
         }
         
         while (+currDate <= +predEndDate) {            
@@ -205,9 +200,7 @@ class InteractiveChart extends Component {
             defined = 0;
             value = 0;
         }
-        console.log(predictionData)
         var filteredData = null;
-        
         var totalData = confirmedData.concat(predictionData);
 
         if(userPrediction) {
@@ -216,11 +209,9 @@ class InteractiveChart extends Component {
                     .attr('d', predLine)
         }
 
-
         //append click area rect
-        var confirmedAreaWidth = confirmedLine.node().getBoundingClientRect().width;
-        var clickAreaWidth = width - confirmedAreaWidth;
-        //console.log(confirmedLine.node().getBoundingClientRect().left);
+        var confirmedAreaWidth = confirmedLine.node().getBoundingClientRect().width; //get width of path element containing confirmed data
+        var clickAreaWidth = width - confirmedAreaWidth; //the remaining area
         svg.append("rect")
            .attr("id", "click-area")
            .attr("width", clickAreaWidth)
@@ -228,11 +219,8 @@ class InteractiveChart extends Component {
            .attr("transform", "translate (" + confirmedAreaWidth+" 0)")
            .attr("fill", "none")
            .style("pointer-events","visible");
-        var clickArea = d3.select("#click-area");
-        
-        /*var gapLine = svg.append("path")
-                            .attr("id", "gap-line");*/
-        
+        //var clickArea = d3.select("#click-area");
+
         var drag = d3.drag()
                      .on("drag", function() {
                         var pos = d3.mouse(this);
@@ -240,15 +228,13 @@ class InteractiveChart extends Component {
                         var value = clamp(0, yAxisMax, y.invert(pos[1]));
                         //var date = x.invert(pos[0]);
                         //var value = y.invert(pos[1]);
-                        console.log(value);
                 
                         predictionData.forEach(function(d){
-                            if (+d3.timeDay.round(d.date) == +d3.timeDay.round(date) && (+d3.timeDay.round(d.date) != +predStartDate)){
+                            if (+d3.timeDay.round(d.date) == +d3.timeDay.round(date)){
                                 d.value = value;
                                 d.defined = true
                             }
-                            predictionData[0].value = confirmedLastVal;
-                            //save prediction data
+                            predictionData[0].value = confirmedLastVal;//make sure the prediction curve is always connected to the confirmed curve
                             //update totalData everytime predictionData is updated
                             totalData = confirmedData.concat(predictionData);
                             /*yourLine.datum(predictionData)
@@ -257,9 +243,7 @@ class InteractiveChart extends Component {
 
                             yourLine.datum(filteredData)
                                     .attr('d', predLine)
-                            
-                            /*gapLine.datum(filteredData)
-                                    .attr('d', predLine(filteredData));*/
+
                         });
                     })
                     .on("end", function () {
@@ -269,7 +253,7 @@ class InteractiveChart extends Component {
         svg.call(drag)
 
         //finds the datapoint closest to the mouse (along x)
-        var bisect = () => {
+        /*var bisect = () => {
             const bisectDate = d3.bisector(d => d.date).left;
             return mx => {
                 const date = x.invert(mx);
@@ -278,38 +262,8 @@ class InteractiveChart extends Component {
                 const b = totalData[index];
                 return b && (date - a.date > b.date - date) ? b : a;
             };
-        }
-        var callout = (g, value) => {
-            if (!value) return g.style("display", "none");
-          
-            g
-                .style("display", null)
-                .style("pointer-events", "none")
-                .style("font", "10px sans-serif");
-          
-            const path = g.selectAll("path")
-              .data([null])
-              .join("path")
-                .attr("fill", "white")
-                .attr("stroke", "black");
-          
-            const text = g.selectAll("text")
-              .data([null])
-              .join("text")
-              .call(text => text
-                .selectAll("tspan")
-                .data((value + "").split(/\n/))
-                .join("tspan")
-                  .attr("x", 0)
-                  .attr("y", (d, i) => `${i * 1.1}em`)
-                  .style("font-weight", (_, i) => i ? null : "bold")
-                  .text(d => d));
-          
-            const {x, y, width: w, height: h} = text.node().getBBox();
-          
-            text.attr("transform", `translate(${-w / 2},${15 - y})`);
-            path.attr("d", `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`);
-        }
+        }*/
+
         const tooltip = svg.append("g");
         const mouseArea = svg.append("rect")
                             .attr("width", width)
@@ -319,7 +273,7 @@ class InteractiveChart extends Component {
 
 
         svg.on("touchmove mousemove", function() {
-            console.log("yep");
+            console.log("working");
             var date = x.invert(d3.mouse(this)[0]);
             const index = d3.bisector(d => d.date).left(totalData, date, 1);
             const a = totalData[index - 1];
@@ -327,14 +281,14 @@ class InteractiveChart extends Component {
             //d = the data object corresponding to date and value pointed by the cursors
             var d = b && (date - a.date > b.date - date) ? b : a;
             date = d.date;
+            var defined = d.defined;
             var value = Math.round(d.value);
-            //if (value != 0) {
-            tooltip
-                .attr("transform", `translate(${x(date)},${y(value)})`)
-                .call(callout, `${value}
-                ${formatDate(date)}`);
-
-            //}
+            if (defined != 0) {
+                tooltip
+                    .attr("transform", `translate(${x(date)},${y(value)})`)
+                    .call(callout, `${value}
+                    ${formatDate(date)}`);
+            }
         });
 
         svg.on("touchend mouseleave", () => tooltip.call(callout, null));
