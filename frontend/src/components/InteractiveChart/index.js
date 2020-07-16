@@ -226,9 +226,21 @@ class InteractiveChart extends Component {
            .attr("fill", "none")
            .style("pointer-events","visible");
         //var clickArea = d3.select("#click-area");
+        
+        //append circle at the end of confirmed curve
+        var selectCircle = svg
+                                .append("g")
+                                .attr("class", "pointer")
+        var pointerCircles = ["pulse-disk", "pulse-circle", "pulse-circle-2"];
+        pointerCircles.map((c) => {
+            selectCircle.append("circle")
+                        .attr("class", c)
+                        .attr("cx", x(confirmedData[confirmedData.length - 1].date))
+                        .attr("cy", y(confirmedData[confirmedData.length - 1].value))
+        })
 
-        //append draw your guess text
         if(!userPrediction) {
+            //append draw your guess text
             svg.append("text")
                 .attr("id", "draw-guess")
                 .attr("x", confirmedAreaWidth + (clickAreaWidth / 2))             
@@ -236,6 +248,17 @@ class InteractiveChart extends Component {
                 .attr("text-anchor", "middle")  
                 .style("font-size", "16px") 
                 .text("Draw your guess");
+            //append circle at the end of confirmed curve
+            var selectCircle = svg
+                                    .append("g")
+                                    .attr("class", "pointer")
+            var pointerCircles = ["pulse-disk", "pulse-circle", "pulse-circle-2"];
+            pointerCircles.map((c) => {
+            selectCircle.append("circle")
+                .attr("class", c)
+                .attr("cx", x(confirmedData[confirmedData.length - 1].date))
+                .attr("cy", y(confirmedData[confirmedData.length - 1].value))
+            })
         }
 
         var drag = d3.drag()
