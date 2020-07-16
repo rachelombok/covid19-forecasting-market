@@ -5,6 +5,14 @@
     stroke-linecap: round;
     fill: none;
 }
+#aggregate {
+    stroke-width: 0.5;
+    stroke-width : 1.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    fill: none;
+}
+
 .forecast {
     stroke-width: 0.5;
     stroke: green;
@@ -16,7 +24,6 @@
 
 #your-line {
     stroke-width: 0.5;
-    stroke: red;
     stroke-width : 1.5;
     stroke-linejoin: round;
     stroke-linecap: round;
@@ -26,6 +33,9 @@
 
 #click-area {
     cursor: pointer;
+}
+.tooltip {
+    opacity: 1;
 }
 
 /*css for blinking red circle*/
