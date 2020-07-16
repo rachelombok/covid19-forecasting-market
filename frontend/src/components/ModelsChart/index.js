@@ -16,7 +16,7 @@ class ModelsChart extends React.Component {
     }
   
     renderChart() {
-      const { data, orgs, confirmed } = this.props;
+      const { data, orgs, confirmed, aggregate } = this.props;
 
       var options = {
         scales: {
@@ -92,6 +92,21 @@ class ModelsChart extends React.Component {
         pointHoverRadius: 7,
         pointHoverBorderColor: 'black',
         borderDash: [15, 10]
+      })
+
+      // Add aggregate data to chart
+      const aggregateResult = cleanConfirmedData(aggregate, dates);
+      datasets.push({
+        label: 'Aggregate Forecast (average)',
+        data: Object.values(aggregateResult),
+        borderColor: 'red',
+        borderWidth: 3,
+        fill: false,
+        pointBackgroundColor: colors[orgs[i]],
+        pointRadius: 4,
+        pointBorderWidth: 1,
+        pointHoverRadius: 7,
+        pointHoverBorderColor: 'black'
       })
   
       // Create chart with all models

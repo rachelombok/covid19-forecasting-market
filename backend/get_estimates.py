@@ -53,6 +53,24 @@ def get_daily_forecasts():
     return models
 
 
+def get_aggregates(forecast_data):
+    aggregate_json = dict()
+    forecast_json = forecast_data
+    for org in forecast_json.keys():
+        data = forecast_json[org]
+        dates = data['target_end_date']
+        values = data['value']
+        for i in range(len(dates)):
+            if dates[i] not in aggregate_json:
+                aggregate_json[dates[i]] = [values[i]]
+            else:
+                aggregate_json[dates[i]].append(values[i])
+
+    for date in aggregate_json:
+        aggregate_json[date] = sum(aggregate_json[date])/len(aggregate_json[date])
+    return aggregate_json
+
+
 #pass in the df containing confirmed and predicted values
 def get_mse(model_df):
     confirmed = model_df['confirmed']
@@ -120,3 +138,4 @@ def get_daily_confirmed(d):
 #print(get_daily_confirmed_df('2020-06-01', '2020-06-03'))
 
 #print(get_daily_forecasts())
+#print(get_aggregates(get_daily_forecasts()))

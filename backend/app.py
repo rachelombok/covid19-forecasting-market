@@ -5,7 +5,7 @@ from passlib.hash import pbkdf2_sha256
 from datetime import timedelta, date
 from bson.json_util import dumps, loads
 import json
-from get_estimates import get_forecasts, get_accuracy_for_all_models, get_daily_confirmed_df, get_daily_forecasts
+from get_estimates import get_forecasts, get_accuracy_for_all_models, get_daily_confirmed_df, get_daily_forecasts, get_aggregates
 from confirmed import get_us_new_deaths, get_us_confirmed
 from gaussian import get_gaussian_for_all
 
@@ -21,6 +21,10 @@ us_data = get_us_confirmed()
 
 us_inc_forecasts = get_daily_forecasts()
 us_inc_confirmed = get_us_new_deaths()
+
+# Get aggregate data
+us_aggregates = get_aggregates(forecast_data)
+us_aggregates_daily = get_aggregates(us_inc_forecasts)
 
 # set up pymongo
 #app.config["MONGO_URI"] = "mongodb://localhost:27017/covid19-forecast"
@@ -178,6 +182,14 @@ def us_cum_deaths_confirmed():
 def us_inc_deaths_confirmed():
     return us_inc_confirmed
     #return data['us_inc_confirmed']
+
+@app.route('/us-agg-cum-deaths')
+def us_agg_cum_deaths():
+    return us_aggregates
+
+@app.route('/us-agg-inc-deaths')
+def us_agg_inc_deaths():
+    return us_aggregates_daily
 
 @app.route('/update/', methods=['POST'])
 def update():

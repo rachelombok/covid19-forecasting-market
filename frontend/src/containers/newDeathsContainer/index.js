@@ -18,7 +18,8 @@ class newDeathsContainer extends React.Component {
       data: null,
       orgs: null,
       confirmed: null,
-      userPrediction: null
+      userPrediction: null,
+      aggregate: null
     };
   }
 
@@ -33,12 +34,15 @@ class newDeathsContainer extends React.Component {
     fetch('/us-inc-deaths-confirmed').then(res => res.json()).then(data => {
       this.setState({ confirmed: data });
     });
+    fetch('/us-agg-inc-deaths').then(res => res.json()).then(data => {
+      this.setState({ aggregate: data });
+    });
   }
 
   render() {
-    const { data, orgs, userPrediction, confirmed } = this.state;
+    const { data, orgs, userPrediction, confirmed, aggregate } = this.state;
 
-    if (!data || !orgs || !userPrediction || !confirmed) return 'Loading...';
+    if (!data || !orgs || !userPrediction || !confirmed || !aggregate) return 'Loading...';
 
     return (
       <div className="chartContainer">
@@ -52,6 +56,7 @@ class newDeathsContainer extends React.Component {
           data={data} 
           orgs={orgs}
           confirmed={confirmed} 
+          aggregate={aggregate}
         />
       </div>
     );
