@@ -110,7 +110,6 @@ def store_session(id, name, username):
 def authenticate(username, password):
     user = mongo.db.users.find_one(
         {"username": username})
-
     if user:
         if pbkdf2_sha256.verify(password, user["password"]):
             store_session((user['_id']), user['name'], user['username'])
@@ -191,41 +190,44 @@ def update():
 
 @app.route('/login/', methods=['POST'])
 def login():
-    '''
-    if request.method == "POST":
-        session.permanent = True
-        username = request.form["username"]
-        password = request.form["password"]
-        if authenticate(username, password):
-            return redirect(url_for("home"))
-        else:
-            flash("Invalid username or password. Please try again", "error")
-            return redirect(url_for("signin"))
-    else:
-        if 'id' in session:
-            return redirect(url_for('home'))
-    '''
+
     if request.method == 'POST':
         data = request.json
-        print(data)
         username = data['username']
         password = data['password']
-        
+        #print(username, password)
+        user = mongo.db.users.find_one(
+        {"username": username})
+        print(user)
         if authenticate(username, password):
-            print('flag2')
-            return redirect(url_for("home"))
-
+            return 'Sucess'
         else:
-            print('flag3')
             flash("Invalid username or password. Please try again", "error")
-            return redirect(url_for("signin"))
+            
     else:
-        print('flag4')
         if 'id' in session:
             print('flag5')
-            return redirect(url_for('home'))
         return "Success"
     return 'None'
+@app.route('/signup/', methods=['POST'])
+def signup():
+    if request.method == "POST":
+        data = request.json
+        name = data['name']
+        username = data['username']
+        password = data['password']
+        print("here it is: ", name, username, password)
+        if register(name, username, password):
+            #return redirect(url_for("home"))
+            return 'Sucess'
+        else:
+            flash("Username is already taken")
+            #return redirect(url_for("signin"))
+    else:
+        print("hmmm")
+        #return redirect(url_for("signin"))
+    return 'None'
+
 
 @app.route('/user-data')
 def leaderboard():
@@ -244,7 +246,7 @@ def addbio():
         location = request.values.get('location')
     user = mongo.db.users.find({'username': session['username']})
     user.insert({'bio':bio, 'location':location})
-    redirect('/user')
+    #redirect('/user')
 
 @app.route("/total")
 def total():
