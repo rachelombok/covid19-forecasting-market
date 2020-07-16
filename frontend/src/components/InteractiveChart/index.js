@@ -116,7 +116,7 @@ class InteractiveChart extends Component {
         var color = d3
                         .scaleOrdinal()
                         .domain(legendString)
-                        .range(d3.schemeSet2);
+                        .range(d3.schemeTableau10);
 
          //draw legend
         var legend = svg.append('g')
@@ -307,13 +307,16 @@ class InteractiveChart extends Component {
 
         var drag = d3.drag()
                      .on("drag", function() {
-                        tooltip.call(callout, null); //hide tooltip
+                        d3.select("#tooltip-line")
+                            .style("opacity", "0");
+                        d3.selectAll(".mouse-per-line circle")
+                            .style("opacity", "0");
+                        d3.selectAll(".mouse-per-line text")
+                            .style("opacity", "0")
                         var pos = d3.mouse(this);
-                        var date = clamp(predStartDate, predEndDate, x.invert(x));
+                        var date = clamp(predStartDate, predEndDate, x.invert(pos[0]));
                         var value = clamp(0, yAxisMax, y.invert(pos[1]));
-                        //var date = x.invert(x);
-                        //var value = y.invert(pos[1]);
-                
+                        
                         predictionData.forEach(function(d){
                             if (+d3.timeDay.round(d.date) == +d3.timeDay.round(date)){
                                 d.value = value;
@@ -321,7 +324,7 @@ class InteractiveChart extends Component {
                             }
                             predictionData[0].value = confirmedLastVal;//make sure the prediction curve is always connected to the confirmed curve
                             //update totalData everytime predictionData is updated
-                            totalData = confirmedData.concat(predictionData);
+                            compiledData[confirmedData.length] = predictionData;
                             /*yourLine.datum(predictionData)
                                     .attr('d', predLine)*/
                             var filteredData = predictionData.filter(predLine.defined())
@@ -334,6 +337,12 @@ class InteractiveChart extends Component {
                     })
                     .on("end", function () {
                         savePrediction(predictionData, category);
+                        d3.select("#tooltip-line")
+                            .style("opacity", "1");
+                        d3.selectAll(".mouse-per-line circle")
+                            .style("opacity", "1");
+                        d3.selectAll(".mouse-per-line text")
+                            .style("opacity", "1")
                     });
         
         svg.call(drag)
@@ -403,7 +412,6 @@ class InteractiveChart extends Component {
 
                     })
                     .on('mousemove', function() { // mouse moving over canvas
-                        console.log("yes")
                         var mouse = d3.mouse(this);
                         var xCoord = mouse[0];
                         d3
