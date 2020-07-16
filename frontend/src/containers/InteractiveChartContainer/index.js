@@ -17,7 +17,8 @@ class InteractiveChartContainer extends Component {
             forecast: null,
             orgs: null,
             confirmed: null,
-            userPrediction: null
+            userPrediction: null,
+            aggregate: null
         };
     }
 
@@ -34,10 +35,13 @@ class InteractiveChartContainer extends Component {
             //const result = JSON.parse(data);
             this.setState({ confirmed: data });
         });
+        fetch('/us-agg-inc-deaths').then(res => res.json()).then(data => {
+            this.setState({ aggregate: data });
+        });
     }
     render() {
-        const { forecast, orgs, userPrediction, confirmed } = this.state;
-        if (!forecast || !orgs || !userPrediction || !confirmed) return 'Loading...';
+        const { forecast, orgs, userPrediction, confirmed, aggregate } = this.state;
+        if (!forecast || !orgs || !userPrediction || !confirmed || !aggregate) return 'Loading...';
 
         return (
             <div className="chartContainer">
@@ -46,6 +50,7 @@ class InteractiveChartContainer extends Component {
                     orgs={orgs}
                     userPrediction={userPrediction}
                     confirmed={confirmed}
+                    aggregate={aggregate}
                 />
             </div>
         );

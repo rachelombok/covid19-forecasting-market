@@ -29,7 +29,7 @@ class InteractiveChart extends Component {
     }
 
     renderChart() {
-        const { forecast, orgs, userPrediction, confirmed } = this.props;
+        const { forecast, orgs, userPrediction, confirmed, aggregate } = this.props;
         var predictionData = [];//where we will store formatted userPrediction
         const savePrediction = this.savePrediction;
         const category = this.state.category;
@@ -52,13 +52,20 @@ class InteractiveChart extends Component {
         var confirmedData = Object.keys(confirmed).map(key => ({
             date: d3.timeParse("%Y-%m-%d")(key),
             value: confirmed[key]
-        }))
+        }));
+        
         var forecastData = forecast.map(f => {
             return Object.keys(f).map(key => ({
                 date: d3.timeParse("%Y-%m-%d")(key),
                 value: f[key]
             }))
         });
+
+        var aggregateData = Object.keys(aggregate).map(key => ({
+            date: d3.timeParse("%Y-%m-%d")(key),
+            value: aggregate[key]
+        }));
+
         if(userPrediction) {
             predictionData = userPrediction.map(p => ({
                 date: d3.timeParse("%Y-%m-%d")((p.date).substring(0,10)),
@@ -157,6 +164,14 @@ class InteractiveChart extends Component {
             .datum(confirmedData)    
             .attr('d', line)
             .attr("stroke", color(legendString[legendString.length - 2]))
+
+        //display aggregate data
+        var confirmedLine = svg
+            .append("path")
+            .attr("id", "confirmed")    
+            .datum(aggregateData)    
+            .attr('d', line)
+            .attr("stroke", 'black')
         
         //display forecast data
         forecastData.map((f, index) => {
