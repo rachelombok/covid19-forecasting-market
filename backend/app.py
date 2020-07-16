@@ -102,6 +102,39 @@ def get_user_prediction(username, category):
         user_prediction = exists['prediction']
     return user_prediction
 
+def store_session(id, name, username):
+    session['id'] = str(id)
+    session['name'] = name
+    session['username'] = username
+
+def authenticate(username, password):
+    user = mongo.db.users.find_one(
+        {"username": username})
+
+    if user:
+        if pbkdf2_sha256.verify(password, user["password"]):
+            store_session((user['_id']), user['name'], user['username'])
+            return True
+    return False
+
+def register(name, username, password):
+    user = mongo.db.users.find_one(
+        {"username": username})
+    # user already exists
+    if user:
+        return False
+    # add new user
+    hashed = pbkdf2_sha256.hash(password)
+    mongo.db.users.insert_one({
+        'name': name,
+        'username': username,
+        'password': hashed,
+        'score': 0
+    })
+    new_user = mongo.db.users.find_one({'username': username})
+    store_session((new_user['_id']), new_user['name'], new_user['username'])
+    return True
+
 
 @app.before_first_request
 def make_session_permanent():
@@ -156,6 +189,44 @@ def update():
         return "Success"
     return 'None'
 
+@app.route('/login/', methods=['POST'])
+def login():
+    '''
+    if request.method == "POST":
+        session.permanent = True
+        username = request.form["username"]
+        password = request.form["password"]
+        if authenticate(username, password):
+            return redirect(url_for("home"))
+        else:
+            flash("Invalid username or password. Please try again", "error")
+            return redirect(url_for("signin"))
+    else:
+        if 'id' in session:
+            return redirect(url_for('home'))
+    '''
+    if request.method == 'POST':
+        data = request.json
+        print(data)
+        username = data['username']
+        password = data['password']
+        
+        if authenticate(username, password):
+            print('flag2')
+            return redirect(url_for("home"))
+
+        else:
+            print('flag3')
+            flash("Invalid username or password. Please try again", "error")
+            return redirect(url_for("signin"))
+    else:
+        print('flag4')
+        if 'id' in session:
+            print('flag5')
+            return redirect(url_for('home'))
+        return "Success"
+    return 'None'
+
 @app.route('/user-data')
 def leaderboard():
     all_users = list(mongo.db.users.find({},{'name': 1, 'score': 1}).sort('score',-1))
@@ -166,7 +237,7 @@ def profile():
     user = mongo.db.users.find({'username': session['username']})
     return json.dumps(user)
 
-@app.route('/action', methods=["POST"])
+@app.route('/action/', methods=["POST"])
 def addbio():
     if request.method == 'POST':
         bio = request.values.get('bio')
