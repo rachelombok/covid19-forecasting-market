@@ -39,7 +39,7 @@ class LineChart extends React.Component {
         datasets: [ // Settings for user prediction graph
           {
               label: "User's Prediciton",
-              data: userPrediction[model].value,
+              data: userPrediction.value,
               backgroundColor: [
                 'rgba(64, 64, 64, 0.2)',
               ],
