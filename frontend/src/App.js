@@ -13,6 +13,7 @@ import * as ROUTES from "./constants/routes";
 import 'leaflet/dist/leaflet.css';
 import Mapportal from './components/Mapportal';
 import Login from './components/LogIn';
+import SignUp from './components/SignUp';
 import {
   BrowserRouter as Router,
   Switch,
@@ -35,6 +36,7 @@ class App extends React.Component {
             <Route exact path={ROUTES.MARKET} component={MarketChart} />
             <Route exact path={ROUTES.PROFILE} component={ProfilePage} />
             <Route exact path={ROUTES.SIGN_IN} component={Login} />
+            <Route exact path={ROUTES.SIGN_UP} component={SignUp} />
             <Route exact path="/blah">
               "BLAH PAGE"
             </Route>
