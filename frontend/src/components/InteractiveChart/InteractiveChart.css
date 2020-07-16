@@ -27,3 +27,72 @@
 #click-area {
     cursor: pointer;
 }
+
+/*css for blinking red circle*/
+/*
+    pulse speed = 3s
+    pulse radius = 2
+    pulse scale = 2
+    pulse stroke = 1
+*/
+.pulse-disk {
+    fill: red;
+    r: 1.5;
+}
+
+.pulse-circle, .pulse-circle-2 {
+    stroke: rgba(255,60,100,1);
+    transform-origin: center;
+    stroke-width: 1;
+    fill: none;
+    transform: translate3d(0,0,0); 
+}
+
+.pulse-circle {
+  animation: pulse 3s cubic-bezier(.39,.54,.41,1.5) infinite;
+  r: 2;
+}
+
+.pulse-circle-2 {
+  r: 4;
+  animation: pulse-2 3s cubic-bezier(.39,.54,.41,1.5) infinite;
+}
+
+@keyframes pulse {
+  0% {    
+      r: 2;
+  }
+  50% {
+    r: 4;
+    opacity: 1;
+  }
+  99% {
+      opacity: 0
+    }
+  100% {
+    opacity: 0;
+    r: 4;
+    }
+}
+
+
+@keyframes pulse-2 {
+    0% {    
+        opacity: 1;
+    }
+    40% {
+        opacity: 0;
+    }
+    49.99%{
+        r: 4;
+        opacity: 0;
+    }
+    50% {
+        r: 2;
+        opacity: 1;
+    }
+    100% {
+        r: 4;
+        opacity: 1;
+    }
+}
