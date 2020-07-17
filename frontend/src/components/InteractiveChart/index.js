@@ -109,14 +109,14 @@ class InteractiveChart extends Component {
         //set other dates
         const confirmedStartDate = d3.timeParse("%Y-%m-%d")("2020-02-01"); //date format: y-m-d
         const predStartDate = confirmedData[confirmedData.length - 1].date; //last date of confirmedData
-        const predLength = 365;
+        const predLength = 155;
         //var predEndDateString = addDays(new Date(), predLength).toISOString().substring(0, 10);
         const predEndDate = d3.timeDay.offset(predStartDate, predLength)
         
         //get confirmedData starting from confirmedStartDate
         confirmedData = confirmedData.filter(d => +d.date >= +confirmedStartDate);
 
-        //draw x-axis        
+        //draw x-axis     
         var x = d3.scaleTime()
             .domain([confirmedStartDate, predEndDate])
             .range([ 0, width ])
@@ -336,7 +336,7 @@ class InteractiveChart extends Component {
             svg.append("text")
                 .attr("id", "draw-guess")
                 .attr("x", confirmedAreaWidth + (clickAreaWidth / 2))             
-                .attr("y", height - 60)
+                .attr("y", height - 100)
                 .attr("text-anchor", "middle")  
                 .style("font-size", "16px") 
                 .text("Draw your guess");
@@ -530,12 +530,12 @@ class InteractiveChart extends Component {
                     .attr('d', predLine)
             //append draw your guess text
             svg.append("text")
-            .attr("id", "draw-guess")
-            .attr("x", confirmedAreaWidth + (clickAreaWidth / 2))             
-            .attr("y", height - 60)
-            .attr("text-anchor", "middle")  
-            .style("font-size", "16px") 
-            .text("Draw your guess");
+                .attr("id", "draw-guess")
+                .attr("x", confirmedAreaWidth + (clickAreaWidth / 2))             
+                .attr("y", height - 100)
+                .attr("text-anchor", "middle")  
+                .style("font-size", "16px") 
+                .text("Draw your guess");
             //append circle at the end of confirmed curve
             var selectCircle = svg
                                     .append("g")
