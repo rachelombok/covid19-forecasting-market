@@ -65,8 +65,8 @@ class InteractiveChart extends Component {
             date: d3.timeParse("%Y-%m-%d")(key),
             value: aggregate[key]
         }));
-
-        if(userPrediction) {
+        //store userPrediction in predictionData if it exists
+        if(Object.keys(userPrediction).length > 0) {
             predictionData = userPrediction.map(p => ({
                 date: d3.timeParse("%Y-%m-%d")((p.date).substring(0,10)),
                 value: p.value,
@@ -74,6 +74,7 @@ class InteractiveChart extends Component {
                 })
             );
         }
+  
 
         //set other dates
         var confirmedStartDate = d3.timeParse("%Y-%m-%d")("2020-02-01"); //date format: y-m-d
@@ -187,7 +188,6 @@ class InteractiveChart extends Component {
         })
         
         var lines = document.getElementsByClassName('line');
-        console.log(lines)
 
         //function that generates the prediction curve
         var predLine = predLineGenerator
@@ -206,7 +206,7 @@ class InteractiveChart extends Component {
         var confirmedLastVal = value; //used to make sure the first data point of prediction stays the same
 
         //check if userPrediction already exists in db
-        if (userPrediction) {
+        if (Object.keys(userPrediction).length > 0) {
             predictionData = predictionData.filter(d => (+d.date >= +predStartDate) && (+d.date <= +predEndDate));
             predictionData[0].value = value;
             defined = false;
@@ -221,7 +221,7 @@ class InteractiveChart extends Component {
             value = 0;
         }
         var filteredData = null;
-        var totalData = confirmedData.concat(predictionData);
+        //var totalData = confirmedData.concat(predictionData);
 
 //!!    //add forecast data to compiledData
         orgs.map((o, index) => {
@@ -238,15 +238,16 @@ class InteractiveChart extends Component {
             name: "Aggregate Forecast",
             data: aggregateData
         })
-        if (userPrediction) {
-            compiledData.push({
-                name: "User Prediction",
-                data: predictionData
-            })
-        }
-        console.log(compiledData)
-
-        if(userPrediction) {
+        //if (userPrediction) {
+        compiledData.push({
+            name: "User Prediction",
+            data: predictionData
+        })
+        console.log(confirmedData);
+        console.log(predictionData)
+        //}
+        //join data to yourLine
+        if(Object.keys(userPrediction).length > 0) {
             filteredData = predictionData.filter(predLine.defined())
             yourLine.datum(filteredData)
                     .attr('d', predLine)
@@ -272,7 +273,7 @@ class InteractiveChart extends Component {
         //var clickArea = d3.select("#click-area");
         
         //append circle at the end of confirmed curve
-        var selectCircle = svg
+        /*var selectCircle = svg
                                 .append("g")
                                 .attr("class", "pointer")
         var pointerCircles = ["pulse-disk", "pulse-circle", "pulse-circle-2"];
@@ -281,9 +282,9 @@ class InteractiveChart extends Component {
                         .attr("class", c)
                         .attr("cx", x(confirmedData[confirmedData.length - 1].date))
                         .attr("cy", y(confirmedData[confirmedData.length - 1].value))
-        })
+        })*/
 
-        if(!userPrediction) {
+        if(Object.keys(userPrediction).length == 0) {
             //append draw your guess text
             svg.append("text")
                 .attr("id", "draw-guess")
@@ -307,6 +308,9 @@ class InteractiveChart extends Component {
 
         var drag = d3.drag()
                      .on("drag", function() {
+                        //hide "draw your guess" text
+                        d3.select("#draw-guess").remove()
+                        d3.select(".pointer").remove()
                         d3.select("#tooltip-line")
                             .style("opacity", "0");
                         d3.selectAll(".mouse-per-line circle")
@@ -322,16 +326,17 @@ class InteractiveChart extends Component {
                                 d.value = value;
                                 d.defined = true
                             }
-                            predictionData[0].value = confirmedLastVal;//make sure the prediction curve is always connected to the confirmed curve
-                            //update totalData everytime predictionData is updated
-                            compiledData[confirmedData.length] = predictionData;
-                            /*yourLine.datum(predictionData)
-                                    .attr('d', predLine)*/
-                            var filteredData = predictionData.filter(predLine.defined())
+                        predictionData[0].value = confirmedLastVal;//make sure the prediction curve is always connected to the confirmed curve
+                        //update totalData everytime predictionData is updated
+                        compiledData[compiledData.length - 1].data = predictionData;
+                        //console.log(compiledData)
+                        /*yourLine.datum(predictionData)
+                                .attr('d', predLine)*/
+                        var filteredData = predictionData.filter(predLine.defined())
 
-                            yourLine.datum(filteredData)
-                                    .attr('d', predLine)
-                                    .style("stroke", color(legendString[legendString.length - 1]))
+                        yourLine.datum(filteredData)
+                                .attr('d', predLine)
+                                .style("stroke", color(legendString[legendString.length - 1]))
 
                         });
                     })
@@ -380,7 +385,6 @@ class InteractiveChart extends Component {
         mousePerLine.append("circle")
                         .attr("r", 2)
                         .style("stroke", function(d) {
-                            console.log(d.name);
                             return color(d.name);
                         })
                         .style("fill", "none")
