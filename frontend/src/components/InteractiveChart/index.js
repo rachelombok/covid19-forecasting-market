@@ -27,11 +27,38 @@ class InteractiveChart extends Component {
           body: JSON.stringify({"data": data, "category": category}),
         });
     }
+    deletePrediction(category) {
+        console.log(category)
+        fetch('/delete/',{
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({"category": category}),
+          });
+        console.log("deleted")
+    }
+
+    createDefaultPrediction(predStartDate, predEndDate) {
+        var defaultData = [];
+        var currDate = predStartDate;
+        //var defined = true;
+        //var value = confirmedData[confirmedData.length - 1].value;
+        
+        //create defaultPredictionData
+        while(+currDate <= +predEndDate) {
+            defaultData.push({date: currDate, value: 0, defined: 0});
+            currDate = d3.timeDay.offset(currDate, 1);
+        }
+        return defaultData;
+    }
 
     renderChart() {
         const { forecast, orgs, userPrediction, confirmed, aggregate } = this.props;
         var predictionData = [];//where we will store formatted userPrediction
+        var defaultPredictionData = []
         const savePrediction = this.savePrediction;
+        const createDefaultPrediction = this.createDefaultPrediction;
         const category = this.state.category;
         var compiledData = [];
         //set up margin, width, height of chart
@@ -47,6 +74,7 @@ class InteractiveChart extends Component {
                     .append("g")
                         .attr("transform",
                         "translate(" + margin.left + "," + margin.top + ")");
+        
         
         //format confirmedData, forecastData, and predictionData into a list of js objects, convert date from string to js date object
         var confirmedData = Object.keys(confirmed).map(key => ({
@@ -66,6 +94,7 @@ class InteractiveChart extends Component {
             value: aggregate[key]
         }));
         //store userPrediction in predictionData if it exists
+        console.log(userPrediction);
         if(Object.keys(userPrediction).length > 0) {
             predictionData = userPrediction.map(p => ({
                 date: d3.timeParse("%Y-%m-%d")((p.date).substring(0,10)),
@@ -74,14 +103,15 @@ class InteractiveChart extends Component {
                 })
             );
         }
+        console.log(predictionData)
   
 
         //set other dates
-        var confirmedStartDate = d3.timeParse("%Y-%m-%d")("2020-02-01"); //date format: y-m-d
-        var predStartDate = confirmedData[confirmedData.length - 1].date; //last date of confirmedData
-        var predLength = 365;
-        var predEndDateString = addDays(new Date(), predLength).toISOString().substring(0, 10);
-        var predEndDate = d3.timeParse("%Y-%m-%d")(predEndDateString)
+        const confirmedStartDate = d3.timeParse("%Y-%m-%d")("2020-02-01"); //date format: y-m-d
+        const predStartDate = confirmedData[confirmedData.length - 1].date; //last date of confirmedData
+        const predLength = 365;
+        //var predEndDateString = addDays(new Date(), predLength).toISOString().substring(0, 10);
+        const predEndDate = d3.timeDay.offset(predStartDate, predLength)
         
         //get confirmedData starting from confirmedStartDate
         confirmedData = confirmedData.filter(d => +d.date >= +confirmedStartDate);
@@ -203,23 +233,42 @@ class InteractiveChart extends Component {
         var currDate = predStartDate;
         var defined = true;
         var value = confirmedData[confirmedData.length - 1].value;
-        var confirmedLastVal = value; //used to make sure the first data point of prediction stays the same
-
+        const confirmedLastVal = value; //used to make sure the first data point of prediction stays the same
+        
         //check if userPrediction already exists in db
         if (Object.keys(userPrediction).length > 0) {
             predictionData = predictionData.filter(d => (+d.date >= +predStartDate) && (+d.date <= +predEndDate));
-            predictionData[0].value = value;
-            defined = false;
-            value = 0;
-            currDate = addDays(predictionData[predictionData.length - 1].date, 1);
+            predictionData[0].value = confirmedLastVal;
+            predictionData[0].defined = true;
+            currDate = d3.timeDay.offset(predictionData[predictionData.length - 1].date, 1);
+            //currDate = addDays(predictionData[predictionData.length - 1].date, 1);
+            console.log(predictionData)
+            console.log(createDefaultPrediction(currDate, predEndDate))
+            predictionData.concat(createDefaultPrediction(currDate, predEndDate));
+            console.log(predictionData);
         }
-        
+        else {
+            predictionData = createDefaultPrediction(predStartDate, predEndDate);
+            predictionData[0].value = confirmedLastVal;
+            predictionData[0].defined = true;
+            console.log(predictionData);
+        }
+        //create defaultPredictionData
+        /*var tempDate = predStartDate;
+        var tempVal = confirmedLastVal
+        while(+tempDate <= +predEndDate) {
+            defaultPredictionData.push({date: tempDate, value: tempVal, defined: 0});
+            tempVal = 0;
+            tempDate = addDays(tempDate, 1);
+        }
+        console.log(defaultPredictionData)
+        //initialize data
         while (+currDate <= +predEndDate) {            
             predictionData.push({date: currDate, value: value, defined: defined});
             currDate = addDays(currDate, 1);
             defined = 0;
             value = 0;
-        }
+        }*/
         var filteredData = null;
         //var totalData = confirmedData.concat(predictionData);
 
@@ -243,8 +292,6 @@ class InteractiveChart extends Component {
             name: "User Prediction",
             data: predictionData
         })
-        console.log(confirmedData);
-        console.log(predictionData)
         //}
         //join data to yourLine
         if(Object.keys(userPrediction).length > 0) {
@@ -468,29 +515,40 @@ class InteractiveChart extends Component {
                         });
                     })
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        const tooltip = svg
-                            .append("g")
-
-        /*svg.on("touchmove mousemove", function() {
-            console.log("working");
-            var date = x.invert(d3.mouse(this)[0]);
-            const index = d3.bisector(d => d.date).left(totalData, date, 1);
-            const a = totalData[index - 1];
-            const b = totalData[index];
-            //d = the data object corresponding to date and value pointed by the cursors
-            var d = b && (date - a.date > b.date - date) ? b : a;
-            date = d.date;
-            var defined = d.defined;
-            var value = Math.round(d.value);
-            if (defined != 0) {
-                tooltip
-                    .attr("transform", `translate(${x(date)},${y(value)})`)
-                    .call(callout, `${value}
-                    ${formatDate(date)}`);
-            }
-        });*/
-
-        //svg.on("touchend mouseleave", () => tooltip.call(callout, null));
+        var deleteButton = document.createElement("button")
+        deleteButton.innerText = "Reset";
+        deleteButton.onclick = () => {
+            this.deletePrediction(category)
+            predictionData = createDefaultPrediction(predStartDate, predEndDate);
+            predictionData[0].value = confirmedLastVal;
+            predictionData[0].defined = true;
+            console.log(predictionData)
+            //update yourLine
+            var filtered = predictionData.filter(predLine.defined())
+            console.log(filtered)
+            yourLine.datum(filtered)
+                    .attr('d', predLine)
+            //append draw your guess text
+            svg.append("text")
+            .attr("id", "draw-guess")
+            .attr("x", confirmedAreaWidth + (clickAreaWidth / 2))             
+            .attr("y", height - 60)
+            .attr("text-anchor", "middle")  
+            .style("font-size", "16px") 
+            .text("Draw your guess");
+            //append circle at the end of confirmed curve
+            var selectCircle = svg
+                                    .append("g")
+                                    .attr("class", "pointer")
+            var pointerCircles = ["pulse-disk", "pulse-circle", "pulse-circle-2"];
+            pointerCircles.map((c) => {
+            selectCircle.append("circle")
+                .attr("class", c)
+                .attr("cx", x(confirmedData[confirmedData.length - 1].date))
+                .attr("cy", y(confirmedData[confirmedData.length - 1].value))
+            })
+        };
+        document.querySelector("body").appendChild(deleteButton);
     }
         
     render() {
