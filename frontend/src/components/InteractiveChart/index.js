@@ -516,7 +516,7 @@ class InteractiveChart extends Component {
                     })
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         var deleteButton = document.createElement("button")
-        deleteButton.innerText = "Delete";
+        deleteButton.innerText = "Reset";
         deleteButton.onclick = () => {
             this.deletePrediction(category)
             predictionData = createDefaultPrediction(predStartDate, predEndDate);
