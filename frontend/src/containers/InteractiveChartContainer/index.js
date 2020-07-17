@@ -31,7 +31,6 @@ class InteractiveChartContainer extends Component {
             this.setState({ userPrediction: data });
         });
         fetch('/us-inc-deaths-confirmed').then(res => res.json()).then(data => {
-            console.log(typeof data)
             //const result = JSON.parse(data);
             this.setState({ confirmed: data });
         });
