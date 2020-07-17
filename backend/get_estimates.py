@@ -12,7 +12,6 @@ def get_forecasts():
     for line in file:
         orgs.append(line.strip())
     orgs = orgs[::-1]
-    print(orgs)
 
     file = open('model-links.csv', 'r')
     models = dict()
@@ -36,7 +35,6 @@ def get_daily_forecasts():
     for line in file:
         orgs.append(line.strip())
     orgs = orgs[::-1]
-    print(orgs)
 
     file = open('model-links.csv', 'r')
     models = dict()
@@ -48,6 +46,7 @@ def get_daily_forecasts():
         df = df[['target_end_date', 'value']]
         df = df.sort_values('target_end_date')
         df = df.drop_duplicates()
+        df['value'] = df['value']/7
         JSON = df.to_json()
         models[orgs.pop()] = df.to_dict('list')
     return models
