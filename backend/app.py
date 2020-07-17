@@ -71,14 +71,15 @@ def update_score(username, score):
             { "score": score }
         })
     #print("score updated")
+def delete_user_prediction(username, category):
+    print(username)
+    print(category)
+    print(mongo.db.predictions.find_one({"username": username, "category": category}))
+    pred = mongo.db.predictions.delete_one({"username": username, "category": category})
+    print(pred.deleted_count)
+    print("deleted")
 
 def update_user_prediction(username, data, category, a=None, higher=False, index=None):
-    #Get gaussian bump
-    '''if category == "us_daily_deaths":
-        print("get gaussian")
-        print(data)
-        data = get_gaussian_for_all(data, a, index, higher)
-        print(data)'''
     pred = mongo.db.predictions.find_one({"username": username, "category": category})
     #print(pred)
     if pred:
@@ -89,15 +90,6 @@ def update_user_prediction(username, data, category, a=None, higher=False, index
         })
     else:
         mongo.db.predictions.insert_one({"username": username, "category": category, "prediction": data})
-       
-    '''pred = mongo.db.predictions.find_one({"username": username, "model": model})
-    if pred:
-        mongo.db.predictions.update_one({"username": username, "model": model}, 
-        {'$set': 
-            { "prediction": data }
-        })
-    else:
-        mongo.db.predictions.insert_one({"username": username, "model": model, "prediction": data})'''
 
 def get_user_prediction(username, category):
     user_prediction = {}
@@ -199,6 +191,16 @@ def update():
         update_user_prediction('testUsername', data['data'], data['category'])
         return "Success"
     return 'None'
+
+@app.route('/delete/', methods=["POST"])
+def delete():
+    if request.method == 'POST':
+        print(request.json)
+        delete_user_prediction('testUsername', request.json['category'])
+        print("prediction deleted!")
+        return "Success"  
+    return "None"
+    
 
 @app.route('/login/', methods=['POST'])
 def login():
