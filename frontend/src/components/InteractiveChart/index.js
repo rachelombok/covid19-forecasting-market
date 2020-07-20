@@ -62,15 +62,16 @@ class InteractiveChart extends Component {
         const category = this.state.category;
         var compiledData = [];
         //set up margin, width, height of chart
-        var legendWidth = 180;
-        var toolTipHeight = 50; //to make sure there's room for the tooltip when the value is 0
+        const legendWidth = 180;
+        const toolTipHeight = 50; //to make sure there's room for the tooltip when the value is 0
+        const contextHeight = 100;
         var margin = {top: 20, right: 30, bottom: 20, left: 60},
             width = 800 - margin.left - margin.right,
             height = 400 - margin.top - margin.bottom;
         var svg = d3.select(this.chartRef.current)
                     .append("svg")
                         .attr("width", width + margin.left + margin.right + legendWidth)
-                        .attr("height", height + margin.top + margin.bottom + toolTipHeight)
+                        .attr("height", height + margin.top + margin.bottom + toolTipHeight + contextHeight)
                     .append("g")
                         .attr("transform",
                         "translate(" + margin.left + "," + margin.top + ")");
@@ -121,9 +122,10 @@ class InteractiveChart extends Component {
             .domain([confirmedStartDate, predEndDate])
             .range([ 0, width ])
             //.nice(); //rounds up/down the max and mind of x axis
-         svg.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x));
+        var xAxis = svg
+                        .append("g")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(d3.axisBottom(x));
         
         //find max val in confirmedData and forecastData to determine the max of y-axis
         var confirmedMax = d3.max(confirmedData, function(d) { return +d.value; });
@@ -138,7 +140,8 @@ class InteractiveChart extends Component {
             .domain([0, yAxisMax])
             .range([ height, 0 ])
             .nice();
-        svg.append("g")
+        svg
+            .append("g")
             .call(d3.axisLeft(y));
    
         //list of data displayed in graph - for legend
@@ -188,33 +191,61 @@ class InteractiveChart extends Component {
             .x(function(d) { return x(d.date) })
             .y(function(d) { return y(d.value) })
         
-        //display confirmed data
-        var confirmedLine = svg
-            .append("path")
-            .attr("id", "confirmed")
-            .attr("class", "line")    
-            .datum(confirmedData)    
-            .attr('d', line)
-            .attr("stroke", color(legendString[legendString.length - 3]))
+        //area where the confirmed curve will be drawn
+        var mainClip = svg
+                            .append("defs")
+                            .append("svg:clipPath")
+                                .attr("id", "main-clip")
+                                .append("svg:rect")
+                                    .attr("width", width )
+                                    .attr("height", height )
+                                    .attr("x", 0)
+                                    .attr("y", 0);
 
+        // Create the confirmed area variable
+        const mainArea = svg
+                                .append('g')
+                                .attr("clip-path", "url(#main-clip)");
+
+        //display confirmed data
+        var confirmedLine = mainArea.append("path")
+                                    .attr("id", "confirmed")
+                                    .attr("class", "line")    
+                                    .datum(confirmedData)    
+                                    .attr('d', line)
+                                    .attr("stroke", color(legendString[legendString.length - 3]))
+        var confirmedAreaEndX = x(confirmedData[confirmedData.length - 1].date);
+        var confirmedAreaEndY = y(confirmedData[confirmedData.length - 1].value);
+
+        //append clip-path for prediction curve
+        var predictionClip = svg.append("defs").append("svg:clipPath")
+                                .attr("id", "prediction-clip")
+                                .append("svg:rect")
+                                    .attr("width", width - confirmedAreaEndX )
+                                    .attr("height", height )
+                                    .attr("x", confirmedAreaEndX)
+                                    .attr("y", 0);
+        const predictionArea = svg.append('g')
+                            .attr("clip-path", "url(#prediction-clip)");
+        
         //display aggregate data
-        var aggregateLine = svg
-            .append("path")
-            .attr("id", "aggregate")
-            .attr("class", "line")        
-            .datum(aggregateData)    
-            .attr('d', line)
-            .attr("stroke", color(legendString[legendString.length - 2]))
+        var aggregateLine = predictionArea.append("path")
+                                    .attr("id", "aggregate")
+                                    .attr("class", "line")        
+                                    .datum(aggregateData)    
+                                    .attr('d', line)
+                                    .attr("stroke", color(legendString[legendString.length - 2]))
         
         //display forecast data
         forecastData.map((f, index) => {
-            svg
-                .append("path")
-                    .attr("class", "forecast line")
-                    .attr("id", orgs[index])
-                    .style("stroke", color(orgs[index]))
-                .datum(f)
-                    .attr("d", line);
+            //make sure they all stem from the confirmed curve!
+            console.log(f)
+            predictionArea.append("path")
+                        .attr("class", "forecast line")
+                        .attr("id", orgs[index])
+                        .style("stroke", color(orgs[index]))
+                        .datum(f)
+                            .attr("d", line);
         })
         
         var lines = document.getElementsByClassName('line');
@@ -226,8 +257,10 @@ class InteractiveChart extends Component {
             .y(function(d) { return y(d.value) })
 
         //append path for prediction data
-        var yourLine = svg.append("path")
-                .attr("id", "your-line");
+        var yourLine = predictionArea
+                                        .append("path")
+                                        .attr("id", "your-line");
+        
         
         //variables used to initialize user prediction data if it doesn't exist in the db
         var currDate = predStartDate;
@@ -253,22 +286,7 @@ class InteractiveChart extends Component {
             predictionData[0].defined = true;
             console.log(predictionData);
         }
-        //create defaultPredictionData
-        /*var tempDate = predStartDate;
-        var tempVal = confirmedLastVal
-        while(+tempDate <= +predEndDate) {
-            defaultPredictionData.push({date: tempDate, value: tempVal, defined: 0});
-            tempVal = 0;
-            tempDate = addDays(tempDate, 1);
-        }
-        console.log(defaultPredictionData)
-        //initialize data
-        while (+currDate <= +predEndDate) {            
-            predictionData.push({date: currDate, value: value, defined: defined});
-            currDate = addDays(currDate, 1);
-            defined = 0;
-            value = 0;
-        }*/
+
         var filteredData = null;
         //var totalData = confirmedData.concat(predictionData);
 
@@ -294,12 +312,10 @@ class InteractiveChart extends Component {
         })
         //}
         //join data to yourLine
-        if(Object.keys(userPrediction).length > 0) {
-            filteredData = predictionData.filter(predLine.defined())
-            yourLine.datum(filteredData)
-                    .attr('d', predLine)
-                    .style("stroke", color(legendString[legendString.length - 1]))
-        }
+        filteredData = predictionData.filter(predLine.defined())
+        yourLine.datum(filteredData)
+                .attr('d', predLine)
+                .style("stroke", color(legendString[legendString.length - 1]))
         //append new rect  
         const mouseArea = svg.append("rect")
             .attr("width", width)
@@ -309,6 +325,7 @@ class InteractiveChart extends Component {
 
         //append click area rect
         var confirmedAreaWidth = confirmedLine.node().getBoundingClientRect().width; //get width of path element containing confirmed data
+        console.log(confirmedAreaWidth)
         var clickAreaWidth = width - confirmedAreaWidth; //the remaining area
         svg.append("rect")
            .attr("id", "click-area")
@@ -319,45 +336,43 @@ class InteractiveChart extends Component {
            .style("pointer-events","visible");
         //var clickArea = d3.select("#click-area");
         
+        //append draw your guess text
+        const drawingInstruction = svg
+                                        .append("g")
+                                        .attr("id", "drawing-instruction")
+                                        .style("opacity", "0");
+        drawingInstruction
+                            .append("text")
+                            .attr("id", "draw-guess")
+                            .attr("x", confirmedAreaEndX + (width - confirmedAreaEndX) / 2)             
+                            .attr("y", height - 100)
+                            .attr("text-anchor", "middle")  
+                            .text("Draw your guess")
+                            .style("font-size", "16px");
         //append circle at the end of confirmed curve
-        /*var selectCircle = svg
-                                .append("g")
-                                .attr("class", "pointer")
+        var selectCircle = drawingInstruction
+                                                .append("g")
+                                                .attr("id", "pointer");
         var pointerCircles = ["pulse-disk", "pulse-circle", "pulse-circle-2"];
         pointerCircles.map((c) => {
-            selectCircle.append("circle")
-                        .attr("class", c)
-                        .attr("cx", x(confirmedData[confirmedData.length - 1].date))
-                        .attr("cy", y(confirmedData[confirmedData.length - 1].value))
-        })*/
+        selectCircle.append("circle")
+            .attr("class", c)
+            .attr("cx", confirmedAreaEndX)
+            .attr("cy", confirmedAreaEndY)
+        })
 
         if(Object.keys(userPrediction).length == 0) {
-            //append draw your guess text
-            svg.append("text")
-                .attr("id", "draw-guess")
-                .attr("x", confirmedAreaWidth + (clickAreaWidth / 2))             
-                .attr("y", height - 100)
-                .attr("text-anchor", "middle")  
-                .style("font-size", "16px") 
-                .text("Draw your guess");
-            //append circle at the end of confirmed curve
-            var selectCircle = svg
-                                    .append("g")
-                                    .attr("class", "pointer")
-            var pointerCircles = ["pulse-disk", "pulse-circle", "pulse-circle-2"];
-            pointerCircles.map((c) => {
-            selectCircle.append("circle")
-                .attr("class", c)
-                .attr("cx", x(confirmedData[confirmedData.length - 1].date))
-                .attr("cy", y(confirmedData[confirmedData.length - 1].value))
-            })
+            svg
+                .select("#drawing-instruction")
+                .style("opacity", "1");
         }
 
         var drag = d3.drag()
                      .on("drag", function() {
                         //hide "draw your guess" text
-                        d3.select("#draw-guess").remove()
-                        d3.select(".pointer").remove()
+                        svg
+                            .select("#drawing-instruction")
+                            .style("opacity", "0");
                         d3.select("#tooltip-line")
                             .style("opacity", "0");
                         d3.selectAll(".mouse-per-line circle")
@@ -514,6 +529,96 @@ class InteractiveChart extends Component {
                                 
                         });
                     })
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        const focusHeight = 100;
+        const contextMargin = 50;
+        var context = svg
+                            .append("g")
+                                .attr("viewBox", [0, 0, width, focusHeight])
+                                .attr("transform", `translate(0,${height + contextMargin} )`)
+                                //.attr("width", width + 100)
+                                //.attr("height", height)
+                                .style("display", "block")
+
+
+
+        /*const xAxis = (g, x, height) => g
+                                            .attr("transform", `translate(0,${height - margin.bottom})`)
+                                            .call(d3.axisBottom(x))*/
+
+        var contextX = d3
+                            .scaleTime()
+                            .domain([confirmedStartDate, predEndDate])
+                            .range([0, width]);
+        
+        var contextXAxis = context
+                                    .append("g")
+                                    .attr("transform", `translate(0,${focusHeight - margin.bottom})`)
+                                    .call(d3.axisBottom(contextX));
+        const brush = d3.brushX()
+                        .extent([[0, 0], [width, focusHeight - margin.bottom]])
+                        .on("brush", brushed)
+                        .on("end", brushended);
+
+        const defaultSelection = [x(d3.timeMonth.offset(x.domain()[1], -7)), x.range()[1]];
+    
+        /*context.append("g")
+                .call(xAxis, x, focusHeight);*/
+    
+        /*svg.append("path")
+            .datum(confirmedData)
+            .attr("fill", "steelblue")
+            .attr("d", line(x, y.copy().range([focusHeight - margin.bottom, 4])));*/
+        function brushed() {
+            console.log("d")
+            if (d3.event.selection) {
+                var extent = d3.event.selection;
+                //console.log([ contextX.invert(extent[0]), contextX.invert(extent[1]) ]);
+                x.domain([ contextX.invert(extent[0]), contextX.invert(extent[1]) ]);
+                xAxis
+                        //.transition()
+                        //.duration(1000)
+                        .call(d3.axisBottom(x))
+                var newX = x(confirmedData[confirmedData.length - 1].date);
+                newX = newX < 0 ? 0 : newX;
+                console.log(newX);
+                d3
+                    .select("#prediction-clip")
+                    .select("rect")
+                        .attr("width", width - newX)
+                        .attr("x", newX);
+
+                svg
+                    .selectAll(".line")
+                    //.transition()
+                    //.duration(1000)
+                    .attr('d', line)
+
+                svg
+                    .select("#your-line")
+                    .attr("d", predLine)
+                
+                //reposition draw your guess text and pointer
+                svg
+                    .select("#draw-guess")
+                    .attr("x", newX + (width - newX) / 2);
+                svg
+                    .select("#pointer")
+                    .selectAll("circle")
+                        .attr("cx", newX);
+            }
+        }
+        
+        function brushended() {
+            if (!d3.event.selection) {
+                gb.call(brush.move, defaultSelection);
+            }
+
+        }
+        const gb = context
+                        .call(brush)
+                        .call(brush.move, defaultSelection);   
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         var deleteButton = document.createElement("button")
         deleteButton.innerText = "Reset";
@@ -528,25 +633,10 @@ class InteractiveChart extends Component {
             console.log(filtered)
             yourLine.datum(filtered)
                     .attr('d', predLine)
-            //append draw your guess text
-            svg.append("text")
-                .attr("id", "draw-guess")
-                .attr("x", confirmedAreaWidth + (clickAreaWidth / 2))             
-                .attr("y", height - 100)
-                .attr("text-anchor", "middle")  
-                .style("font-size", "16px") 
-                .text("Draw your guess");
-            //append circle at the end of confirmed curve
-            var selectCircle = svg
-                                    .append("g")
-                                    .attr("class", "pointer")
-            var pointerCircles = ["pulse-disk", "pulse-circle", "pulse-circle-2"];
-            pointerCircles.map((c) => {
-            selectCircle.append("circle")
-                .attr("class", c)
-                .attr("cx", x(confirmedData[confirmedData.length - 1].date))
-                .attr("cy", y(confirmedData[confirmedData.length - 1].value))
-            })
+                    
+            svg
+                .select("#drawing-instruction")
+                .style("opacity", "1");
         };
         document.querySelector("body").appendChild(deleteButton);
     }
