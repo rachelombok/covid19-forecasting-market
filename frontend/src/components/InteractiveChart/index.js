@@ -179,7 +179,8 @@ class InteractiveChart extends Component {
 
         //create line generator for confirmed/forecast data and prediction data
         var lineGenerator = d3.line()
-            .curve(d3.curveCatmullRom)//curve that goes through all data points
+            .curve(d3.curveBasis);
+            //.curve(d3.curveCatmullRom)//curve that goes through all data points
         var predLineGenerator = d3.line()
             .curve(d3.curveBasis); //curve doesn't go through all data points (it's smoothed out)
             //d3.curveMonotoneX
@@ -591,7 +592,7 @@ class InteractiveChart extends Component {
                         .on("brush", brushed)
                         .on("end", brushended);
 
-        const defaultSelection = [x(d3.timeMonth.offset(x.domain()[1], -7)), x.range()[1]];
+        const defaultSelection = [x(d3.timeMonth.offset(x.domain()[1], -8)), x.range()[1]];
     
         /*context.append("g")
                 .call(xAxis, x, focusHeight);*/
