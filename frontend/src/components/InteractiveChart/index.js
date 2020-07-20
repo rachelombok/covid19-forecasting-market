@@ -94,8 +94,8 @@ class InteractiveChart extends Component {
             date: d3.timeParse("%Y-%m-%d")(key),
             value: aggregate[key]
         }));
+        
         //store userPrediction in predictionData if it exists
-        console.log(userPrediction);
         if(Object.keys(userPrediction).length > 0) {
             predictionData = userPrediction.map(p => ({
                 date: d3.timeParse("%Y-%m-%d")((p.date).substring(0,10)),
@@ -228,6 +228,21 @@ class InteractiveChart extends Component {
         const predictionArea = svg.append('g')
                             .attr("clip-path", "url(#prediction-clip)");
         
+        //make sure aggregateData curve stems from confiremData curve
+        var idxOfStartDate = d3.bisector(f => f.date).left(aggregateData, predStartDate);
+        //check if predStartDate exists in AD
+        if (aggregateData.length > 0 && +aggregateData[idxOfStartDate].date == +predStartDate) {
+            aggregateData[idxOfStartDate].value = confirmedData[confirmedData.length - 1].value;
+        }
+        else {
+            aggregateData.splice(idxOfStartDate, 0, {
+                date: predStartDate,
+                value: confirmedData[confirmedData.length - 1].value
+            });
+            console.log(aggregateData);
+            console.log("done");
+        }
+
         //display aggregate data
         var aggregateLine = predictionArea.append("path")
                                     .attr("id", "aggregate")
@@ -239,7 +254,22 @@ class InteractiveChart extends Component {
         //display forecast data
         forecastData.map((f, index) => {
             //make sure they all stem from the confirmed curve!
+            //var temp = d3.timeParse("%Y-%m-%d")("2020-07-18")
+            var idxOfStartDate = d3.bisector(f => f.date).left(f, predStartDate);
+            //check if predStartDate exists in f
+            if (f.length > 0 && +f[idxOfStartDate].date == +predStartDate) {
+                f[idxOfStartDate].value = confirmedData[confirmedData.length - 1].value;
+            }
+            else {
+                f.splice(idxOfStartDate, 0, {
+                    date: predStartDate,
+                    value: confirmedData[confirmedData.length - 1].value
+                });
+                console.log(f);
+                console.log("done");
+            }
             console.log(f)
+            console.log(idxOfStartDate)
             predictionArea.append("path")
                         .attr("class", "forecast line")
                         .attr("id", orgs[index])
