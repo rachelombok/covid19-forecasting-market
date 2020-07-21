@@ -352,6 +352,7 @@ class InteractiveChart extends Component {
             .attr("width", width)
             .attr("height", height)
             .attr("fill", "none")
+            .attr("id", "mouse-area")
             .style("pointer-events","visible");
 
         //append click area rect
@@ -491,6 +492,7 @@ class InteractiveChart extends Component {
                     .attr('height', height)
                     .attr('fill', 'none')
                     .attr('pointer-events', 'all')
+                    .style("cursor", "pointer")
                     .on('mouseout', function() { // on mouse out hide line, circles and text
                         d3.select("#tooltip-line")
                           .style("opacity", "0");

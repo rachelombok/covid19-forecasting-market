@@ -28,7 +28,7 @@ class App extends React.Component {
         <div className="App">
           <Navbar />
           <Switch>
-            <Route exact path={ROUTES.LANDING} component={LandingPage} />
+            <Route exact path={ROUTES.LANDING} component={InteractiveChartContainer} />
             <Route exact path={ROUTES.US_NATIONAL_CUM} component={ChartContainer} />
             <Route exact path={ROUTES.US_NATIONAL_INC} component={newDeathsContainer} />
             <Route exact path={ROUTES.MAP_PORTAL} component={Mapportal} />
