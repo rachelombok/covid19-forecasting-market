@@ -82,3 +82,23 @@ export const callout = (g, value) => {
   text.attr("transform", `translate(${-w / 2},${15 - y})`);
   path.attr("d", `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`);
 }
+
+export const sortDictByDateDescending = (data) => {
+  var sortedList = [];
+  const sortedDates = Object.keys(data).sort((a, b) => new Date(b) - new Date(a));
+  sortedDates.map(d => {
+    sortedList.push({
+      date: d,
+      prediction: data[d]
+    })
+  })
+  return sortedList;
+
+}
+
+export const getMostRecentPrediction = (data) => {
+  const sortedDates = Object.keys(data).sort((a, b) => new Date(b) - new Date(a));
+  const mostRecentDate = sortedDates[0];
+  console.log(mostRecentDate);
+  return data[mostRecentDate]
+}

@@ -74,28 +74,36 @@ def update_score(username, score):
 def delete_user_prediction(username, category):
     print(username)
     print(category)
+    curr_date = date.today().strftime("%Y-%m-%d")
     print(mongo.db.predictions.find_one({"username": username, "category": category}))
-    pred = mongo.db.predictions.delete_one({"username": username, "category": category})
+    pred = mongo.db.predictions.delete_one({"username": username, "category": category, "date": curr_date})
     print(pred.deleted_count)
     print("deleted")
 
 def update_user_prediction(username, data, category, a=None, higher=False, index=None):
-    pred = mongo.db.predictions.find_one({"username": username, "category": category})
+    curr_date = date.today().strftime("%Y-%m-%d")
+    print(curr_date)
+    pred = mongo.db.predictions.find_one({"username": username, "category": category, "date": curr_date, })
     #print(pred)
     if pred:
         #print("already exists")
-        mongo.db.predictions.update_one({"username": username, "category": category}, 
+        mongo.db.predictions.update_one({"username": username, "category": category, "date": curr_date, }, 
         {'$set': 
             { "prediction": data }
         })
     else:
-        mongo.db.predictions.insert_one({"username": username, "category": category, "prediction": data})
+        mongo.db.predictions.insert_one({"username": username, "category": category, "date": curr_date, "prediction": data})
 
 def get_user_prediction(username, category):
     user_prediction = {}
-    exists = mongo.db.predictions.find_one({"username": username, "category": category})
-    if exists:
-        user_prediction = exists['prediction']
+    prediction = mongo.db.predictions.find({"username": username, "category": category})
+    for p in prediction:
+        print("inside")
+        #(date, prediction)
+        print(p)
+        print(p['prediction'])
+        user_prediction[p['date']] = p['prediction']
+    #user_prediction = exists['prediction']
     return user_prediction
 
 def store_session(id, name, username):
@@ -153,6 +161,7 @@ def home():
     print(pred_category)
     print("done")
     user_prediction = get_user_prediction('testUsername', pred_category)
+    print(user_prediction)
     return json.dumps(user_prediction)
 
 @app.route("/us-cum-deaths-forecasts")
@@ -183,11 +192,12 @@ def us_agg_cum_deaths():
 def us_agg_inc_deaths():
     return us_aggregates_daily
 
-@app.route('/update/', methods=['POST'])
+@app.route('/update/', methods=['GET', 'POST'])
 def update():
     if request.method == 'POST':
         data = request.json
         print(data)
+        #replace username with user id
         update_user_prediction('testUsername', data['data'], data['category'])
         return "Success"
     return 'None'

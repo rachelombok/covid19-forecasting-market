@@ -29,6 +29,7 @@ class InteractiveChartContainer extends Component {
         });
             fetch('/user-prediction?category=us_daily_deaths').then(res => res.json()).then(data => {
             this.setState({ userPrediction: data });
+            console.log(data);
         });
         fetch('/us-inc-deaths-confirmed').then(res => res.json()).then(data => {
             //const result = JSON.parse(data);

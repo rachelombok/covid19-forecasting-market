@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3'
 import './InteractiveChart.css';
-import { clamp, callout } from '../../utils/data';
+import { clamp, sortDictByDateDescending, callout, getMostRecentPrediction } from '../../utils/data';
 import { elementType } from 'prop-types';
 import { addDays, formatDate } from '../../utils/date';
 
@@ -94,10 +94,10 @@ class InteractiveChart extends Component {
             date: d3.timeParse("%Y-%m-%d")(key),
             value: aggregate[key]
         }));
-        
+
         //store userPrediction in predictionData if it exists
         if(Object.keys(userPrediction).length > 0) {
-            predictionData = userPrediction.map(p => ({
+            predictionData = getMostRecentPrediction(userPrediction).map(p => ({
                 date: d3.timeParse("%Y-%m-%d")((p.date).substring(0,10)),
                 value: p.value,
                 defined: p.defined
@@ -106,7 +106,6 @@ class InteractiveChart extends Component {
         }
         console.log(predictionData)
   
-
         //set other dates
         const confirmedStartDate = d3.timeParse("%Y-%m-%d")("2020-02-01"); //date format: y-m-d
         const predStartDate = confirmedData[confirmedData.length - 1].date; //last date of confirmedData
