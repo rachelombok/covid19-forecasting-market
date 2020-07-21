@@ -39,19 +39,22 @@ class SignUp extends React.Component{
       render() {
         return (
           <form onSubmit={this.handleSubmit.bind(this)}>
-            <h1>Hello {this.state.nam}</h1>
+            <h1>Sign Up</h1>
+            <span>Name</span>
             <input
               type="text"
               value={this.state.nam}
               onChange={this.handleChange.bind(this)}
               name='nam'
             />
+            <span>Username</span>
             <input
               type="text"
               value={this.state.username}
               onChange={this.handleChange.bind(this)}
               name='username'
             />
+            <span>Password</span>
             <input
               type="text"
               value={this.state.password}

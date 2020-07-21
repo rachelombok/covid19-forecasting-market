@@ -35,13 +35,15 @@ class Login extends React.Component{
       render() {
         return (
           <form onSubmit={this.handleSubmit.bind(this)}>
-            <h1>Hello {this.state.username}</h1>
+            <h1>Sign In</h1>
+            <span>Username</span>
             <input
               type="text"
               value={this.state.username}
               onChange={this.handleChange.bind(this)}
               name='username'
             />
+            <span>Password</span>
             <input
               type="text"
               value={this.state.password}
