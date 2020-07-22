@@ -1,4 +1,5 @@
 import React from 'react';
+import UserPredictionChartContainer from '../../containers/UserPredictionChartContainer';
 
 class ProfilePage extends React.Component {
   constructor(props) {
@@ -9,14 +10,19 @@ class ProfilePage extends React.Component {
   }
 
   componentDidMount() {
-    fetch('/user').then(res => res.json()).then(data => {
+    /*fetch('/user').then(res => res.json()).then(data => {
       this.setState({ user: data });
-    });
+    });*/
   }
 
   renderUser() {
     return (
-        <div>
+      <div>
+        <h3>My Predictions</h3>
+        <UserPredictionChartContainer/>
+      </div>
+
+        /*<div>
             <p><b>Name: </b>{ this.state.user['name'] }</p>
             <p><b>Poll score: </b>{ this.state.user['score'] }</p>
             <p><b>Country/Location: </b></p>
@@ -29,13 +35,13 @@ class ProfilePage extends React.Component {
             <button type='submit'>Create</button>
             </form>
           
-        </div>
+        </div>*/
     );
   }
 
   render() {
     const { user } = this.state;
-    if (!user) return 'Loading...';
+    //if (!user) return 'Loading...';
 
     return (
         <div>

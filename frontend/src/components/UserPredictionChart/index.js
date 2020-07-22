@@ -209,6 +209,7 @@ class UserPredictionChart extends Component {
                         console.log(index)
                         return color(legendString[index]);
                     })
+                    .attr("id", "circle")
                     .style("fill", "none")
                     .style("stroke-width", "1px")
                     .style("opacity", "0");
@@ -280,18 +281,21 @@ class UserPredictionChart extends Component {
                                 if (+d3.timeDay.floor(date) == +data.date || +d3.timeDay.ceil(date) == +data.date) {
                                     if (data.defined != 0) {
                                         var element = d3.select(this)
-                                                        .select('#value')
-                                                            .style("opacity", "1")
-                                                            .text(Math.round(data.value))
-                                                            .attr("transform", `translate(${mouse[0]}, ${y(data.value)})`);
-                                                        
-                                        tooltip
+                                        element
+                                                .select('#value')
+                                                .style("opacity", "1")
+                                                .text(Math.round(data.value))
+                                                .attr("transform", `translate(${mouse[0]}, ${y(data.value)})`);
+                                            
+                                        element
                                                 .select("#date")
                                                 .style("opacity", "1")
                                                 .attr("transform", `translate(${mouse[0] + 15}, 0) rotate(-90)`)
                                                 .text(d3.timeFormat("%B %d, %Y")(data.date));
-                                        element.select("circle")
-                                                .style("opacity", "1");
+                                        element
+                                                .select("circle")
+                                                .style("opacity", "1")
+                                                .attr("transform", `translate(${mouse[0]}, ${y(data.value)})`);
                                         return "translate(0,0)";
                                     }
                                 }
