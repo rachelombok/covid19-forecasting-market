@@ -44,7 +44,9 @@ class UserPredictionChart extends Component {
         console.log(mostRecentPred)
         //push to compiledData
         compiledData = [confirmedData, mostRecentPred]
-        console.log(compiledData)
+        console.log(dates[0])
+        console.log(d3.timeFormat("%B %d, %Y")(dates[0]))
+    
 
         //IMPORTANT BOUNDARIES// 
         const confirmedStartDate = d3.timeParse("%Y-%m-%d")("2020-02-01");
@@ -211,7 +213,12 @@ class UserPredictionChart extends Component {
                     .style("stroke-width", "1px")
                     .style("opacity", "0");
         mousePerLine.append("text")
+                    .attr("id", "value")
                     .attr("transform", "translate(10,3)"); 
+        mousePerLine.append("text")
+                    .attr("id", "date")
+                    .attr("text-anchor", "end")
+                    .attr("transform", "rotate(-90)")
         
         svg
                 .append("svg:rect")
@@ -272,12 +279,19 @@ class UserPredictionChart extends Component {
                                 if (+d3.timeDay.floor(date) == +data.date || +d3.timeDay.ceil(date) == +data.date) {
                                     if (data.defined != 0) {
                                         var element = d3.select(this)
-                                                        .select('text')
+                                                        .select('#value')
                                                             .style("opacity", "1")
-                                                            .text(Math.round(data.value).toFixed(2));
+                                                            .text(Math.round(data.value))
+                                                            .attr("transform", `translate(${mouse[0]}, ${y(data.value)})`);
+                                                        
+                                        tooltip
+                                                .select("#date")
+                                                .style("opacity", "1")
+                                                .attr("transform", `translate(${mouse[0] + 15}, 0) rotate(-90)`)
+                                                .text(d3.timeFormat("%B %d, %Y")(data.date));
                                         element.select("circle")
                                                 .style("opacity", "1");
-                                        return "translate(" + mouse[0] + "," + y(data.value)+")";
+                                        return "translate(0,0)";
                                     }
                                 }
                                 var element = d3.select(this)
