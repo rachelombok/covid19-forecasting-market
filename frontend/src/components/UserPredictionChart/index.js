@@ -257,9 +257,10 @@ class UserPredictionChart extends Component {
                         d3
                             .selectAll(".mouse-per-line")
                             .attr("transform", function(d, i) {
+                                console.log(d)
                                 if (d.length == 0) {return;}
                                 var date = x.invert(xCoord);
-                                const index = d3.bisector(f => f.date).left(compiledData[i], date);
+                                const index = d3.bisector(f => f.date).left(d, date);
                                 var a = null;
                                 if (index > 0) {
                                     a = d[index - 1];
@@ -314,6 +315,7 @@ class UserPredictionChart extends Component {
                                 .select("#prediction")
                                 .datum(predictionData[date].filter(predLine.defined()))
                                 .attr("d", predLine)
+                            compiledData[1] = predictionData[date];
                         }
                         else {
                             if (index == 0) {
@@ -321,6 +323,7 @@ class UserPredictionChart extends Component {
                                     .select("#prediction")
                                     .datum([])
                                     .attr("d", predLine)
+                                compiledData[1] = [];
                             }
                             else {
                                 date = dates[index - 1];
@@ -328,8 +331,10 @@ class UserPredictionChart extends Component {
                                     .select("#prediction")
                                     .datum(predictionData[date].filter(predLine.defined()))
                                     .attr("d", predLine);
+                                compiledData[1] = predictionData[date];
                             }
                         }
+                        mousePerLine.data(compiledData);
                     })
         
                 
