@@ -467,7 +467,7 @@ class InteractiveChart extends Component {
                     .style("stroke", "black")
                     .style("stroke-width", "0.5px")
                     .style("opacity", "0");
-        
+        console.log(compiledData)
         var mousePerLine = tooltipArea
                                         .selectAll(".mouse-per-line")
                                         .data(compiledData)

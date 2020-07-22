@@ -1,3 +1,5 @@
+import * as d3 from 'd3'
+
 export const cleanConfirmedData = (data, dates) => {
   var result = {};
   for (var i = 0; i < dates.length; i++) {
@@ -83,17 +85,20 @@ export const callout = (g, value) => {
   path.attr("d", `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`);
 }
 
-export const sortDictByDateDescending = (data) => {
-  var sortedList = [];
-  const sortedDates = Object.keys(data).sort((a, b) => new Date(b) - new Date(a));
+export const sortDictByDate = (data) => {
+  var sortedDict = {};
+  const sortedDates = Object.keys(data).sort((a, b) => new Date(a) - new Date(b));
   sortedDates.map(d => {
-    sortedList.push({
-      date: d,
-      prediction: data[d]
-    })
+    const dateObj = d3.timeParse("%Y-%m-%d")(d);
+    sortedDict[dateObj] = data[d]
   })
-  return sortedList;
-
+  return sortedDict;
+}
+//pass in list of string dates, return string dates y-m-d
+export const sortStringDates = (data) => {
+  var sortedDates = data.sort((a, b) => new Date(a) - new Date(b));
+  sortedDates = sortedDates.map(d => d3.timeParse("%Y-%m-%d")(d));
+  return sortedDates;
 }
 
 export const getMostRecentPrediction = (data) => {

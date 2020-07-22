@@ -9,6 +9,7 @@ import Leaderboard from './components/Leaderboard';
 import MarketChart from './components/MarketChart';
 import ProfilePage from './pages/ProfilePage';
 import InteractiveChartContainer from './containers/InteractiveChartContainer';
+import UserPredictionChartContainer from './containers/UserPredictionChartContainer';
 import * as ROUTES from "./constants/routes";
 import 'leaflet/dist/leaflet.css';
 import Mapportal from './components/Mapportal';
@@ -41,6 +42,8 @@ class App extends React.Component {
               "BLAH PAGE"
             </Route>
             <Route exact path="/interactive-chart" component={InteractiveChartContainer}/>
+            <Route exact path="/profile-chart" component={UserPredictionChartContainer}/>
+
           </Switch>
         </div>
       </Router>
