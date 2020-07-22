@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { useHistory } from "react-router-dom";
 import ReactDOM from 'react-dom';
 
 class Login extends React.Component{
@@ -6,6 +7,8 @@ class Login extends React.Component{
         super(props)
         this.state = { username: '', password: '' }
       }
+
+      
 
     saveLogin(username, password) {
         fetch('/login/',{
@@ -25,11 +28,14 @@ class Login extends React.Component{
       if (name == 'password'){
         this.setState({ password: event.target.value})
       }
+  
     }
     
     handleSubmit(event) {
-        this.saveLogin(this.state.username, this.state.password)
         event.preventDefault()
+        this.saveLogin(this.state.username, this.state.password)
+        
+
       }
     
       render() {
@@ -50,6 +56,7 @@ class Login extends React.Component{
               onChange={this.handleChange.bind(this)}
               name='password'
             />
+            
             <input type="submit" value="Submit" />
           </form>
         )
