@@ -106,7 +106,7 @@ def get_user_prediction(username, category):
     #user_prediction = exists['prediction']
     return user_prediction
 
-def store_session(id, name, username):
+def store_session(id, email, name, username):
     session['id'] = str(id)
     session['name'] = name
     session['username'] = username
@@ -116,11 +116,11 @@ def authenticate(username, password):
         {"username": username})
     if user:
         if pbkdf2_sha256.verify(password, user["password"]):
-            store_session((user['_id']), user['name'], user['username'])
+            store_session((user['_id']), user['email'], user['name'], user['username'])
             return True
     return False
 
-def register(name, username, password):
+def register(name, email, username, password):
     user = mongo.db.users.find_one(
         {"username": username})
     # user already exists
@@ -130,13 +130,19 @@ def register(name, username, password):
     hashed = pbkdf2_sha256.hash(password)
     mongo.db.users.insert_one({
         'name': name,
+        'email': email,
         'username': username,
         'password': hashed,
         'score': 0
     })
     new_user = mongo.db.users.find_one({'username': username})
-    store_session((new_user['_id']), new_user['name'], new_user['username'])
+    store_session((new_user['_id']), new_user['email'], new_user['name'], new_user['username'])
     return True
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 
 @app.before_first_request
@@ -214,17 +220,14 @@ def delete():
 
 @app.route('/login/', methods=['POST'])
 def login():
-
     if request.method == 'POST':
         data = request.json
         username = data['username']
         password = data['password']
         #print(username, password)
-        user = mongo.db.users.find_one(
-        {"username": username})
-        print(user)
         if authenticate(username, password):
-            return 'Sucess'
+            print('suce9ss')
+            return redirect('/home',code=302,Response=None)
         else:
             flash("Invalid username or password. Please try again", "error")
             
@@ -233,15 +236,17 @@ def login():
             print('flag5')
         return "Success"
     return 'None'
+
 @app.route('/signup/', methods=['POST'])
 def signup():
     if request.method == "POST":
         data = request.json
+        email = data['email']
         name = data['name']
         username = data['username']
         password = data['password']
         print("here it is: ", name, username, password)
-        if register(name, username, password):
+        if register(name, email, username, password):
             #return redirect(url_for("home"))
             return 'Sucess'
         else:

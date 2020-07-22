@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import ChartContainer from './containers/ChartContainer';
 import newDeathsContainer from './containers/newDeathsContainer';
 import LandingPage from './pages/LandingPage';
+import AboutPage from './pages/AboutPage';
 import Leaderboard from './components/Leaderboard';
 import MarketChart from './components/MarketChart';
 import ProfilePage from './pages/ProfilePage';
@@ -38,6 +39,7 @@ class App extends React.Component {
             <Route exact path={ROUTES.PROFILE} component={ProfilePage} />
             <Route exact path={ROUTES.SIGN_IN} component={Login} />
             <Route exact path={ROUTES.SIGN_UP} component={SignUp} />
+            <Route exact path={ROUTES.ABOUT} component={AboutPage} />
             <Route exact path="/blah">
               "BLAH PAGE"
             </Route>
