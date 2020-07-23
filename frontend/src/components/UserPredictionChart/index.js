@@ -245,11 +245,13 @@ class UserPredictionChart extends Component {
                             .style("opacity", "1")
                     })*/
                     .on('mousemove', function() { // mouse moving over canvas
+                        var todayDate = new Date();
+                        todayDate = d3.timeParse("%Y-%m-%d")(todayDate.toISOString().substring(0,10));
                         var date = x.invert(d3.mouse(this)[0])
+                        if (+date > +todayDate) {
+                            date = todayDate;
+                        }
                         const index = d3.bisectRight(dates, date);
-                        console.log(dates)
-                        console.log(date)
-                        console.log(index)
                         if(predictionData[date]) {
                             console.log("exists")
                             svg
