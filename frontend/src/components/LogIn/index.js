@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { useHistory } from "react-router-dom";
 import ReactDOM from 'react-dom';
+import './Login.css';
 
 class Login extends React.Component{
     constructor(props) {
@@ -20,6 +21,17 @@ class Login extends React.Component{
         });
     }
 
+    wasSucess(){
+      fetch('/login/',{ method: 'GET'})
+      .then(function (response) {
+        return response.text();
+    }).then(function (textie) {
+        window.alert(textie)
+        console.log(textie); // Print the greeting as text
+    });
+  }
+    
+
     handleChange(event) {
       let name = event.target.name;
       if (name == 'username'){
@@ -34,21 +46,23 @@ class Login extends React.Component{
     handleSubmit(event) {
         event.preventDefault()
         this.saveLogin(this.state.username, this.state.password)
-        
+        this.wasSucess();
 
       }
+
+
     
       render() {
         return (
-          <form onSubmit={this.handleSubmit.bind(this)}>
+          <form onSubmit={this.handleSubmit.bind(this)} class='form-group'>
             <h1>Sign In</h1>
-            <span>Username</span>
+            <label>Username</label>
             <input
               type="text"
               value={this.state.username}
               onChange={this.handleChange.bind(this)}
               name='username'
-            />
+            /><br></br>
             <span>Password</span>
             <input
               type="text"
