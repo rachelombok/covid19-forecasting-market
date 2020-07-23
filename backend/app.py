@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_pymongo import PyMongo
 from pymongo import MongoClient, DESCENDING
 from passlib.hash import pbkdf2_sha256
@@ -140,11 +140,6 @@ def register(name, email, username, password):
     return True
 
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-
 @app.before_first_request
 def make_session_permanent():
     session.permanent = True
@@ -218,7 +213,7 @@ def delete():
     return "None"
     
 
-@app.route('/login/', methods=['POST'])
+@app.route('/login/', methods=['POST','GET'])
 def login():
     if request.method == 'POST':
         data = request.json
@@ -226,15 +221,13 @@ def login():
         password = data['password']
         #print(username, password)
         if authenticate(username, password):
-            print('suce9ss')
-            return redirect('/home',code=302,Response=None)
+            return "Success"
         else:
             flash("Invalid username or password. Please try again", "error")
-            
+            return "Fail"
     else:
         if 'id' in session:
-            print('flag5')
-        return "Success"
+            return "Already logged in"
     return 'None'
 
 @app.route('/signup/', methods=['POST'])
@@ -248,13 +241,23 @@ def signup():
         print("here it is: ", name, username, password)
         if register(name, email, username, password):
             #return redirect(url_for("home"))
-            return 'Sucess'
+            return 'Success'
         else:
             flash("Username is already taken")
+            return 'Fail'
             #return redirect(url_for("signin"))
     else:
         print("hmmm")
         #return redirect(url_for("signin"))
+    return 'None'
+
+
+@app.route("/logout")
+def logout():
+    if 'id' in session:
+        session.pop('id')
+        session.pop('name')
+        session.pop('username')
     return 'None'
 
 
