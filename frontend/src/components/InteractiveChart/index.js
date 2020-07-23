@@ -546,7 +546,7 @@ class InteractiveChart extends Component {
                                         var element = d3.select(this)
                                                         .select('text')
                                                             .style("opacity", "1")
-                                                            .text(Math.round(data.value).toFixed(2));
+                                                            .text(Math.round(data.value));
                                         element.select("circle")
                                                 .style("opacity", "1");
                                         return "translate(" + mouse[0] + "," + y(data.value)+")";
