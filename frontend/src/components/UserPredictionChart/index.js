@@ -245,6 +245,44 @@ class UserPredictionChart extends Component {
                             .style("opacity", "1")
                     })*/
                     .on('mousemove', function() { // mouse moving over canvas
+                        var date = x.invert(d3.mouse(this)[0])
+                        const index = d3.bisectRight(dates, date);
+                        console.log(dates)
+                        console.log(date)
+                        console.log(index)
+                        if(predictionData[date]) {
+                            console.log("exists")
+                            svg
+                                .select("#prediction")
+                                .datum(predictionData[date].filter(predLine.defined()))
+                                .attr("d", predLine)
+                            compiledData[1] = predictionData[date];
+                        }
+                        else {
+                            if (index == 0) {
+                                svg
+                                    .select("#prediction")
+                                    .datum([])
+                                    .attr("d", predLine)
+                                compiledData[1] = [];
+                            }
+                            else {
+                                var newDate = dates[index - 1];
+                                console.log(+predictionData[newDate][0].date, +date);
+                                var pred = predictionData[newDate].filter(d => +d.date >= +date)
+                                console.log(pred)
+                                svg
+                                    .select("#prediction")
+                                    .datum(pred.filter(predLine.defined()))
+                                    .attr("d", predLine);
+                                compiledData[1] = pred;
+                            }
+                        }
+                        mousePerLine.data(compiledData);
+                        ////////////////////
+
+
+
                         var mouse = d3.mouse(this);
                         var xCoord = mouse[0];
                         d3
