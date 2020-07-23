@@ -671,6 +671,68 @@ class InteractiveChart extends Component {
                 .style("opacity", "1");
         };
         document.querySelector("body").appendChild(deleteButton);
+        /////////////////////////////////////////////////////////
+        /*var test1 = [];
+        var test2 = [];
+        var test3 = [];
+        var test4 = [];
+        var test5 = [];
+
+        var start1 = d3.timeParse("%Y-%m-%d")("2020-03-01");
+        var start2 = d3.timeParse("%Y-%m-%d")("2020-04-01");
+        var start3 = d3.timeParse("%Y-%m-%d")("2020-05-01");
+        var start4 = d3.timeParse("%Y-%m-%d")("2020-06-01");
+        var start5 = d3.timeParse("%Y-%m-%d")("2020-07-01");
+
+        var end1 = d3.timeParse("%Y-%m-%d")("2020-8-01");
+        var end2 = d3.timeParse("%Y-%m-%d")("2020-9-01");
+        var end3 = d3.timeParse("%Y-%m-%d")("2020-10-01");
+        var end4 = d3.timeParse("%Y-%m-%d")("2020-11-01");
+        var end5 = d3.timeParse("%Y-%m-%d")("2020-12-01");
+        var length = 153;
+        for(var i = 0; i < length; i++) {
+            test1.push({
+                date: start1,
+                value: Math.floor(Math.random() * 4001),
+                defined: true
+            })
+            test2.push({
+                date: start2,
+                value: Math.floor(Math.random() * 4001),
+                defined: true
+            })
+            test3.push({
+                date: start3,
+                value: Math.floor(Math.random() * 4001),
+                defined: true
+            })
+            test4.push({
+                date: start4,
+                value: Math.floor(Math.random() * 4001),
+                defined: true
+            })
+            test5.push({
+                date: start5,
+                value: Math.floor(Math.random() * 4001),
+                defined: true
+            })
+            start1 = d3.timeDay.offset(start1, 1);
+            start2 = d3.timeDay.offset(start2, 1);
+            start3 = d3.timeDay.offset(start3, 1);
+            start4 = d3.timeDay.offset(start4, 1);
+            start5 = d3.timeDay.offset(start5, 1);
+        }
+        console.log(test1);
+        console.log(test2);
+        console.log(test3);
+        console.log(test4);
+        console.log(test5);*/
+        //savePrediction(test1, category);
+        //savePrediction(test2, category);
+        //savePrediction(test3, category);
+        //savePrediction(test4, category);
+        //savePrediction(test5, category);
+
     }
         
     render() {

@@ -206,7 +206,6 @@ class UserPredictionChart extends Component {
         mousePerLine.append("circle")
                     .attr("r", 2)
                     .style("stroke", function(d, index) {
-                        console.log(index)
                         return color(legendString[index]);
                     })
                     .attr("id", "circle")
@@ -258,7 +257,6 @@ class UserPredictionChart extends Component {
                         d3
                             .selectAll(".mouse-per-line")
                             .attr("transform", function(d, i) {
-                                console.log(d)
                                 if (d.length == 0) {return;}
                                 var date = x.invert(xCoord);
                                 const index = d3.bisector(f => f.date).left(d, date);
@@ -330,17 +328,19 @@ class UserPredictionChart extends Component {
                                 compiledData[1] = [];
                             }
                             else {
-                                date = dates[index - 1];
+                                var newDate = dates[index - 1];
+                                console.log(+predictionData[newDate][0].date, +date);
+                                var pred = predictionData[newDate].filter(d => +d.date >= +date)
+                                console.log(pred)
                                 svg
                                     .select("#prediction")
-                                    .datum(predictionData[date].filter(predLine.defined()))
+                                    .datum(pred.filter(predLine.defined()))
                                     .attr("d", predLine);
-                                compiledData[1] = predictionData[date];
+                                compiledData[1] = pred;
                             }
                         }
                         mousePerLine.data(compiledData);
                     })
-        
                 
     }
 
