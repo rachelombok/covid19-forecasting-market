@@ -196,7 +196,7 @@ class UserPredictionChart extends Component {
                 .attr("id", "tooltip-line")
                 .style("stroke", "black")
                 .style("stroke-width", "0.5px")
-                .style("opacity", "0");
+                .style("display", "none");
         var mousePerLine = tooltip
                                     .selectAll(".mouse-per-line")
                                     .data(compiledData)
@@ -211,7 +211,7 @@ class UserPredictionChart extends Component {
                     .attr("id", "circle")
                     .style("fill", "none")
                     .style("stroke-width", "1px")
-                    .style("opacity", "0");
+                    .style("display", "none");
         mousePerLine.append("text")
                     .attr("id", "value")
                     .attr("transform", "translate(10,3)"); 
@@ -230,20 +230,20 @@ class UserPredictionChart extends Component {
                     .style("cursor", "pointer")
                     .on('mouseout', function() { // on mouse out hide line, circles and text
                         d3.select("#tooltip-line")
-                            .style("opacity", "0");
+                            .style("display", "none");
                         d3.selectAll(".mouse-per-line circle")
-                            .style("opacity", "0");
+                            .style("display", "none");
                         d3.selectAll(".mouse-per-line text")
-                            .style("opacity", "0")
+                            .style("display", "none")
                     })
-                    .on('mouseover', function() { // on mouse in show line, circles and text
+                    /*.on('mouseover', function() { // on mouse in show line, circles and text
                         d3.select("#tooltip-line")
                             .style("opacity", "1");
                         d3.selectAll(".mouse-per-line circle")
                             .style("opacity", "1");
                         d3.selectAll(".mouse-per-line text")
                             .style("opacity", "1")
-                    })
+                    })*/
                     .on('mousemove', function() { // mouse moving over canvas
                         var mouse = d3.mouse(this);
                         var xCoord = mouse[0];
@@ -281,28 +281,29 @@ class UserPredictionChart extends Component {
                                         var element = d3.select(this)
                                         element
                                                 .select('#value')
-                                                .style("opacity", "1")
+                                                .style("display", "block")
                                                 .text(Math.round(data.value))
                                                 .attr("transform", `translate(${mouse[0]}, ${y(data.value)})`);
                                             
                                         element
                                                 .select("#date")
-                                                .style("opacity", "1")
+                                                .style("display", "block")
                                                 .attr("transform", `translate(${mouse[0] + 15}, 0) rotate(-90)`)
                                                 .text(d3.timeFormat("%B %d, %Y")(data.date));
                                         element
                                                 .select("circle")
-                                                .style("opacity", "1")
+                                                .style("display", "block")
                                                 .attr("transform", `translate(${mouse[0]}, ${y(data.value)})`);
                                         return "translate(0,0)";
                                     }
                                 }
                                 var element = d3.select(this)
-                                                .select("text")
-                                                .style("opacity", "0")
+                                element                
+                                    .selectAll("text")
+                                        .style("display", "none")
                                 element
                                         .select("circle")
-                                        .style("opacity", "0");
+                                        .style("display", "none");
                             });
                     })
                     .on("click", function() {
