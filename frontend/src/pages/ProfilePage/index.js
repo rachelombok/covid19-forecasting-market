@@ -15,6 +15,8 @@ class ProfilePage extends React.Component {
     });*/
   }
 
+  
+
   renderUser() {
     return (
       <div>

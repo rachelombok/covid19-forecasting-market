@@ -14,6 +14,16 @@ class Leaderboard extends React.Component {
     });
   }
 
+  saveLogout() {
+    fetch('/logout/',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+      
+    });
+}
+
   renderTable() {
     return this.state.users.map((user, index) => {
       return (
@@ -37,6 +47,7 @@ class Leaderboard extends React.Component {
 
     return (
       <div>
+        <button onClick={this.saveLogout()}>Logout</button>
         <h2>Leaderboard</h2>
         <table style={tableStyle} className="table table-bordered table-hover table-sm">
           <thead className="thead-dark">

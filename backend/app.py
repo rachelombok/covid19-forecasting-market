@@ -252,13 +252,15 @@ def signup():
     return 'None'
 
 
-@app.route("/logout")
+@app.route("/logout/", methods=["POST"])
 def logout():
-    if 'id' in session:
-        session.pop('id')
-        session.pop('name')
-        session.pop('username')
-    return 'None'
+    if request.method == "POST":
+        if 'id' in session:
+            session.pop('id')
+            session.pop('name')
+            session.pop('username')
+            print("logut was a sucess")
+    return 'Nonee'
 
 @app.route('/user-status')
 def user_status():

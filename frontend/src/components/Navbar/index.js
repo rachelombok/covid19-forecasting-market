@@ -1,6 +1,8 @@
 import React from 'react';
 
 class Navbar extends React.Component {
+ 
+
   render() {
     return (
      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -15,6 +17,7 @@ class Navbar extends React.Component {
          <a className="nav-item nav-link" href="/signin">Sign in/Sign Up</a>
          <a className="nav-item nav-link" href="/profile">My Profile</a>
          <a className="nav-item nav-link" href="/leaderboard">Top Forecasts</a>
+        
        </div>
        </div>
      </nav>

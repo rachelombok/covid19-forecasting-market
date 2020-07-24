@@ -7,9 +7,7 @@ class Login extends React.Component{
     constructor(props) {
         super(props)
         this.state = { username: '', password: '' }
-      }
-
-      
+      }      
 
     saveLogin(username, password) {
         fetch('/login/',{
@@ -54,7 +52,7 @@ class Login extends React.Component{
     
       render() {
         return (
-          <form onSubmit={this.handleSubmit.bind(this)} class='form-group'>
+          <form onSubmit={this.handleSubmit.bind(this)} className='form-group'>
             <h1>Sign In</h1>
             <label>Username</label>
             <input
