@@ -143,7 +143,7 @@ def register(name, email, username, password):
 @app.before_first_request
 def make_session_permanent():
     session.permanent = True
-    # Get forecasts data when initially launching website6
+    ''' Get forecasts data when initially launching website6
     data['us_cum_forecasts'] = get_forecasts()
     print("cum forecasts")
     # Get confirmed cases in US
@@ -153,7 +153,7 @@ def make_session_permanent():
     print("inc forecasts")
     # Get new deaths in US
     data['us_inc_confirmed'] = get_us_new_deaths()
-    print("inc confirmed")
+    print("inc confirmed")'''
 
 
 @app.route("/user-prediction", methods=['POST','GET'])
@@ -259,6 +259,18 @@ def logout():
         session.pop('name')
         session.pop('username')
     return 'None'
+
+@app.route('/user-status')
+def user_status():
+    if 'id' in session:
+        return {
+            'logged in': True,
+            'id': session['id'],
+            'name': session['name'],
+            'username': session['username']
+        }
+    else:
+        return {'logged in': False}
 
 
 @app.route('/user-data')
