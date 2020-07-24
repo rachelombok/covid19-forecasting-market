@@ -15,6 +15,26 @@ def get_us_new_deaths():
     df.reset_index(drop=True, inplace=True)
     return json.dumps(pd.Series(df.new_deaths.values,index=df.date).to_dict())
 
+
+def get_us_new_deaths_weekly(data):
+    daily_deaths = json.loads(data)
+    dates = list(daily_deaths.keys())[::-1]
+    result = dict()
+    n = 1
+    tempDate = ""
+    for date in dates:
+        if n == 1:
+            tempDate = date
+            result[tempDate] = daily_deaths[date]
+        else:
+            result[tempDate] += daily_deaths[date]
+            if n == 7:
+                result[tempDate] //= 7 
+                n = 0
+        n += 1
+    return json.dumps(result)
+        
+
 # get confirmed cumulative deaths in the us
 def get_us_confirmed():
     df = pd.read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv")
