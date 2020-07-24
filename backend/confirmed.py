@@ -16,7 +16,7 @@ def get_us_new_deaths():
     return json.dumps(pd.Series(df.new_deaths.values,index=df.date).to_dict())
 
 
-def get_us_new_deaths_weekly(data):
+def get_us_new_deaths_weekly_avg(data):
     daily_deaths = json.loads(data)
     dates = list(daily_deaths.keys())[::-1]
     result = dict()
