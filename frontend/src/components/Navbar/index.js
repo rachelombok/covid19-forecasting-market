@@ -1,4 +1,5 @@
 import React from 'react';
+import * as ROUTES from '../../constants/routes';
 
 class Navbar extends React.Component {
  
@@ -12,11 +13,12 @@ class Navbar extends React.Component {
        </button>
        <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
        <div className="navbar-nav">
-         <a className="nav-item nav-link active" href="#">Home <span className="sr-only">(current)</span></a>
-         <a className="nav-item nav-link" href="/about">About</a>
-         <a className="nav-item nav-link" href="/signin">Sign in/Sign Up</a>
-         <a className="nav-item nav-link" href="/profile">My Profile</a>
-         <a className="nav-item nav-link" href="/leaderboard">Top Forecasts</a>
+         <a className="nav-item nav-link active" href={ROUTES.LANDING}>Home <span className="sr-only">(current)</span></a>
+         <a className="nav-item nav-link" href={ROUTES.ABOUT}>About</a>
+         <a className="nav-item nav-link" href={ROUTES.SIGN_IN}>Sign in</a>
+         <a className="nav-item nav-link" href={ROUTES.SIGN_UP}>Sign Up</a>
+         <a className="nav-item nav-link" href={ROUTES.PROFILE}>My Profile</a>
+         <a className="nav-item nav-link" href={ROUTES.LEADERBOARD}>Top Forecasts</a>
         
        </div>
        </div>
