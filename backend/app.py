@@ -6,7 +6,7 @@ from datetime import timedelta, date
 from bson.json_util import dumps, loads
 import json
 from get_estimates import get_forecasts, get_accuracy_for_all_models, get_daily_confirmed_df, get_daily_forecasts, get_aggregates
-from confirmed import get_us_new_deaths, get_us_confirmed
+from confirmed import get_us_new_deaths, get_us_confirmed, get_us_new_deaths_weekly_avg
 from gaussian import get_gaussian_for_all
 
 app = Flask(__name__)
@@ -21,6 +21,7 @@ us_data = get_us_confirmed()
 
 us_inc_forecasts = get_daily_forecasts()
 us_inc_confirmed = get_us_new_deaths()
+us_inc_confirmed_wk_avg = get_us_new_deaths_weekly_avg(us_inc_confirmed)
 
 # Get aggregate data
 us_aggregates = get_aggregates(forecast_data)
@@ -184,6 +185,10 @@ def us_cum_deaths_confirmed():
 def us_inc_deaths_confirmed():
     return us_inc_confirmed
     #return data['us_inc_confirmed']
+
+@app.route('/us-inc-deaths-confirmed-wk-avg')
+def us_inc_deaths_confirmed_wk_avg():
+    return us_inc_confirmed_wk_avg
 
 @app.route('/us-agg-cum-deaths')
 def us_agg_cum_deaths():

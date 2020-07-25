@@ -82,6 +82,7 @@ class InteractiveChart extends Component {
             date: d3.timeParse("%Y-%m-%d")(key),
             value: confirmed[key]
         }));
+        console.log(confirmedData);
         
         var forecastData = forecast.map(f => {
             return Object.keys(f).map(key => ({
@@ -104,11 +105,12 @@ class InteractiveChart extends Component {
                 })
             );
         }
-        console.log(predictionData)
+        //console.log(predictionData)
   
         //set other dates
         const confirmedStartDate = d3.timeParse("%Y-%m-%d")("2020-02-01"); //date format: y-m-d
-        const predStartDate = confirmedData[confirmedData.length - 1].date; //last date of confirmedData
+        //const predStartDate = confirmedData[confirmedData.length - 1].date; //last date of confirmedData
+        const predStartDate = confirmedData[0].date
         const predLength = 155;
         //var predEndDateString = addDays(new Date(), predLength).toISOString().substring(0, 10);
         const predEndDate = d3.timeDay.offset(predStartDate, predLength)
@@ -265,11 +267,11 @@ class InteractiveChart extends Component {
                     date: predStartDate,
                     value: confirmedData[confirmedData.length - 1].value
                 });
-                console.log(f);
-                console.log("done");
+                //console.log(f);
+                //console.log("done");
             }
-            console.log(f)
-            console.log(idxOfStartDate)
+            //console.log(f)
+            //console.log(idxOfStartDate)
             predictionArea.append("path")
                         .attr("class", "forecast line")
                         .attr("id", orgs[index])
@@ -305,16 +307,16 @@ class InteractiveChart extends Component {
             predictionData[0].defined = true;
             currDate = d3.timeDay.offset(predictionData[predictionData.length - 1].date, 1);
             //currDate = addDays(predictionData[predictionData.length - 1].date, 1);
-            console.log(predictionData)
-            console.log(createDefaultPrediction(currDate, predEndDate))
+            //console.log(predictionData)
+            //console.log(createDefaultPrediction(currDate, predEndDate))
             predictionData.concat(createDefaultPrediction(currDate, predEndDate));
-            console.log(predictionData);
+            //console.log(predictionData);
         }
         else {
             predictionData = createDefaultPrediction(predStartDate, predEndDate);
             predictionData[0].value = confirmedLastVal;
             predictionData[0].defined = true;
-            console.log(predictionData);
+            //console.log(predictionData);
         }
 
         var filteredData = null;
@@ -467,7 +469,7 @@ class InteractiveChart extends Component {
                     .style("stroke", "black")
                     .style("stroke-width", "0.5px")
                     .style("opacity", "0");
-        console.log(compiledData)
+        //console.log(compiledData)
         var mousePerLine = tooltipArea
                                         .selectAll(".mouse-per-line")
                                         .data(compiledData)
