@@ -32,6 +32,7 @@ def get_us_new_deaths_weekly_avg(data):
                 result[tempDate] //= 7 
                 n = 0
         n += 1
+    result = dict(sorted(result.items()))
     return json.dumps(result)
         
 

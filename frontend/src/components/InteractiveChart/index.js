@@ -108,9 +108,9 @@ class InteractiveChart extends Component {
         //console.log(predictionData)
   
         //set other dates
-        const confirmedStartDate = d3.timeParse("%Y-%m-%d")("2020-02-01"); //date format: y-m-d
-        //const predStartDate = confirmedData[confirmedData.length - 1].date; //last date of confirmedData
-        const predStartDate = confirmedData[0].date
+        //const confirmedStartDate = d3.timeParse("%Y-%m-%d")("2020-02-01"); //date format: y-m-d
+        const confirmedStartDate = confirmedData[4].date;
+        const predStartDate = confirmedData[confirmedData.length - 1].date; //last date of confirmedData
         const predLength = 155;
         //var predEndDateString = addDays(new Date(), predLength).toISOString().substring(0, 10);
         const predEndDate = d3.timeDay.offset(predStartDate, predLength)
