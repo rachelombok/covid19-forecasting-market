@@ -6,8 +6,13 @@ import './Login.css';
 class Login extends React.Component{
     constructor(props) {
         super(props)
-        this.state = { username: '', password: '' }
-      }      
+        this.state = { username: '', password: '', loggedinstate: '' }
+      }  
+      
+      componentDidMount(){
+        this.isLoggedIn();
+        
+      }
 
     saveLogin(username, password) {
         fetch('/login/',{
@@ -24,11 +29,17 @@ class Login extends React.Component{
       .then(function (response) {
         return response.text();
     }).then(function (textie) {
-        window.alert(textie)
-        console.log(textie); // Print the greeting as text
+        console.log(textie);
     });
   }
     
+
+  isLoggedIn = () => {
+		fetch('/user-status/')
+		.then((response) => response.json())
+		.then((data) => this.setState({loggedinstate: data}));
+		
+}
 
     handleChange(event) {
       let name = event.target.name;
@@ -41,12 +52,16 @@ class Login extends React.Component{
   
     }
     
-    handleSubmit(event) {
+    async handleSubmit(event) {
         event.preventDefault()
         this.saveLogin(this.state.username, this.state.password)
-        this.wasSucess();
+        await this.wasSucess();
+        await this.isLoggedIn()
+        console.log(this.state.loggedinstate['logged in'])
+        
 
       }
+
 
 
     

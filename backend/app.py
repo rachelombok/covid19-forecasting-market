@@ -262,17 +262,17 @@ def logout():
             print("logut was a sucess")
     return 'Nonee'
 
-@app.route('/user-status')
+@app.route('/user-status/')
 def user_status():
     if 'id' in session:
-        return {
+        return dumps({
             'logged in': True,
             'id': session['id'],
             'name': session['name'],
             'username': session['username']
-        }
+        })
     else:
-        return {'logged in': False}
+        return dumps({'logged in': False})
 
 
 @app.route('/user-data')
