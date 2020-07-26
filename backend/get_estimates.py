@@ -52,7 +52,7 @@ def get_daily_forecasts():
     return models
 
 
-def get_aggregates(forecast_data):
+def get_aggregates(forecast_data, user_prediction):
     aggregate_json = dict()
     forecast_json = forecast_data
     for org in forecast_json.keys():
@@ -64,6 +64,17 @@ def get_aggregates(forecast_data):
                 aggregate_json[dates[i]] = [values[i]]
             else:
                 aggregate_json[dates[i]].append(values[i])
+
+    pred_date = list(user_prediction.keys())[-1]
+    preds = user_prediction[pred_date]
+    for i in range(len(preds)):
+        T_index = preds[i]['date'].index('T')
+        date = preds[i]['date'][:T_index]
+        value = preds[i]['value']
+        if date not in aggregate_json:
+            aggregate_json[date] = [value]
+        else:
+            aggregate_json[date].append(value)
 
     for date in aggregate_json:
         aggregate_json[date] = sum(aggregate_json[date])/len(aggregate_json[date])
