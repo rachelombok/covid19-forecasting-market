@@ -227,7 +227,7 @@ def delete():
 
 @app.route('/login/', methods=['POST','GET'])
 def login():
-    if request.method == 'POST':
+    if (request.method == 'POST'):
         data = request.json
         username = data['username']
         password = data['password']
@@ -240,7 +240,9 @@ def login():
     else:
         if 'id' in session:
             return "Already logged in"
-    return 'None'
+        else: 
+            return "None"
+    #return 'None'
 
 @app.route('/signup/', methods=['POST'])
 def signup():

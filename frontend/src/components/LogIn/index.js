@@ -52,14 +52,14 @@ class Login extends React.Component{
   
     }
     
-    async handleSubmit(event) {
+    handleSubmit(event) {
         event.preventDefault()
         this.saveLogin(this.state.username, this.state.password)
-        await this.wasSucess();
-        await this.isLoggedIn()
+        this.wasSucess();
+        this.isLoggedIn()
         console.log(this.state.loggedinstate['logged in'])
         
-
+        
       }
 
 
@@ -78,10 +78,11 @@ class Login extends React.Component{
             /><br></br>
             <span>Password</span>
             <input
-              type="text"
+              type="password"
               value={this.state.password}
               onChange={this.handleChange.bind(this)}
               name='password'
+              required
             />
             
             <input type="submit" value="Submit" />
