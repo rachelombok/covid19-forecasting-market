@@ -10,7 +10,8 @@ class UserPredictionChartContainer extends Component {
             orgs: null,
             confirmed: null,
             userPrediction: null,
-            aggregate: null
+            aggregate: null,
+            userStatus: null
         };
     }
 
@@ -29,10 +30,14 @@ class UserPredictionChartContainer extends Component {
         fetch('/us-agg-inc-deaths').then(res => res.json()).then(data => {
             this.setState({ aggregate: data });
         });
+        fetch('/login-status/').then(res => res.json()).then(data => {
+            this.setState({ userStatus: data });
+            console.log(data);
+        });
     }
     render() {
-        const { forecast, orgs, userPrediction, confirmed, aggregate } = this.state;
-        if (!forecast || !orgs || !userPrediction || !confirmed || !aggregate) return 'Loading...';
+        const { forecast, orgs, userPrediction, confirmed, aggregate, userStatus } = this.state;
+        if (!forecast || !orgs || !userPrediction || !confirmed || !aggregate || !userStatus) return 'Loading...';
 
         return (
             <div className="chartContainer">
@@ -42,6 +47,7 @@ class UserPredictionChartContainer extends Component {
                     userPrediction={userPrediction}
                     confirmed={confirmed}
                     aggregate={aggregate}
+                    userStatus={userStatus}
                 />
             </div>
         );

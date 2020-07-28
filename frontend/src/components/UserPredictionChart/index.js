@@ -11,8 +11,14 @@ class UserPredictionChart extends Component {
     }
 
     componentDidMount() {
-        //console.log(this.props);
-        this.renderChart();
+        const userStatus = this.props.userStatus;
+        console.log(userStatus)
+        if (userStatus['logged in']) {
+            this.renderChart();
+        }
+        else {
+            this.chartRef.current.innerHTML = "Please log in"
+        }
     }
     renderChart() {
         const { forecast, orgs, userPrediction, confirmed, aggregate } = this.props;

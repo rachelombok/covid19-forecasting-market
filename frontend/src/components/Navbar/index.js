@@ -29,7 +29,7 @@ class Navbar extends React.Component {
 }
 
 	isLoggedIn = () => {
-		fetch('/user-status/')
+		fetch('/login-status/')
 		.then((response) => response.json())
 		.then((data) => this.setState({loggedinstate: data}));
 		
