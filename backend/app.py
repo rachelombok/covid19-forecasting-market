@@ -162,10 +162,12 @@ def make_session_permanent():
 
 @app.route("/user-prediction", methods=['POST','GET'])
 def home():
+    user_prediction = {}
     pred_category = request.args.get('category')
     #print(pred_category)
     #print("done")
-    user_prediction = get_user_prediction('testUsername', pred_category)
+    if 'id' in session:
+        user_prediction = get_user_prediction(session['username'], pred_category)
     #print(user_prediction)
     return json.dumps(user_prediction)
 
@@ -195,13 +197,17 @@ def us_inc_deaths_confirmed_wk_avg():
 
 @app.route('/us-agg-cum-deaths')
 def us_agg_cum_deaths():
-    user_prediction = get_user_prediction('testUsername', 'us_daily_deaths')
+    user_prediction = {}
+    if 'id' in session:
+        user_prediction = get_user_prediction(session['username'], 'us_daily_deaths')
     us_aggregates = get_aggregates(forecast_data, user_prediction)
     return us_aggregates
 
 @app.route('/us-agg-inc-deaths')
 def us_agg_inc_deaths():
-    user_prediction = get_user_prediction('testUsername', 'us_daily_deaths')
+    user_prediction = {}
+    if 'id' in session:
+        user_prediction = get_user_prediction(session['username'], 'us_daily_deaths')
     us_aggregates_daily = get_aggregates(us_inc_forecasts, user_prediction)
     return us_aggregates_daily
 
@@ -284,7 +290,7 @@ def logout():
             print("logout was a sucess")
     return 'None'
 
-@app.route('/user-status/', methods=["GET"])
+@app.route('/login-status/', methods=["GET"])
 def user_status():
     if 'id' in session:
         return dumps({
@@ -297,10 +303,6 @@ def user_status():
     else:
         return dumps({'logged in': False})
 
-@app.route('/test', methods=["GET", "POST"])
-def test():
-    return dumps({"test": "test"})
-
 
 @app.route('/user-data')
 def leaderboard():
@@ -309,15 +311,19 @@ def leaderboard():
 
 @app.route('/user')
 def profile():
-    user = mongo.db.users.find({'username': session['username']})
+    user = {}
+    if 'id' in session:
+        user = mongo.db.users.find({'username': session['username']})
     return json.dumps(user)
 
 @app.route('/action/', methods=["POST"])
 def addbio():
+    user = {}
     if request.method == 'POST':
         bio = request.values.get('bio')
         location = request.values.get('location')
-    user = mongo.db.users.find({'username': session['username']})
+    if 'id' in session:
+        user = mongo.db.users.find({'username': session['username']})
     user.insert({'bio':bio, 'location':location})
     #redirect('/user')
 
