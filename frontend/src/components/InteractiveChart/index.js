@@ -61,9 +61,23 @@ class InteractiveChart extends Component {
     }
     
     appendModal() {
-        var modal = document.createElement("div")
-        modal.id = "popup"
-        this.chartRef.current.appendChild(modal)
+        var modal = document.createElement("div");
+        modal.id = "modal";
+        var modalContent = document.createElement("div");
+        modalContent.id = "modal-content";
+        var text = document.createElement("p");
+        text.innerText = "Please log in to save your prediction."
+        var signinBtn = document.createElement("button");
+        signinBtn.id = "signin-btn"
+        signinBtn.innerText = "Sign In"
+        var signupBtn = document.createElement("button");
+        signupBtn.id = "signup-btn"
+        signupBtn.innerText = "Sign Up"
+        modalContent.appendChild(text);
+        modalContent.appendChild(signinBtn);
+        modalContent.appendChild(signupBtn);
+        modal.appendChild(modalContent);
+        this.chartRef.current.appendChild(modal);
     }
 
     renderChartUnregistered() {
@@ -421,8 +435,8 @@ class InteractiveChart extends Component {
                     })
                     .on("end", function () {
                         d3
-                            .select("#popup")
-                            .style("display", "none");
+                            .select("#modal")
+                            .style("display", "block");
                         console.log("popup");
                         d3.select("#tooltip-line")
                             .style("opacity", "1");
@@ -433,6 +447,13 @@ class InteractiveChart extends Component {
                     });
         
         svg.call(drag)
+        var modal = document.getElementById("modal");
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+              modal.style.display = "none";
+            }
+          }
 
         //finds the datapoint closest to the mouse (along x)
         /*var bisect = () => {
