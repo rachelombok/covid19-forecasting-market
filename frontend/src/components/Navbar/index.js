@@ -39,10 +39,10 @@ renderDropdown(){
 	if(this.state.loggedinstate['logged in']){
 		
 		return(
-			<div>
+			<div className='navbar-nav ml-auto'>
 
 <ul className="navbar-nav ml-auto">
-				 <li className="nav-item dropdown">
+				 <li className="nav-item dropdown ml-auto">
 				<a className="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
 					Hello {this.state.loggedinstate['name']}!</a>
 			<div className="dropdown-menu">
@@ -58,7 +58,7 @@ renderDropdown(){
 	else{
 		return(
 			<div className='navbar-nav ml-auto'>
-				<ul className="navbar-nav">
+				<ul className="navbar-nav ml-auto">
 				 <li className="nav-item dropdown">
 				<a className="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
 					Welcome</a>

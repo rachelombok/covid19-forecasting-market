@@ -24,8 +24,10 @@ us_inc_confirmed = get_us_new_deaths()
 us_inc_confirmed_wk_avg = get_us_new_deaths_weekly_avg(us_inc_confirmed)
 
 # Get aggregate data
-us_aggregates = get_aggregates(forecast_data)
-us_aggregates_daily = get_aggregates(us_inc_forecasts)
+#us_aggregates = get_aggregates(forecast_data)
+#us_aggregates_daily = get_aggregates(us_inc_forecasts)
+us_aggregates = None
+us_aggregates_daily = None
 
 # set up pymongo
 #app.config["MONGO_URI"] = "mongodb://localhost:27017/covid19-forecast"
@@ -99,12 +101,12 @@ def get_user_prediction(username, category):
     user_prediction = {}
     prediction = mongo.db.predictions.find({"username": username, "category": category})
     for p in prediction:
-        print("inside")
+        #print("inside")
         #(date, prediction)
-        print(p)
-        print(p['prediction'])
+        #print(p)
+        #print(p['prediction'])
         user_prediction[p['date']] = p['prediction']
-    #user_prediction = exists['prediction']
+    #user_prediction = exists['prediction']        
     return user_prediction
 
 def store_session(id, email, name, username):
@@ -161,12 +163,10 @@ def make_session_permanent():
 @app.route("/user-prediction", methods=['POST','GET'])
 def home():
     pred_category = request.args.get('category')
-    user_prediction = {}
-    if 'id' in session:
-        user_prediction = get_user_prediction(session['username'], pred_category)
-        print("user prediction returned")
-    else:
-        print("session empty")
+    #print(pred_category)
+    #print("done")
+    user_prediction = get_user_prediction('testUsername', pred_category)
+    #print(user_prediction)
     return json.dumps(user_prediction)
 
 @app.route("/us-cum-deaths-forecasts")
@@ -195,11 +195,16 @@ def us_inc_deaths_confirmed_wk_avg():
 
 @app.route('/us-agg-cum-deaths')
 def us_agg_cum_deaths():
+    user_prediction = get_user_prediction('testUsername', 'us_daily_deaths')
+    us_aggregates = get_aggregates(forecast_data, user_prediction)
     return us_aggregates
 
 @app.route('/us-agg-inc-deaths')
 def us_agg_inc_deaths():
+    user_prediction = get_user_prediction('testUsername', 'us_daily_deaths')
+    us_aggregates_daily = get_aggregates(us_inc_forecasts, user_prediction)
     return us_aggregates_daily
+
 
 @app.route('/update/', methods=['GET', 'POST'])
 def update():
@@ -229,7 +234,7 @@ def delete():
 
 @app.route('/login/', methods=['POST','GET'])
 def login():
-    if request.method == 'POST':
+    if (request.method == 'POST'):
         data = request.json
         username = data['username']
         password = data['password']
@@ -242,7 +247,9 @@ def login():
     else:
         if 'id' in session:
             return "Already logged in"
-    return 'None'
+        else: 
+            return "None"
+    #return 'None'
 
 @app.route('/signup/', methods=['POST'])
 def signup():
