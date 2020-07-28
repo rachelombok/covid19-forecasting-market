@@ -109,6 +109,7 @@ def get_user_prediction(username, category):
 
 def store_session(id, email, name, username):
     session['id'] = str(id)
+    session['email'] = email
     session['name'] = name
     session['username'] = username
 
@@ -160,10 +161,12 @@ def make_session_permanent():
 @app.route("/user-prediction", methods=['POST','GET'])
 def home():
     pred_category = request.args.get('category')
-    print(pred_category)
-    print("done")
-    user_prediction = get_user_prediction('testUsername', pred_category)
-    print(user_prediction)
+    user_prediction = {}
+    if 'id' in session:
+        user_prediction = get_user_prediction(session['username'], pred_category)
+        print("user prediction returned")
+    else:
+        print("session empty")
     return json.dumps(user_prediction)
 
 @app.route("/us-cum-deaths-forecasts")
@@ -204,16 +207,22 @@ def update():
         data = request.json
         print(data)
         #replace username with user id
-        update_user_prediction('testUsername', data['data'], data['category'])
-        return "Success"
+        if 'id' in session:
+            update_user_prediction(session['username'], data['data'], data['category'])
+            return "Success"
+        else:
+            print("session empty")
     return 'None'
 
 @app.route('/delete/', methods=["POST"])
 def delete():
     if request.method == 'POST':
         print(request.json)
-        delete_user_prediction('testUsername', request.json['category'])
-        print("prediction deleted!")
+        if 'id' in session:
+            delete_user_prediction(session['username'], request.json['category'])
+            print("prediction deleted!")
+        else:
+            print("session empty")
         return "Success"  
     return "None"
     
@@ -264,20 +273,26 @@ def logout():
             session.pop('id')
             session.pop('name')
             session.pop('username')
-            print("logut was a sucess")
-    return 'Nonee'
+            session.pop('email')
+            print("logout was a sucess")
+    return 'None'
 
-@app.route('/user-status/')
+@app.route('/user-status/', methods=["GET"])
 def user_status():
     if 'id' in session:
         return dumps({
             'logged in': True,
             'id': session['id'],
             'name': session['name'],
+            'email': session['email'],
             'username': session['username']
         })
     else:
         return dumps({'logged in': False})
+
+@app.route('/test', methods=["GET", "POST"])
+def test():
+    return dumps({"test": "test"})
 
 
 @app.route('/user-data')
