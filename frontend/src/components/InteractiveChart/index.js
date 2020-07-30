@@ -104,6 +104,14 @@ class InteractiveChart extends Component {
                         .attr("transform",
                         "translate(" + margin.left + "," + margin.top + ")");
         
+        // add title
+        svg.append("text")
+            .attr("x", (width / 2))             
+            .attr("y", 0 - (margin.top / 2))
+            .attr("text-anchor", "middle")  
+            .style("font-size", "16px") 
+            .style("text-decoration", "underline")  
+            .text("COVID-19 Forecasts Over Time");
         
         //format confirmedData, forecastData, and predictionData into a list of js objects, convert date from string to js date object
         var confirmedData = Object.keys(confirmed).map(key => ({
@@ -125,11 +133,9 @@ class InteractiveChart extends Component {
         }));
   
         //set other dates
-        //const confirmedStartDate = d3.timeParse("%Y-%m-%d")("2020-02-01"); //date format: y-m-d
         const confirmedStartDate = confirmedData[4].date;
         const predStartDate = confirmedData[confirmedData.length - 1].date; //last date of confirmedData
         const predLength = 155;
-        //var predEndDateString = addDays(new Date(), predLength).toISOString().substring(0, 10);
         const predEndDate = d3.timeDay.offset(predStartDate, predLength)
         
         //get confirmedData starting from confirmedStartDate
@@ -273,7 +279,6 @@ class InteractiveChart extends Component {
         //display forecast data
         forecastData.map((f, index) => {
             //make sure they all stem from the confirmed curve!
-            //var temp = d3.timeParse("%Y-%m-%d")("2020-07-18")
             var idxOfStartDate = d3.bisector(f => f.date).left(f, predStartDate);
             //check if predStartDate exists in f
             if (f.length > 0 && +f[idxOfStartDate].date == +predStartDate) {
@@ -284,11 +289,8 @@ class InteractiveChart extends Component {
                     date: predStartDate,
                     value: confirmedData[confirmedData.length - 1].value
                 });
-                //console.log(f);
-                //console.log("done");
             }
-            //console.log(f)
-            //console.log(idxOfStartDate)
+
             predictionArea.append("path")
                         .attr("class", "forecast line")
                         .attr("id", orgs[index])
@@ -320,9 +322,7 @@ class InteractiveChart extends Component {
 
         predictionData = createDefaultPrediction(predStartDate, predEndDate);
         predictionData[0].value = confirmedLastVal;
-        predictionData[0].defined = true;
-        //console.log(predictionData);
-        
+        predictionData[0].defined = true;        
 
         var filteredData = null;
         //var totalData = confirmedData.concat(predictionData);
@@ -705,6 +705,14 @@ class InteractiveChart extends Component {
                         .attr("transform",
                         "translate(" + margin.left + "," + margin.top + ")");
         
+        // add title
+        svg.append("text")
+            .attr("x", (width / 2))             
+            .attr("y", 0)
+            .attr("text-anchor", "middle")  
+            .style("font-size", "16px") 
+            .style("text-decoration", "underline")  
+            .text("COVID-19 Forecasts Over Time");
         
         //format confirmedData, forecastData, and predictionData into a list of js objects, convert date from string to js date object
         var confirmedData = Object.keys(confirmed).map(key => ({
@@ -734,14 +742,11 @@ class InteractiveChart extends Component {
                 })
             );
         }
-        //console.log(predictionData)
   
         //set other dates
-        //const confirmedStartDate = d3.timeParse("%Y-%m-%d")("2020-02-01"); //date format: y-m-d
         const confirmedStartDate = confirmedData[4].date;
         const predStartDate = confirmedData[confirmedData.length - 1].date; //last date of confirmedData
         const predLength = 155;
-        //var predEndDateString = addDays(new Date(), predLength).toISOString().substring(0, 10);
         const predEndDate = d3.timeDay.offset(predStartDate, predLength)
         
         //get confirmedData starting from confirmedStartDate
@@ -896,11 +901,7 @@ class InteractiveChart extends Component {
                     date: predStartDate,
                     value: confirmedData[confirmedData.length - 1].value
                 });
-                //console.log(f);
-                //console.log("done");
             }
-            //console.log(f)
-            //console.log(idxOfStartDate)
             predictionArea.append("path")
                         .attr("class", "forecast line")
                         .attr("id", orgs[index])
