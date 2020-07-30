@@ -23,7 +23,7 @@ class UserPredictionChartContainer extends Component {
             fetch('/user-prediction?category=us_daily_deaths').then(res => res.json()).then(data => {
             this.setState({ userPrediction: data });
         });
-        fetch('/us-inc-deaths-confirmed').then(res => res.json()).then(data => {
+        fetch('/us-inc-deaths-confirmed-wk-avg').then(res => res.json()).then(data => {
             //const result = JSON.parse(data);
             this.setState({ confirmed: data });
         });
