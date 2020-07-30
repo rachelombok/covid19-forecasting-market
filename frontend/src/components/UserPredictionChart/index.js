@@ -81,6 +81,23 @@ class UserPredictionChart extends Component {
                     .append("g")
                         .attr("transform",
                         "translate(" + margin.left + "," + margin.top + ")");
+        
+        //Create X axis label   
+        svg.append("text")
+            .attr("x", width/2)
+            .attr("y", height + 2*margin.bottom)
+            .style("text-anchor", "middle")
+            .text("Date");
+            
+        //Create Y axis label
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - margin.left)
+            .attr("x", 0 - (height/2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("Daily Deaths");
+
         var x = d3
                     .scaleTime()
                     .domain([confirmedStartDate, predEndDate])
