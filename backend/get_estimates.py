@@ -40,13 +40,21 @@ def get_daily_forecasts():
     models = dict()
     for line in file:
         df = pd.read_csv(line.strip())
-        df = df.loc[df['location'] == 'US']
-        df = df.loc[df['type'] == 'point']
-        df = df.loc[df['target'].str.contains("inc death")]
+        df = df.loc[(df['location'] == 'US') & (df['type'] == 'point') & (df['target'].str.contains("inc death")) & (df['target'].str.contains("wk"))]
+        #df = df.loc[df['type'] == 'point']
+        #df = df.loc[df['target'].str.contains("inc death")]
+        
+        mask = df['target'].str.contains('wk')
+        df.loc[mask, 'value'] /= 7
+
+        #print(df.head())
         df = df[['target_end_date', 'value']]
         df = df.sort_values('target_end_date')
         df = df.drop_duplicates()
-        df['value'] = df['value']/7
+        #df['value'] = df['value']/7
+        '''if orgs[-1] == 'UCLA':
+            for i in range(len(df)):
+                print(df.iloc[i])'''
         JSON = df.to_json()
         models[orgs.pop()] = df.to_dict('list')
     return models
@@ -148,5 +156,5 @@ def get_daily_confirmed(d):
 #print(get_accuracy_for_all_models())
 #print(get_daily_confirmed_df('2020-06-01', '2020-06-03'))
 
-#print(get_daily_forecasts())
+#get_daily_forecasts()
 #print(get_aggregates(get_daily_forecasts()))
