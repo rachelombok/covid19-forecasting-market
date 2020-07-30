@@ -68,9 +68,9 @@ def get_aggregates(forecast_data, user_prediction):
                 aggregate_json[dates[i]].append(values[i])
 
     if len(user_prediction) > 0:
-        for key in user_prediction.keys():
+        '''for key in user_prediction.keys():
             #print(key)
-            user_prediction[key] = [d for d in user_prediction[key] if d['defined'] is True]
+            user_prediction[key] = [d for d in user_prediction[key] if d['defined'] is True]'''
         #print(user_prediction)
         pred_date = list(user_prediction.keys())[-1]
         preds = user_prediction[pred_date]
