@@ -41,28 +41,22 @@ def get_daily_forecasts():
     for line in file:
         df = pd.read_csv(line.strip())
         df = df.loc[(df['location'] == 'US') & (df['type'] == 'point') & (df['target'].str.contains("inc death")) & (df['target'].str.contains("wk"))]
-        #df = df.loc[df['type'] == 'point']
-        #df = df.loc[df['target'].str.contains("inc death")]
-        
+
         mask = df['target'].str.contains('wk')
         df.loc[mask, 'value'] /= 7
-
-        #print(df.head())
         df = df[['target_end_date', 'value']]
         df = df.sort_values('target_end_date')
-        df = df.drop_duplicates()
-        #df['value'] = df['value']/7
-        '''if orgs[-1] == 'UCLA':
-            for i in range(len(df)):
-                print(df.iloc[i])'''
-        JSON = df.to_json()
+        df = df.drop_duplicates(subset=['target_end_date'], keep='last')
+
         models[orgs.pop()] = df.to_dict('list')
     return models
 
 
+# Get aggregate data (average of all forecasts including user prediction)
 def get_aggregates(forecast_data, user_prediction):
     aggregate_json = dict()
     forecast_json = forecast_data
+
     for org in forecast_json.keys():
         data = forecast_json[org]
         dates = data['target_end_date']
@@ -72,8 +66,12 @@ def get_aggregates(forecast_data, user_prediction):
                 aggregate_json[dates[i]] = [values[i]]
             else:
                 aggregate_json[dates[i]].append(values[i])
+
     if len(user_prediction) > 0:
-        print("user prediction")
+        '''for key in user_prediction.keys():
+            #print(key)
+            user_prediction[key] = [d for d in user_prediction[key] if d['defined'] is True]'''
+        #print(user_prediction)
         pred_date = list(user_prediction.keys())[-1]
         preds = user_prediction[pred_date]
         for i in range(len(preds)):
@@ -81,14 +79,26 @@ def get_aggregates(forecast_data, user_prediction):
             date = preds[i]['date'][:T_index]
             value = preds[i]['value']
             if date not in aggregate_json:
-                aggregate_json[date] = [value]
+                #aggregate_json[date] = [value]
+                continue
             else:
                 aggregate_json[date].append(value)
 
+    dates_removed = []
     for date in aggregate_json:
+        if aggregate_json[date] == [0]:
+            dates_removed.append(date)
+            continue
         aggregate_json[date] = sum(aggregate_json[date])/len(aggregate_json[date])
+
+    # Any dates without an actual forecast value are removed
+    for date in dates_removed:
+        del aggregate_json[date]
     return aggregate_json
 
+def filter_undefined(prediction):
+    print(prediction)
+    return prediction['defined'] is True
 
 #pass in the df containing confirmed and predicted values
 def get_mse(model_df):
@@ -151,10 +161,3 @@ def get_daily_confirmed(d):
     return data['Deaths'].sum()
     # catch error!!
 
-
-
-#print(get_accuracy_for_all_models())
-#print(get_daily_confirmed_df('2020-06-01', '2020-06-03'))
-
-#get_daily_forecasts()
-#print(get_aggregates(get_daily_forecasts()))

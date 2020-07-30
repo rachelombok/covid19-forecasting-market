@@ -168,7 +168,6 @@ def home():
     #print("done")
     if 'id' in session:
         user_prediction = get_user_prediction(session['username'], pred_category)
-    #print(user_prediction)
     return json.dumps(user_prediction)
 
 @app.route("/us-cum-deaths-forecasts")
@@ -207,7 +206,7 @@ def us_agg_cum_deaths():
 def us_agg_inc_deaths():
     user_prediction = {}
     if 'id' in session:
-        user_prediction = get_user_prediction(session['username'], 'us_daily_deaths')
+        user_prediction = get_user_prediction(session['username'], 'us_daily_deaths') 
     us_aggregates_daily = get_aggregates(us_inc_forecasts, user_prediction)
     return us_aggregates_daily
 
