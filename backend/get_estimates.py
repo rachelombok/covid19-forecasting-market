@@ -46,7 +46,7 @@ def get_daily_forecasts():
         df.loc[mask, 'value'] /= 7
         df = df[['target_end_date', 'value']]
         df = df.sort_values('target_end_date')
-        df = df.drop_duplicates()
+        df = df.drop_duplicates(subset=['target_end_date'], keep='last')
 
         models[orgs.pop()] = df.to_dict('list')
     return models
@@ -76,12 +76,21 @@ def get_aggregates(forecast_data, user_prediction):
             date = preds[i]['date'][:T_index]
             value = preds[i]['value']
             if date not in aggregate_json:
-                aggregate_json[date] = [value]
+                #aggregate_json[date] = [value]
+                continue
             else:
                 aggregate_json[date].append(value)
 
+    dates_removed = []
     for date in aggregate_json:
+        if aggregate_json[date] == [0]:
+            dates_removed.append(date)
+            continue
         aggregate_json[date] = sum(aggregate_json[date])/len(aggregate_json[date])
+
+    # Any dates without an actual forecast value are removed
+    for date in dates_removed:
+        del aggregate_json[date]
     return aggregate_json
 
 

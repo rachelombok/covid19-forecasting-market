@@ -36,6 +36,7 @@ class InteractiveChartContainer extends Component {
         });
         fetch('/us-agg-inc-deaths').then(res => res.json()).then(data => {
             this.setState({ aggregate: data });
+            console.log(data);
         });
         fetch('/login-status/').then(res => res.json()).then(data => {
             this.setState({ loginStatus: data });
