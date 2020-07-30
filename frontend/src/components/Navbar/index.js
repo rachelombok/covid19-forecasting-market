@@ -77,8 +77,8 @@ renderDropdown(){
 
   render() {
     return (
-     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-       <a className="navbar-brand" href="#">Navbar</a>
+     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+       <a className="navbar-brand" href="#">Aggregate COVID-19 Forecasting</a>
        <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
          <span className="navbar-toggler-icon"></span>
        </button>
