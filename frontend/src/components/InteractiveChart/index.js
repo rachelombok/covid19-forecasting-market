@@ -111,7 +111,26 @@ class InteractiveChart extends Component {
             .attr("text-anchor", "middle")  
             .style("font-size", "16px") 
             .style("text-decoration", "underline")  
-            .text("COVID-19 Forecasts Over Time");
+            .text("COVID-19 Forecasts of Daily Deaths in the US Over Time");
+
+        const w = 710 - margin.left - margin.right;
+        const h = 360 - margin.top - margin.bottom;
+            
+        //Create X axis label   
+        svg.append("text")
+            .attr("x", w/2 + margin.right)
+            .attr("y", h + 4*margin.bottom)
+            .style("text-anchor", "middle")
+            .text("Date");
+            
+        //Create Y axis label
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0-margin.left)
+            .attr("x",0 - (h / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("Daily Deaths");
         
         //format confirmedData, forecastData, and predictionData into a list of js objects, convert date from string to js date object
         var confirmedData = Object.keys(confirmed).map(key => ({
@@ -712,7 +731,26 @@ class InteractiveChart extends Component {
             .attr("text-anchor", "middle")  
             .style("font-size", "16px") 
             .style("text-decoration", "underline")  
-            .text("COVID-19 Forecasts Over Time");
+            .text("COVID-19 Forecasts of Daily Deaths in the US Over Time");
+
+        const w = 710 - margin.left - margin.right;
+        const h = 360 - margin.top - margin.bottom;
+            
+        //Create X axis label   
+        svg.append("text")
+            .attr("x", w/2 + margin.right)
+            .attr("y", h + 4*margin.bottom)
+            .style("text-anchor", "middle")
+            .text("Date");
+            
+        //Create Y axis label
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - margin.left)
+            .attr("x", 0 - (h/2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("Daily Deaths");
         
         //format confirmedData, forecastData, and predictionData into a list of js objects, convert date from string to js date object
         var confirmedData = Object.keys(confirmed).map(key => ({
