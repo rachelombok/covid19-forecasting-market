@@ -65,7 +65,10 @@ def get_aggregates(forecast_data, user_prediction):
             else:
                 aggregate_json[dates[i]].append(values[i])
     if len(user_prediction) > 0:
-        print("user prediction")
+        for key in user_prediction.keys():
+            #print(key)
+            user_prediction[key] = [d for d in user_prediction[key] if d['defined'] is True]
+        #print(user_prediction)
         pred_date = list(user_prediction.keys())[-1]
         preds = user_prediction[pred_date]
         for i in range(len(preds)):
@@ -81,6 +84,9 @@ def get_aggregates(forecast_data, user_prediction):
         aggregate_json[date] = sum(aggregate_json[date])/len(aggregate_json[date])
     return aggregate_json
 
+def filter_undefined(prediction):
+    print(prediction)
+    return prediction['defined'] is True
 
 #pass in the df containing confirmed and predicted values
 def get_mse(model_df):
