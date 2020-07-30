@@ -104,6 +104,14 @@ class InteractiveChart extends Component {
                         .attr("transform",
                         "translate(" + margin.left + "," + margin.top + ")");
         
+        // add title
+        svg.append("text")
+            .attr("x", (width / 2))             
+            .attr("y", 0 - (margin.top / 2))
+            .attr("text-anchor", "middle")  
+            .style("font-size", "16px") 
+            .style("text-decoration", "underline")  
+            .text("COVID-19 Forecasts Over Time");
         
         //format confirmedData, forecastData, and predictionData into a list of js objects, convert date from string to js date object
         var confirmedData = Object.keys(confirmed).map(key => ({
@@ -705,6 +713,14 @@ class InteractiveChart extends Component {
                         .attr("transform",
                         "translate(" + margin.left + "," + margin.top + ")");
         
+        // add title
+        svg.append("text")
+            .attr("x", (width / 2))             
+            .attr("y", 0)
+            .attr("text-anchor", "middle")  
+            .style("font-size", "16px") 
+            .style("text-decoration", "underline")  
+            .text("COVID-19 Forecasts Over Time");
         
         //format confirmedData, forecastData, and predictionData into a list of js objects, convert date from string to js date object
         var confirmedData = Object.keys(confirmed).map(key => ({
