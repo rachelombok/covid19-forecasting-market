@@ -228,8 +228,8 @@ class InteractiveChart extends Component {
 
         //create line generator for confirmed/forecast data and prediction data
         var lineGenerator = d3.line()
-            .curve(d3.curveBasis);
-            //.curve(d3.curveCatmullRom)//curve that goes through all data points
+            //.curve(d3.curveBasis);
+            .curve(d3.curveCatmullRom)//curve that goes through all data points
         var predLineGenerator = d3.line()
             .curve(d3.curveBasis); //curve doesn't go through all data points (it's smoothed out)
             //d3.curveMonotoneX
