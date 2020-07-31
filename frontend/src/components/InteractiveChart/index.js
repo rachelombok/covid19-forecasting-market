@@ -4,6 +4,7 @@ import './InteractiveChart.css';
 import { clamp, sortDictByDateDescending, callout, getMostRecentPrediction } from '../../utils/data';
 import { elementType } from 'prop-types';
 import { addDays, formatDate } from '../../utils/date';
+import { rectangle } from 'leaflet';
 
 
 class InteractiveChart extends Component {
@@ -388,13 +389,13 @@ class InteractiveChart extends Component {
         //append click area rect
         var confirmedAreaWidth = confirmedLine.node().getBoundingClientRect().width; //get width of path element containing confirmed data
         var clickAreaWidth = width - confirmedAreaWidth; //the remaining area
-        svg.append("rect")
+        /*svg.append("rect")
            .attr("id", "click-area")
            .attr("width", clickAreaWidth)
            .attr("height",height)
            .attr("transform", "translate (" + confirmedAreaWidth+" 0)")
            .attr("fill", "none")
-           .style("pointer-events","visible");
+           .style("pointer-events","visible");*/
         //var clickArea = d3.select("#click-area");
         
         //append draw your guess text
@@ -525,7 +526,7 @@ class InteractiveChart extends Component {
                     .attr('height', height)
                     .attr('fill', 'none')
                     .attr('pointer-events', 'all')
-                    .style("cursor", "pointer")
+                    //.style("cursor", "pointer")
                     .on('mouseout', function() { // on mouse out hide line, circles and text
                         d3.select("#tooltip-line")
                           .style("opacity", "0");
@@ -902,6 +903,7 @@ class InteractiveChart extends Component {
         var predictionClip = svg.append("defs").append("svg:clipPath")
                                 .attr("id", "prediction-clip")
                                 .append("svg:rect")
+                                    .attr("id", "prediction-rect")
                                     .attr("width", width - confirmedAreaEndX )
                                     .attr("height", height )
                                     .attr("x", confirmedAreaEndX)
@@ -1124,19 +1126,6 @@ class InteractiveChart extends Component {
         
         svg.call(drag)
 
-        //finds the datapoint closest to the mouse (along x)
-        /*var bisect = () => {
-            const bisectDate = d3.bisector(d => d.date).left;
-            return mx => {
-                const date = x.invert(mx);
-                const index = bisectDate(totalData, date, 1);
-                const a = totalData[index - 1];
-                const b = totalData[index];
-                return b && (date - a.date > b.date - date) ? b : a;
-            };
-        }*/
-
-
         const tooltipArea = svg
                                 .append("g")
                                 .attr("class", "tooltip")
@@ -1164,82 +1153,90 @@ class InteractiveChart extends Component {
                         .style("opacity", "0");
         mousePerLine.append("text")
                     .attr("transform", "translate(10,3)"); 
-        tooltipArea
-                    .append("svg:rect")
-                    .attr('width', width)
-                    .attr('height', height)
-                    .attr('fill', 'none')
-                    .attr('pointer-events', 'all')
-                    .style("cursor", "pointer")
-                    .on('mouseout', function() { // on mouse out hide line, circles and text
-                        d3.select("#tooltip-line")
-                          .style("opacity", "0");
-                        d3.selectAll(".mouse-per-line circle")
-                          .style("opacity", "0");
-                        d3.selectAll(".mouse-per-line text")
-                          .style("opacity", "0")
-                    })
-                    .on('mouseover', function() { // on mouse in show line, circles and text
-                        d3.select("#tooltip-line")
-                          .style("opacity", "1");
-                        d3.selectAll(".mouse-per-line circle")
-                          .style("opacity", "1");
-                        d3.selectAll(".mouse-per-line text")
-                          .style("opacity", "1")
+        var chart = tooltipArea
+                            .append("svg:rect")
+                            .attr('width', width)
+                            .attr('height', height)
+                            .attr('fill', 'none')
+                            .attr('pointer-events', 'all')
+                            //.style("cursor", "pointer")
+                            .on('mouseout', function() { // on mouse out hide line, circles and text
+                                d3.select("#tooltip-line")
+                                .style("opacity", "0");
+                                d3.selectAll(".mouse-per-line circle")
+                                .style("opacity", "0");
+                                d3.selectAll(".mouse-per-line text")
+                                .style("opacity", "0")
+                            })
+                            .on('mouseover', function() { // on mouse in show line, circles and text
+                                d3.select("#tooltip-line")
+                                .style("opacity", "1");
+                                d3.selectAll(".mouse-per-line circle")
+                                .style("opacity", "1");
+                                d3.selectAll(".mouse-per-line text")
+                                .style("opacity", "1")
 
-                    })
-                    .on('mousemove', function() { // mouse moving over canvas
-                        var mouse = d3.mouse(this);
-                        var xCoord = mouse[0];
-                        d3
-                            .select("#tooltip-line")
-                            .attr("d", function() {
-                                var d = "M" + xCoord + "," + height;
-                                d += " " + xCoord + "," + 0;
-                                return d;
-                            });
-                        d3
-                            .selectAll(".mouse-per-line")
-                            .attr("transform", function(d, i) {
-                                if (d.data.length == 0) {return;}
-                                var date = x.invert(xCoord);
-                                const index = d3.bisector(f => f.date).left(compiledData[i].data, date);
-                                var a = null;
-                                if (index > 0) {
-                                    a = d.data[index - 1];
-                                }
-                                const b = d.data[index];
-                                //d = the data object corresponding to date and value pointed by the cursors
-                                var data = null;
-                                if (!a) {
-                                    data = b;
-                                }
-                                else if (!b) {
-                                    data = a;
+                            })
+                            .on('mousemove', function() { // mouse moving over canvas
+                                var mouse = d3.mouse(this);
+                                var xCoord = mouse[0];
+                                var yCoord = mouse[1];
+                                const xLowerBoundary = x(confirmedData[confirmedData.length - 1].date)
+                                if (xCoord > xLowerBoundary && xCoord < width && yCoord > 0 && yCoord < height) {
+                                    chart.attr("cursor", "pointer");
                                 }
                                 else {
-                                    data = b && (date - a.date > b.date - date) ? b : a;
+                                    chart.attr("cursor", "default");
                                 }
-                                if (+d3.timeDay.floor(date) == +data.date || +d3.timeDay.ceil(date) == +data.date) {
-                                    if (data.defined != 0) {
+                                d3
+                                    .select("#tooltip-line")
+                                    .attr("d", function() {
+                                        var d = "M" + xCoord + "," + height;
+                                        d += " " + xCoord + "," + 0;
+                                        return d;
+                                    });
+                                d3
+                                    .selectAll(".mouse-per-line")
+                                    .attr("transform", function(d, i) {
+                                        if (d.data.length == 0) {return;}
+                                        var date = x.invert(xCoord);
+                                        const index = d3.bisector(f => f.date).left(compiledData[i].data, date);
+                                        var a = null;
+                                        if (index > 0) {
+                                            a = d.data[index - 1];
+                                        }
+                                        const b = d.data[index];
+                                        //d = the data object corresponding to date and value pointed by the cursors
+                                        var data = null;
+                                        if (!a) {
+                                            data = b;
+                                        }
+                                        else if (!b) {
+                                            data = a;
+                                        }
+                                        else {
+                                            data = b && (date - a.date > b.date - date) ? b : a;
+                                        }
+                                        if (+d3.timeDay.floor(date) == +data.date || +d3.timeDay.ceil(date) == +data.date) {
+                                            if (data.defined != 0) {
+                                                var element = d3.select(this)
+                                                                .select('text')
+                                                                    .style("opacity", "1")
+                                                                    .text(Math.round(data.value));
+                                                element.select("circle")
+                                                        .style("opacity", "1");
+                                                return "translate(" + mouse[0] + "," + y(data.value)+")";
+                                            }
+                                        }
                                         var element = d3.select(this)
-                                                        .select('text')
-                                                            .style("opacity", "1")
-                                                            .text(Math.round(data.value));
-                                        element.select("circle")
-                                                .style("opacity", "1");
-                                        return "translate(" + mouse[0] + "," + y(data.value)+")";
-                                    }
-                                }
-                                var element = d3.select(this)
-                                                .select("text")
-                                                .style("opacity", "0")
-                                element
-                                        .select("circle")
-                                        .style("opacity", "0");
-                                
-                        });
-                    })
+                                                        .select("text")
+                                                        .style("opacity", "0")
+                                        element
+                                                .select("circle")
+                                                .style("opacity", "0");
+                                        
+                                });
+                            })
 
         /////////////////////////////////////////////////////////////////////////////////////////////
         const focusHeight = 100;
@@ -1351,66 +1348,7 @@ class InteractiveChart extends Component {
         };
         document.querySelector("body").appendChild(deleteButton);
         /////////////////////////////////////////////////////////
-        /*var test1 = [];
-        var test2 = [];
-        var test3 = [];
-        var test4 = [];
-        var test5 = [];
-
-        var start1 = d3.timeParse("%Y-%m-%d")("2020-03-01");
-        var start2 = d3.timeParse("%Y-%m-%d")("2020-04-01");
-        var start3 = d3.timeParse("%Y-%m-%d")("2020-05-01");
-        var start4 = d3.timeParse("%Y-%m-%d")("2020-06-01");
-        var start5 = d3.timeParse("%Y-%m-%d")("2020-07-01");
-
-        var end1 = d3.timeParse("%Y-%m-%d")("2020-8-01");
-        var end2 = d3.timeParse("%Y-%m-%d")("2020-9-01");
-        var end3 = d3.timeParse("%Y-%m-%d")("2020-10-01");
-        var end4 = d3.timeParse("%Y-%m-%d")("2020-11-01");
-        var end5 = d3.timeParse("%Y-%m-%d")("2020-12-01");
-        var length = 153;
-        for(var i = 0; i < length; i++) {
-            test1.push({
-                date: start1,
-                value: Math.floor(Math.random() * 4001),
-                defined: true
-            })
-            test2.push({
-                date: start2,
-                value: Math.floor(Math.random() * 4001),
-                defined: true
-            })
-            test3.push({
-                date: start3,
-                value: Math.floor(Math.random() * 4001),
-                defined: true
-            })
-            test4.push({
-                date: start4,
-                value: Math.floor(Math.random() * 4001),
-                defined: true
-            })
-            test5.push({
-                date: start5,
-                value: Math.floor(Math.random() * 4001),
-                defined: true
-            })
-            start1 = d3.timeDay.offset(start1, 1);
-            start2 = d3.timeDay.offset(start2, 1);
-            start3 = d3.timeDay.offset(start3, 1);
-            start4 = d3.timeDay.offset(start4, 1);
-            start5 = d3.timeDay.offset(start5, 1);
-        }
-        console.log(test1);
-        console.log(test2);
-        console.log(test3);
-        console.log(test4);
-        console.log(test5);*/
-        //savePrediction(test1, category);
-        //savePrediction(test2, category);
-        //savePrediction(test3, category);
-        //savePrediction(test4, category);
-        //savePrediction(test5, category);
+        
 
     }
         
