@@ -62,18 +62,22 @@ class InteractiveChart extends Component {
     }
     
     appendModal() {
+        const signinRedirect = () => {window.location.href='/signin'}
+        const signupRedirect = () => {window.location.href='/signup'}
         var modal = document.createElement("div");
         modal.id = "modal";
         var modalContent = document.createElement("div");
         modalContent.id = "modal-content";
         var text = document.createElement("p");
-        text.innerText = "Please log in to save your prediction."
+        text.innerText = "Please log in to save your prediction.";
         var signinBtn = document.createElement("button");
-        signinBtn.id = "signin-btn"
-        signinBtn.innerText = "Sign In"
+        signinBtn.id = "signin-btn";
+        signinBtn.innerText = "Sign In";
+        signinBtn.onclick= signinRedirect;
         var signupBtn = document.createElement("button");
-        signupBtn.id = "signup-btn"
-        signupBtn.innerText = "Sign Up"
+        signupBtn.id = "signup-btn";
+        signupBtn.onclick= signupRedirect;
+        signupBtn.innerText = "Sign Up";
         modalContent.appendChild(text);
         modalContent.appendChild(signinBtn);
         modalContent.appendChild(signupBtn);
@@ -520,7 +524,8 @@ class InteractiveChart extends Component {
                         .style("opacity", "0");
         mousePerLine.append("text")
                     .attr("transform", "translate(10,3)"); 
-        tooltipArea
+                    
+        var chart = tooltipArea
                     .append("svg:rect")
                     .attr('width', width)
                     .attr('height', height)
@@ -529,24 +534,32 @@ class InteractiveChart extends Component {
                     //.style("cursor", "pointer")
                     .on('mouseout', function() { // on mouse out hide line, circles and text
                         d3.select("#tooltip-line")
-                          .style("opacity", "0");
+                        .style("opacity", "0");
                         d3.selectAll(".mouse-per-line circle")
-                          .style("opacity", "0");
+                        .style("opacity", "0");
                         d3.selectAll(".mouse-per-line text")
-                          .style("opacity", "0")
+                        .style("opacity", "0")
                     })
                     .on('mouseover', function() { // on mouse in show line, circles and text
                         d3.select("#tooltip-line")
-                          .style("opacity", "1");
+                        .style("opacity", "1");
                         d3.selectAll(".mouse-per-line circle")
-                          .style("opacity", "1");
+                        .style("opacity", "1");
                         d3.selectAll(".mouse-per-line text")
-                          .style("opacity", "1")
+                        .style("opacity", "1")
 
                     })
                     .on('mousemove', function() { // mouse moving over canvas
                         var mouse = d3.mouse(this);
                         var xCoord = mouse[0];
+                        var yCoord = mouse[1];
+                        const xLowerBoundary = x(confirmedData[confirmedData.length - 1].date)
+                        if (xCoord > xLowerBoundary && xCoord < width && yCoord > 0 && yCoord < height) {
+                            chart.attr("cursor", "pointer");
+                        }
+                        else {
+                            chart.attr("cursor", "default");
+                        }
                         d3
                             .select("#tooltip-line")
                             .attr("d", function() {
