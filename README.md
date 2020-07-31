@@ -44,7 +44,7 @@ npm start
 
 ## Authors
 
-* **Jake Abernethy** -
+* **Jacob Abernethy** -
 * **Bo Waggoner** -
 * **Rafael Frongillo** -
 * **Aniruddha Murali** -
