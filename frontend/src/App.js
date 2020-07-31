@@ -41,12 +41,6 @@ class App extends React.Component {
             <Route exact path={ROUTES.SIGN_IN} component={Login} />
             <Route exact path={ROUTES.SIGN_UP} component={SignUp} />
             <Route exact path={ROUTES.ABOUT} component={AboutPage} />
-            <Route exact path="/blah">
-              "BLAH PAGE"
-            </Route>
-            <Route exact path="/interactive-chart" component={InteractiveChartContainer}/>
-            <Route exact path="/profile-chart" component={UserPredictionChartContainer}/>
-
           </Switch>
         </div>
       </Router>
