@@ -188,7 +188,8 @@ class InteractiveChart extends Component {
             .call(d3.axisLeft(y));
    
         //list of data displayed in graph - for legend
-        var legendString = orgs.concat(["Daily Confirmed Deaths", "Aggregate Forecast", "User Prediction"]);
+        //var legendString = orgs.concat(["Daily Confirmed Deaths", "Aggregate Forecast", "User Prediction"]);
+        var legendString = ["Daily Confirmed Deaths", "Aggregate Forecast", "User Prediction"].concat(orgs);
         //color function that assigns random colors to each data
         var color = d3
                         .scaleOrdinal()
@@ -257,7 +258,8 @@ class InteractiveChart extends Component {
                                     .attr("class", "line")    
                                     .datum(confirmedData)    
                                     .attr('d', line)
-                                    .attr("stroke", color(legendString[legendString.length - 3]))
+                                    .attr("stroke", color(legendString[0]))
+                                    .style("stroke-width", "3px")
         var confirmedAreaEndX = x(confirmedData[confirmedData.length - 1].date);
         var confirmedAreaEndY = y(confirmedData[confirmedData.length - 1].value);
 
@@ -293,7 +295,8 @@ class InteractiveChart extends Component {
                                     .attr("class", "line")        
                                     .datum(aggregateData)    
                                     .attr('d', line)
-                                    .attr("stroke", color(legendString[legendString.length - 2]))
+                                    .attr("stroke", color(legendString[1]))
+                                    .style("stroke-width", "2px")
         
         //display forecast data
         forecastData.map((f, index) => {
@@ -371,7 +374,9 @@ class InteractiveChart extends Component {
         filteredData = predictionData.filter(predLine.defined())
         yourLine.datum(filteredData)
                 .attr('d', predLine)
-                .style("stroke", color(legendString[legendString.length - 1]))
+                .style("stroke", color(legendString[2]))
+                .style("stroke-width", "2px")
+
         //append new rect  
         const mouseArea = svg.append("rect")
             .attr("width", width)
@@ -448,8 +453,8 @@ class InteractiveChart extends Component {
 
                         yourLine.datum(filteredData)
                                 .attr('d', predLine)
-                                .style("stroke", color(legendString[legendString.length - 1]))
-
+                                .style("stroke", color(legendString[2]))
+                                .style("stroke-width", "2px")
                         });
                     })
                     .on("end", function () {
@@ -818,7 +823,8 @@ class InteractiveChart extends Component {
             .call(d3.axisLeft(y));
    
         //list of data displayed in graph - for legend
-        var legendString = orgs.concat(["Daily Confirmed Deaths", "Aggregate Forecast", "User Prediction"]);
+        //var legendString = orgs.concat(["Daily Confirmed Deaths", "Aggregate Forecast", "User Prediction"]);
+        var legendString = ["Daily Confirmed Deaths", "Aggregate Forecast", "User Prediction"].concat(orgs);
         //color function that assigns random colors to each data
         var color = d3
                         .scaleOrdinal()
@@ -887,7 +893,8 @@ class InteractiveChart extends Component {
                                     .attr("class", "line")    
                                     .datum(confirmedData)    
                                     .attr('d', line)
-                                    .attr("stroke", color(legendString[legendString.length - 3]))
+                                    .attr("stroke", color(legendString[0]))
+                                    .style("stroke-width", "3px")
         var confirmedAreaEndX = x(confirmedData[confirmedData.length - 1].date);
         var confirmedAreaEndY = y(confirmedData[confirmedData.length - 1].value);
 
@@ -923,7 +930,8 @@ class InteractiveChart extends Component {
                                     .attr("class", "line")        
                                     .datum(aggregateData)    
                                     .attr('d', line)
-                                    .attr("stroke", color(legendString[legendString.length - 2]))
+                                    .attr("stroke", color(legendString[1]))
+                                    .style("stroke-width", "2px")
         
         //display forecast data
         forecastData.map((f, index) => {
@@ -1015,7 +1023,8 @@ class InteractiveChart extends Component {
         filteredData = predictionData.filter(predLine.defined())
         yourLine.datum(filteredData)
                 .attr('d', predLine)
-                .style("stroke", color(legendString[legendString.length - 1]))
+                .style("stroke", color(legendString[2]))
+                .style("stroke-width", "2px")
         //append new rect  
         const mouseArea = svg.append("rect")
             .attr("width", width)
@@ -1099,8 +1108,8 @@ class InteractiveChart extends Component {
 
                         yourLine.datum(filteredData)
                                 .attr('d', predLine)
-                                .style("stroke", color(legendString[legendString.length - 1]))
-
+                                .style("stroke", color(legendString[2]))
+                                .style("stroke-width", "2px")
                         });
                     })
                     .on("end", function () {
