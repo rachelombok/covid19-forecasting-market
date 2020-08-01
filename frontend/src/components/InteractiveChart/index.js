@@ -755,6 +755,7 @@ class InteractiveChart extends Component {
         const legendWidth = 180;
         const toolTipHeight = 50; //to make sure there's room for the tooltip when the value is 0
         const contextHeight = 100;
+        const titleHeight = 20;
         var margin = {top: 20, right: 30, bottom: 20, left: 60},
             width = 800 - margin.left - margin.right,
             height = 400 - margin.top - margin.bottom;
@@ -763,16 +764,16 @@ class InteractiveChart extends Component {
                         .attr("width", width + margin.left + margin.right + legendWidth)
                         .attr("height", height + margin.top + margin.bottom + toolTipHeight + contextHeight)
                     .append("g")
-                        .attr("transform",
-                        "translate(" + margin.left + "," + margin.top + ")");
+                        .attr("transform", `translate(${margin.left}, ${margin.top + 20} )`);
         
         // add title
         svg.append("text")
             .attr("x", (width / 2))             
-            .attr("y", 0)
+            .attr("y", -20)
             .attr("text-anchor", "middle")  
             .style("font-size", "16px") 
             .style("text-decoration", "underline")  
+            .style("font-weight", "bold")
             .text("COVID-19 Forecasts of Daily Deaths in the US Over Time");
 
         const w = 710 - margin.left - margin.right;
