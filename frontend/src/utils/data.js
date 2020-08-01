@@ -107,3 +107,19 @@ export const getMostRecentPrediction = (data) => {
   console.log(mostRecentDate);
   return data[mostRecentDate]
 }
+
+export const reformatData = (data) => {
+  return Object.keys(data).map(key => ({
+    date: d3.timeParse("%Y-%m-%d")(key),
+    value: data[key]
+}));
+}
+
+export const reformatPredData = (data) => {
+  return data.map(d => ({
+    date: d3.timeParse("%Y-%m-%d")((d.date).substring(0,10)),
+    value: d.value,
+    defined: d.defined
+    })
+);
+}

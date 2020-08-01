@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3'
 import './InteractiveChart.css';
-import { clamp, sortDictByDateDescending, callout, getMostRecentPrediction } from '../../utils/data';
+import { clamp, reformatData, reformatPredData, getMostRecentPrediction } from '../../utils/data';
 import { elementType } from 'prop-types';
 import { addDays, formatDate } from '../../utils/date';
 import { rectangle } from 'leaflet';
@@ -772,32 +772,16 @@ class InteractiveChart extends Component {
             .text("Daily Deaths");
         
         //format confirmedData, forecastData, and predictionData into a list of js objects, convert date from string to js date object
-        var confirmedData = Object.keys(confirmed).map(key => ({
-            date: d3.timeParse("%Y-%m-%d")(key),
-            value: confirmed[key]
-        }));
-        console.log(confirmedData);
-        
+        var confirmedData = reformatData(confirmed);
         var forecastData = forecast.map(f => {
-            return Object.keys(f).map(key => ({
-                date: d3.timeParse("%Y-%m-%d")(key),
-                value: f[key]
-            }))
+            return reformatData(f);
         });
-
-        var aggregateData = Object.keys(aggregate).map(key => ({
-            date: d3.timeParse("%Y-%m-%d")(key),
-            value: aggregate[key]
-        }));
+        var aggregateData = reformatData(aggregate);
 
         //store userPrediction in predictionData if it exists
         if(Object.keys(userPrediction).length > 0) {
-            predictionData = getMostRecentPrediction(userPrediction).map(p => ({
-                date: d3.timeParse("%Y-%m-%d")((p.date).substring(0,10)),
-                value: p.value,
-                defined: p.defined
-                })
-            );
+            const mostRecentPred = getMostRecentPrediction(userPrediction);
+            predictionData = reformatPredData(mostRecentPred);
         }
   
         //set other dates
