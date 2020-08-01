@@ -15,6 +15,7 @@ class Navbar extends React.Component {
 	}*/
 
 	componentDidMount(){
+		console.log("nav bar loading");
 		this.isLoggedIn();
 		
 	}

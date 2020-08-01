@@ -61,7 +61,8 @@ class SignUp extends React.Component{
     
       render() {
         if (this.state.loginStatus) {
-          return <Redirect to="/" />
+          //return <Redirect to="/" />
+          window.location.href ='/'
         }
         return (
           <form onSubmit={this.handleSubmit.bind(this)}>
