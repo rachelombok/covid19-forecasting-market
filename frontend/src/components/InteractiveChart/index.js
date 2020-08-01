@@ -205,11 +205,12 @@ class InteractiveChart extends Component {
         var legend = svg.append('g')
                         .attr("id", "legend")
         var size = 10;
+        const legendMarginL = 30;
         legend.selectAll("rect")
             .data(legendString)
             .enter()
             .append("circle")
-                .attr('cx', width + 30)
+                .attr('cx', width + legendMarginL)
                 .attr("cy", function(d,i){ return 20 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
                 .attr("r", 6)
                 //.attr("width", size)
@@ -833,11 +834,12 @@ class InteractiveChart extends Component {
         var legend = svg.append('g')
                         .attr("id", "legend")
         var size = 10;
+        const legendMarginL = 30;
         legend.selectAll("rect")
             .data(legendString)
             .enter()
             .append("circle")
-                .attr('cx', width + 30)
+                .attr('cx', width + legendMarginL)
                 .attr("cy", function(d,i){ return 20 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
                 .attr("r", 6)
                 //.attr("width", size)
@@ -1326,7 +1328,10 @@ class InteractiveChart extends Component {
                         .call(brush.move, defaultSelection);   
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         var deleteButton = document.createElement("button")
+        deleteButton.className = 'btn primary-btn'
+        deleteButton.id = 'delete-btn'
         deleteButton.innerText = "Reset";
+        d3.select("#delete-btn")
         deleteButton.onclick = () => {
             this.deletePrediction(category)
             predictionData = createDefaultPrediction(predStartDate, predEndDate);

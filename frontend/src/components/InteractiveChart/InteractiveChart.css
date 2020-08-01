@@ -35,6 +35,12 @@
     opacity: 1;
 }
 
+#delete-btn {
+    display: flex;
+    margin-top: -18.5rem;
+    margin-left: 64.2rem;
+}
+
 /*css for blinking red circle*/
 /*
     pulse speed = 3s
