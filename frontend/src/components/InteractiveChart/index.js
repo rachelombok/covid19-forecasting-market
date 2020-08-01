@@ -701,7 +701,10 @@ class InteractiveChart extends Component {
                         .call(brush.move, defaultSelection);   
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         var deleteButton = document.createElement("button")
+        deleteButton.className = 'btn primary-btn'
+        deleteButton.id = 'delete-btn'
         deleteButton.innerText = "Reset";
+        d3.select("#delete-btn")
         deleteButton.onclick = () => {
             this.deletePrediction(category)
             predictionData = createDefaultPrediction(predStartDate, predEndDate);
