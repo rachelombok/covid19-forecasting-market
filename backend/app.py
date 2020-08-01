@@ -271,16 +271,14 @@ def signup():
         password = data['password']
         print("here it is: ", name, username, password)
         if register(name, email, username, password):
-            #return redirect(url_for("home"))
+            print("registered")
             return 'Success'
         else:
-            flash("Username is already taken")
+            print("Username is already taken")
             return 'Fail'
-            #return redirect(url_for("signin"))
     else:
-        print("hmmm")
-        #return redirect(url_for("signin"))
-    return 'None'
+        print("invalid method")
+        return 'None'
 
 
 @app.route("/logout/", methods=["POST"])

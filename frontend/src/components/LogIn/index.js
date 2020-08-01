@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { useHistory } from "react-router-dom";
 import ReactDOM from 'react-dom';
 import './Login.css';
-import { Redirect, Route } from "react-router";
+import { Redirect } from "react-router";
 
 
 class Login extends React.Component{
@@ -43,7 +43,7 @@ class Login extends React.Component{
   }
     
 
-  isLoggedIn = () => {
+  updateLoginState = () => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         fetch('/login-status/')
@@ -76,7 +76,7 @@ class Login extends React.Component{
         /*await this.wasSucess().then(status => {
           console.log(status);
         });*/
-        await this.isLoggedIn();
+        await this.updateLoginState();
       }
 
 

@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import { Redirect } from "react-router";
+
 
 class SignUp extends React.Component{
     constructor(props) {
         super(props)
-        this.state = { nam:'', email: '', username: '', password: '' }
+        this.state = { nam:'', email: '', username: '', password: '', loginStatus: false }
       }
 
     saveLogin(nam, email, username, password) {
+      return new Promise((resolve, reject) => {
         fetch('/signup/',{
           method: 'POST',
           headers: {
@@ -15,6 +18,8 @@ class SignUp extends React.Component{
           },
           body: JSON.stringify({"name": nam, "email": email, "username": username, "password": password}),
         });
+        resolve();
+      })
     }
 
     handleChange(event) {
@@ -33,13 +38,31 @@ class SignUp extends React.Component{
       }
 
     }
+
+    updateLoginState = () => {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          fetch('/login-status/')
+          .then((response) => response.json())
+          .then((data) => {
+            this.setState({loginStatus: data['logged in']});
+            console.log(data['logged in']);
+            resolve(data['logged in']);
+          });
+        }, 300)
+      })
+    }
     
-    handleSubmit(event) {
-        this.saveLogin(this.state.nam, this.state.email, this.state.username, this.state.password)
-        event.preventDefault()
+    async handleSubmit(event) {
+      event.preventDefault()
+      await this.saveLogin(this.state.nam, this.state.email, this.state.username, this.state.password)
+      this.updateLoginState();
       }
     
       render() {
+        if (this.state.loginStatus) {
+          return <Redirect to="/" />
+        }
         return (
           <form onSubmit={this.handleSubmit.bind(this)}>
             <h1>Sign Up</h1>
