@@ -106,16 +106,16 @@ class InteractiveChart extends Component {
                         .attr("width", width + margin.left + margin.right + legendWidth)
                         .attr("height", height + margin.top + margin.bottom + toolTipHeight + contextHeight)
                     .append("g")
-                        .attr("transform",
-                        "translate(" + margin.left + "," + margin.top + ")");
+                    .attr("transform", `translate(${margin.left}, ${margin.top + 20} )`);
         
-        // add title
+                    // add title
         svg.append("text")
             .attr("x", (width / 2))             
-            .attr("y", 0 - (margin.top / 2))
+            .attr("y", -20)
             .attr("text-anchor", "middle")  
             .style("font-size", "16px") 
             .style("text-decoration", "underline")  
+            .style("font-weight", "bold")
             .text("COVID-19 Forecasts of Daily Deaths in the US Over Time");
 
         const w = 710 - margin.left - margin.right;
