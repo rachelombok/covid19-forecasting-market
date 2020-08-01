@@ -245,15 +245,20 @@ def login():
         password = data['password']
         #print(username, password)
         if authenticate(username, password):
+            print("logged in")
             return "Success"
         else:
+            print("not logged in")
             flash("Invalid username or password. Please try again", "error")
             return "Fail"
     else:
         if 'id' in session:
-            return "Already logged in"
+            print("True")
+            return dumps({'status': True})
+            #return "Already logged in"
         else: 
-            return "None"
+            print("False")
+            return dumps({'status': False})
     #return 'None'
 
 @app.route('/signup/', methods=['POST'])
