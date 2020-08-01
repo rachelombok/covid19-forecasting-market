@@ -719,6 +719,28 @@ class InteractiveChart extends Component {
                 .style("opacity", "1");
         };
         document.querySelector("body").appendChild(deleteButton);
+        ////ADD TODAY LINE/////////////////////////////////////////////////////
+        const today = d3.timeParse("%Y-%m-%d")(new Date().toISOString().substring(0,10));
+        console.log(today);
+        var todayMarker = svg
+                            .append("g")
+                            .attr("id", "today-marker")
+        todayMarker
+                    .append("line")
+                    .attr("id", "today-line")
+                    .attr("x1", x(today))
+                    .attr("x2", x(today))
+                    .attr("y1", 0)
+                    .attr("y2", height)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1)
+                    .attr("stroke-dasharray", "8, 8")
+        todayMarker
+                    .append("text")
+                    .attr("id", "today-text")
+                    .attr("transform", `translate(${x(today) + 17}, 0) rotate(-90)`)
+                    .text("Today")
+                    .style("text-anchor", "end")
     }
 
     renderChart() {
@@ -1349,8 +1371,28 @@ class InteractiveChart extends Component {
                 .style("opacity", "1");
         };
         document.querySelector("body").appendChild(deleteButton);
-        /////////////////////////////////////////////////////////
-        
+        ////ADD TODAY LINE/////////////////////////////////////////////////////
+        const today = d3.timeParse("%Y-%m-%d")(new Date().toISOString().substring(0,10));
+        console.log(today);
+        var todayMarker = svg
+                            .append("g")
+                            .attr("id", "today-marker")
+        todayMarker
+                    .append("line")
+                    .attr("id", "today-line")
+                    .attr("x1", x(today))
+                    .attr("x2", x(today))
+                    .attr("y1", 0)
+                    .attr("y2", height)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1)
+                    .attr("stroke-dasharray", "8, 8")
+        todayMarker
+                    .append("text")
+                    .attr("id", "today-text")
+                    .attr("transform", `translate(${x(today) + 17}, 0) rotate(-90)`)
+                    .text("Today")
+                    .style("text-anchor", "end")
 
     }
         
