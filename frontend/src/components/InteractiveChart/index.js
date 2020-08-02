@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3'
 import './InteractiveChart.css';
-import { clamp, findYatX, getDataPointsFromPath, reformatData, reformatPredData, getMostRecentPrediction } from '../../utils/data';
+import { clamp, findYatX, getAllDataPoints, getDataPointsFromPath, reformatData, reformatPredData, getMostRecentPrediction } from '../../utils/data';
 import { elementType } from 'prop-types';
 import { addDays, formatDate } from '../../utils/date';
 import { rectangle } from 'leaflet';
@@ -355,26 +355,36 @@ class InteractiveChart extends Component {
         //var totalData = confirmedData.concat(predictionData);
 
 //!!    //add forecast data to compiledData
+const forecastPaths = document.querySelectorAll(".forecast");
+        const confirmedPath = document.querySelector("#confirmed");
+        const aggregatePath = document.querySelector("#aggregate");
+        console.log(aggregatePath)
+        console.log(forecastPaths);
+        console.log(orgs);
         orgs.map((o, index) => {
+            var lastDate = forecastData[index][forecastData[index].length - 1].date;
+            forecastData[index] = getAllDataPoints(forecastPaths[index], x, y, predStartDate, lastDate);
             compiledData.push({
                 name: o,
                 data: forecastData[index]
             })
         })
+        //confirmedData = getAllDataPoints(confirmedPath, x, y, confirmedStartDate, predStartDate);
         compiledData.push({
             name: "Daily Confirmed Deaths",
             data: confirmedData
         })
+        var lastDate = aggregateData[aggregateData.length - 1].date;
+        aggregateData = getAllDataPoints(aggregatePath, x, y, aggregateData[0].date, lastDate)
+        console.log(aggregateData);
         compiledData.push({
             name: "Aggregate Forecast",
             data: aggregateData
         })
-        //if (userPrediction) {
         compiledData.push({
             name: "User Prediction",
             data: predictionData
         })
-        //}
         //join data to yourLine
         filteredData = predictionData.filter(predLine.defined())
         yourLine.datum(filteredData)
@@ -1013,28 +1023,40 @@ class InteractiveChart extends Component {
         }
 
         var filteredData = null;
-
 //!!    //add forecast data to compiledData
+        //get complete dataset from paths
+        const forecastPaths = document.querySelectorAll(".forecast");
+        const confirmedPath = document.querySelector("#confirmed");
+        const aggregatePath = document.querySelector("#aggregate");
+        console.log(aggregatePath)
+        console.log(forecastPaths);
+        console.log(orgs);
         orgs.map((o, index) => {
+            var lastDate = forecastData[index][forecastData[index].length - 1].date;
+            forecastData[index] = getAllDataPoints(forecastPaths[index], x, y, predStartDate, lastDate);
             compiledData.push({
                 name: o,
                 data: forecastData[index]
             })
         })
+        //confirmedData = getAllDataPoints(confirmedPath, x, y, confirmedStartDate, predStartDate);
         compiledData.push({
             name: "Daily Confirmed Deaths",
             data: confirmedData
         })
+        var lastDate = aggregateData[aggregateData.length - 1].date;
+        console.log(aggregateData);
+        console.log(lastDate);
+        aggregateData = getAllDataPoints(aggregatePath, x, y, aggregateData[0].date, lastDate)
+        console.log(aggregateData);
         compiledData.push({
             name: "Aggregate Forecast",
             data: aggregateData
         })
-        //if (userPrediction) {
         compiledData.push({
             name: "User Prediction",
             data: predictionData
         })
-        //}
         //join data to yourLine
         filteredData = predictionData.filter(predLine.defined())
         yourLine.datum(filteredData)
@@ -1252,6 +1274,66 @@ class InteractiveChart extends Component {
                                         
                                 });
                             })
+                            // .on('mousemove', function() { // mouse moving over canvas
+                            //     var mouse = d3.mouse(this);
+                            //     var xCoord = mouse[0];
+                            //     var yCoord = mouse[1];
+                            //     const xLowerBoundary = x(confirmedData[confirmedData.length - 1].date)
+                            //     if (xCoord > xLowerBoundary && xCoord < width && yCoord > 0 && yCoord < height) {
+                            //         chart.attr("cursor", "pointer");
+                            //     }
+                            //     else {
+                            //         chart.attr("cursor", "default");
+                            //     }
+                            //     d3
+                            //         .select("#tooltip-line")
+                            //         .attr("d", function() {
+                            //             var d = "M" + xCoord + "," + height;
+                            //             d += " " + xCoord + "," + 0;
+                            //             return d;
+                            //         });
+                            //     d3
+                            //         .selectAll(".mouse-per-line")
+                            //         .attr("transform", function(d, i) {
+                            //             if (d.data.length == 0) {return;}
+                            //             var date = x.invert(xCoord);
+                            //             const index = d3.bisector(f => f.date).left(compiledData[i].data, date);
+                            //             var a = null;
+                            //             if (index > 0) {
+                            //                 a = d.data[index - 1];
+                            //             }
+                            //             const b = d.data[index];
+                            //             //d = the data object corresponding to date and value pointed by the cursors
+                            //             var data = null;
+                            //             if (!a) {
+                            //                 data = b;
+                            //             }
+                            //             else if (!b) {
+                            //                 data = a;
+                            //             }
+                            //             else {
+                            //                 data = b && (date - a.date > b.date - date) ? b : a;
+                            //             }
+                            //             if (+d3.timeDay.floor(date) == +data.date || +d3.timeDay.ceil(date) == +data.date) {
+                            //                 if (data.defined != 0) {
+                            //                     var element = d3.select(this)
+                            //                                     .select('text')
+                            //                                         .style("opacity", "1")
+                            //                                         .text(Math.round(data.value));
+                            //                     element.select("circle")
+                            //                             .style("opacity", "1");
+                            //                     return "translate(" + mouse[0] + "," + y(data.value)+")";
+                            //                 }
+                            //             }
+                            //             var element = d3.select(this)
+                            //                             .select("text")
+                            //                             .style("opacity", "0")
+                            //             element
+                            //                     .select("circle")
+                            //                     .style("opacity", "0");
+                                        
+                            //     });
+                            // })
 
         /////////////////////////////////////////////////////////////////////////////////////////////
         const focusHeight = 100;

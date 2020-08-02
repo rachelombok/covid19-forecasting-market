@@ -104,7 +104,6 @@ export const sortStringDates = (data) => {
 export const getMostRecentPrediction = (data) => {
   const sortedDates = Object.keys(data).sort((a, b) => new Date(b) - new Date(a));
   const mostRecentDate = sortedDates[0];
-  console.log(mostRecentDate);
   return data[mostRecentDate]
 }
 
@@ -166,7 +165,6 @@ export const findYatX = (x, path, startX) => {
   var result = 0;
   while (start < end) { 
     var mid = (start + end) / 2;
-    console.log(mid);
     var currPoint = getXY(mid);
     var currPointX = currPoint[0];
     if (x < currPointX) {
@@ -181,14 +179,13 @@ export const findYatX = (x, path, startX) => {
     }
   }
   if (result == 0) {
-    console.log("none")
     result = getXY(start);
   }
   return result;
 }
 
-//for confirmedData
-export const getConfirmedDataPath = (pathNode, xAxis, yAxis, startDate, endDate) => {
+//for confirmedData, forecastData, aggregateData
+export const getAllDataPoints = (pathNode, xAxis, yAxis, startDate, endDate) => {
   var data = [];
   var date = startDate;
   var startX = 0;
