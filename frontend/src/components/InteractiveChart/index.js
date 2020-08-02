@@ -93,7 +93,7 @@ class InteractiveChart extends Component {
         const category = this.state.category;
         var compiledData = [];
         //set up margin, width, height of chart
-        const legendWidth = 180;
+        const legendWidth = 380;
         const toolTipHeight = 50; //to make sure there's room for the tooltip when the value is 0
         const contextHeight = 100;
         var margin = {top: 20, right: 30, bottom: 20, left: 60},
@@ -1386,7 +1386,12 @@ class InteractiveChart extends Component {
     }
         
     render() {
-        return(<div ref={this.chartRef}></div>);
+        return(<div>
+            <h2>US Daily Deaths</h2>
+            <p>Daily deaths is the best indicator of the progression of the pandemic.</p>
+            {/*<p>Current total: {this.confirmedData.value}</p>*/}
+            <div ref={this.chartRef}></div>
+            </div>);
     }
 }
 

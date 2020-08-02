@@ -2,9 +2,16 @@ import React, { Component } from 'react';
 
 const pstyle = {
     textAlign: 'left',
-    marginLeft: '20px'
-  
+    marginLeft: '20px',
+    fontSize: '20px'
   }
+
+const h1style = {
+    textAlign: 'left',
+    marginLeft: '20px',
+    fontSize: '40px'
+
+}
 
 class AboutPage extends Component {
 
@@ -13,7 +20,7 @@ class AboutPage extends Component {
     render() {
         return(
             <div >
-        <h1>About</h1>
+        <h1 style={h1style}>About</h1>
         <h3></h3>
         <p style={pstyle}> 
 
@@ -24,6 +31,8 @@ class AboutPage extends Component {
 
         
         Our mission is to deliver future projections and collected data by providing the best information on the COVID-19 pandemic.</p>
+        <h3>How we Score</h3>
+        <p></p>
         </div>
             );
         
