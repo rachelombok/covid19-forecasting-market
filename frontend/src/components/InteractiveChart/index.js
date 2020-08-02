@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3'
 import './InteractiveChart.css';
-import { clamp, reformatData, reformatPredData, getMostRecentPrediction } from '../../utils/data';
+import { clamp, findYatX, getDataPointsFromPath, reformatData, reformatPredData, getMostRecentPrediction } from '../../utils/data';
 import { elementType } from 'prop-types';
 import { addDays, formatDate } from '../../utils/date';
 import { rectangle } from 'leaflet';
@@ -1119,8 +1119,7 @@ class InteractiveChart extends Component {
                         //console.log(compiledData)
                         /*yourLine.datum(predictionData)
                                 .attr('d', predLine)*/
-                        var filteredData = predictionData.filter(predLine.defined())
-
+                        filteredData = predictionData.filter(predLine.defined())
                         yourLine.datum(filteredData)
                                 .attr('d', predLine)
                                 .style("stroke", color(legendString[2]))
@@ -1128,13 +1127,16 @@ class InteractiveChart extends Component {
                         });
                     })
                     .on("end", function () {
-                        savePrediction(predictionData, category);
                         d3.select("#tooltip-line")
                             .style("opacity", "1");
                         d3.selectAll(".mouse-per-line circle")
                             .style("opacity", "1");
                         d3.selectAll(".mouse-per-line text")
                             .style("opacity", "1")
+                        var lastPredDate = filteredData[filteredData.length - 1].date;
+                        getDataPointsFromPath(predictionData, yourLine.node(), x, y, lastPredDate);
+                        console.log(predictionData);
+                        savePrediction(predictionData, category);
                     });
         
         svg.call(drag)
