@@ -355,26 +355,36 @@ class InteractiveChart extends Component {
         //var totalData = confirmedData.concat(predictionData);
 
 //!!    //add forecast data to compiledData
+const forecastPaths = document.querySelectorAll(".forecast");
+        const confirmedPath = document.querySelector("#confirmed");
+        const aggregatePath = document.querySelector("#aggregate");
+        console.log(aggregatePath)
+        console.log(forecastPaths);
+        console.log(orgs);
         orgs.map((o, index) => {
+            var lastDate = forecastData[index][forecastData[index].length - 1].date;
+            forecastData[index] = getAllDataPoints(forecastPaths[index], x, y, predStartDate, lastDate);
             compiledData.push({
                 name: o,
                 data: forecastData[index]
             })
         })
+        confirmedData = getAllDataPoints(confirmedPath, x, y, confirmedStartDate, predStartDate);
         compiledData.push({
             name: "Daily Confirmed Deaths",
             data: confirmedData
         })
+        var lastDate = aggregateData[aggregateData.length - 1].date;
+        aggregateData = getAllDataPoints(aggregatePath, x, y, aggregateData[0].date, lastDate)
+        console.log(aggregateData);
         compiledData.push({
             name: "Aggregate Forecast",
             data: aggregateData
         })
-        //if (userPrediction) {
         compiledData.push({
             name: "User Prediction",
             data: predictionData
         })
-        //}
         //join data to yourLine
         filteredData = predictionData.filter(predLine.defined())
         yourLine.datum(filteredData)
