@@ -117,9 +117,124 @@ export const reformatData = (data) => {
 
 export const reformatPredData = (data) => {
   return data.map(d => ({
-    date: d3.timeParse("%Y-%m-%d")((d.date).substring(0,10)),
-    value: d.value,
-    defined: d.defined
+      date: d3.timeParse("%Y-%m-%d")((d.date).substring(0,10)),
+      value: d.value,
+      defined: d.defined
+      })
+  );
+}
+//returns y coordinate at given x 
+/*export const findYatX = (x, path) => {
+  if (x > path.getTotalLength()) {return null}
+  const getXY = (len) => {
+      var point = path.getPointAtLength(len);
+      return [point.x, point.y];
+  }
+  var start = 0;
+  var end = path.getTotalLength();
+  var result = 0;
+  while (start < end) { 
+    var mid = (start + end) / 2;
+    var currPoint = getXY(mid);
+    var currPointX = currPoint[0];
+    if (x < currPointX) {
+      end = mid - 0.01; //does it have to be 0.01?
+    }
+    else if (x > currPointX) {
+      start = mid + 0.01;
+    }
+    else {
+      console.log(currPointX);
+      result = currPoint[1];
+      break;
+    }
+  }
+  if (result == 0) {
+    console.log(start, end);
+    return getXY(start)[1];
+  }
+  return result;
+}*/
+
+export const findYatX = (x, path, startX) => {
+  const getXY = (len) => {
+      var point = path.getPointAtLength(len);
+      return [point.x, point.y, len];
+  }
+  var start = startX;
+  var end = path.getTotalLength();
+  var result = 0;
+  while (start < end) { 
+    var mid = (start + end) / 2;
+    console.log(mid);
+    var currPoint = getXY(mid);
+    var currPointX = currPoint[0];
+    if (x < currPointX) {
+      end = mid - 0.001; //does it have to be 0.01?
+    }
+    else if (x > currPointX) {
+      start = mid + 0.001;
+    }
+    else {
+      result = currPoint;
+      break;
+    }
+  }
+  if (result == 0) {
+    console.log("none")
+    result = getXY(start);
+  }
+  return result;
+}
+
+//get daily data from d3 curve (after interpolation)
+/*export const getDataPointsFromPath = (predictionData, pathNode, xAxis, yAxis, startDate, endDate, lastPredDate) => {
+  var data = [];
+  var date = startDate;
+  var startX = 0;
+  while (+date <= +lastPredDate) {
+    console.log(date, lastPredDate);
+    var x = xAxis(date);
+    const point = findYatX(x, pathNode, startX);
+    if(!point) {//null point -> break
+      console.log(date);
+      console.log("out")
+      break;
+    }
+    data.push({
+      date: date,
+      value: yAxis.invert(point[1]),
+      defined: true
     })
-);
+    date = d3.timeDay.offset(date, 1);
+    startX = point[2];
+  }
+  while (+date <= +endDate) {
+    console.log(date);
+    data.push({
+      date: date,
+      value: 0,
+      defined: 0
+    })
+    date = d3.timeDay.offset(date, 1);
+  }
+  return data;
+}*/
+
+export const getDataPointsFromPath = (predictionData, pathNode, xAxis, yAxis, lastPredDate) => {
+  var date = predictionData[0].date;
+  var startX = 0;
+  for (var i = 0; i < predictionData.length; i++) {
+    if (+predictionData[i].date > +lastPredDate) {
+      break;
+    }
+    if (predictionData[i].defined == 0) {
+      date = predictionData[i].date;
+      var point = findYatX(xAxis(date), pathNode, startX);
+      predictionData[i].defined = true;
+      predictionData[i].value = yAxis.invert(point[1]);
+      startX = point[2];
+    }
+  }
+  return predictionData;
 }
