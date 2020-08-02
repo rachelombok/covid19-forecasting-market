@@ -187,40 +187,23 @@ export const findYatX = (x, path, startX) => {
   return result;
 }
 
-//get daily data from d3 curve (after interpolation)
-/*export const getDataPointsFromPath = (predictionData, pathNode, xAxis, yAxis, startDate, endDate, lastPredDate) => {
+//for confirmedData
+export const getDataPointsFromPath = (pathNode, xAxis, yAxis, startDate, endDate) => {
   var data = [];
   var date = startDate;
   var startX = 0;
-  while (+date <= +lastPredDate) {
-    console.log(date, lastPredDate);
-    var x = xAxis(date);
-    const point = findYatX(x, pathNode, startX);
-    if(!point) {//null point -> break
-      console.log(date);
-      console.log("out")
-      break;
-    }
-    data.push({
-      date: date,
-      value: yAxis.invert(point[1]),
-      defined: true
-    })
-    date = d3.timeDay.offset(date, 1);
-    startX = point[2];
-  }
   while (+date <= +endDate) {
-    console.log(date);
+    var x = xAxis(date);
+    var point = findYatX(x, pathNode, startX);
     data.push({
       date: date,
-      value: 0,
-      defined: 0
-    })
+      value: yAxis.invert(point[1])
+    });
+    startX = point[2];
     date = d3.timeDay.offset(date, 1);
   }
   return data;
-}*/
-
+}
 export const getDataPointsFromPath = (predictionData, pathNode, xAxis, yAxis, lastPredDate) => {
   var date = predictionData[0].date;
   var startX = 0;
