@@ -188,7 +188,7 @@ export const findYatX = (x, path, startX) => {
 }
 
 //for confirmedData
-export const getDataPointsFromPath = (pathNode, xAxis, yAxis, startDate, endDate) => {
+export const getConfirmedDataPath = (pathNode, xAxis, yAxis, startDate, endDate) => {
   var data = [];
   var date = startDate;
   var startX = 0;
