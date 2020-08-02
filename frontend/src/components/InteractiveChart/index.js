@@ -15,12 +15,10 @@ class InteractiveChart extends Component {
     }
     componentDidMount() {
         const loginStatus = this.props.loginStatus;
-        console.log(loginStatus)
         if (loginStatus['logged in']) {
             this.renderChart();
         }
         else {
-            console.log("not logged in")
             this.renderChartUnregistered()
         }
     }
@@ -142,7 +140,6 @@ class InteractiveChart extends Component {
             date: d3.timeParse("%Y-%m-%d")(key),
             value: confirmed[key]
         }));
-        console.log(confirmedData);
         
         var forecastData = forecast.map(f => {
             return Object.keys(f).map(key => ({
@@ -291,8 +288,7 @@ class InteractiveChart extends Component {
                 date: predStartDate,
                 value: confirmedData[confirmedData.length - 1].value
             });
-            console.log(aggregateData);
-            console.log("done");
+
         }
 
         //display aggregate data
@@ -307,18 +303,20 @@ class InteractiveChart extends Component {
         //display forecast data
         forecastData.map((f, index) => {
             //make sure they all stem from the confirmed curve!
+            //var temp = d3.timeParse("%Y-%m-%d")("2020-07-18")
             var idxOfStartDate = d3.bisector(f => f.date).left(f, predStartDate);
             //check if predStartDate exists in f
             if (f.length > 0 && +f[idxOfStartDate].date == +predStartDate) {
                 f[idxOfStartDate].value = confirmedData[confirmedData.length - 1].value;
             }
-            else {
+            else {//add data point to forecastData array
                 f.splice(idxOfStartDate, 0, {
                     date: predStartDate,
                     value: confirmedData[confirmedData.length - 1].value
                 });
+                f = f.slice(idxOfStartDate, f.length);
             }
-
+            forecastData[index] = f;
             predictionArea.append("path")
                         .attr("class", "forecast line")
                         .attr("id", orgs[index])
@@ -467,7 +465,6 @@ class InteractiveChart extends Component {
                         d3
                             .select("#modal")
                             .style("display", "block");
-                        console.log("popup");
                         d3.select("#tooltip-line")
                             .style("opacity", "1");
                         d3.selectAll(".mouse-per-line circle")
@@ -652,7 +649,6 @@ class InteractiveChart extends Component {
             .attr("fill", "steelblue")
             .attr("d", line(x, y.copy().range([focusHeight - margin.bottom, 4])));*/
         function brushed() {
-            console.log("d")
             if (d3.event.selection) {
                 var extent = d3.event.selection;
                 //console.log([ contextX.invert(extent[0]), contextX.invert(extent[1]) ]);
@@ -710,10 +706,8 @@ class InteractiveChart extends Component {
             predictionData = createDefaultPrediction(predStartDate, predEndDate);
             predictionData[0].value = confirmedLastVal;
             predictionData[0].defined = true;
-            console.log(predictionData)
             //update yourLine
             var filtered = predictionData.filter(predLine.defined())
-            console.log(filtered)
             yourLine.datum(filtered)
                     .attr('d', predLine)
                     
@@ -724,7 +718,6 @@ class InteractiveChart extends Component {
         document.querySelector("body").appendChild(deleteButton);
         ////ADD TODAY LINE/////////////////////////////////////////////////////
         const today = d3.timeParse("%Y-%m-%d")(new Date().toISOString().substring(0,10));
-        console.log(today);
         var todayMarker = svg
                             .append("g")
                             .attr("id", "today-marker")
@@ -947,8 +940,7 @@ class InteractiveChart extends Component {
                 date: predStartDate,
                 value: confirmedData[confirmedData.length - 1].value
             });
-            console.log(aggregateData);
-            console.log("done");
+
         }
 
         //display aggregate data
@@ -969,12 +961,14 @@ class InteractiveChart extends Component {
             if (f.length > 0 && +f[idxOfStartDate].date == +predStartDate) {
                 f[idxOfStartDate].value = confirmedData[confirmedData.length - 1].value;
             }
-            else {
+            else {//add data point to forecastData array
                 f.splice(idxOfStartDate, 0, {
                     date: predStartDate,
                     value: confirmedData[confirmedData.length - 1].value
                 });
+                f = f.slice(idxOfStartDate, f.length);
             }
+            forecastData[index] = f;
             predictionArea.append("path")
                         .attr("class", "forecast line")
                         .attr("id", orgs[index])
@@ -1009,21 +1003,15 @@ class InteractiveChart extends Component {
             predictionData[0].value = confirmedLastVal;
             predictionData[0].defined = true;
             currDate = d3.timeDay.offset(predictionData[predictionData.length - 1].date, 1);
-            //currDate = addDays(predictionData[predictionData.length - 1].date, 1);
-            //console.log(predictionData)
-            //console.log(createDefaultPrediction(currDate, predEndDate))
             predictionData.concat(createDefaultPrediction(currDate, predEndDate));
-            //console.log(predictionData);
         }
         else {
             predictionData = createDefaultPrediction(predStartDate, predEndDate);
             predictionData[0].value = confirmedLastVal;
             predictionData[0].defined = true;
-            //console.log(predictionData);
         }
 
         var filteredData = null;
-        //var totalData = confirmedData.concat(predictionData);
 
 //!!    //add forecast data to compiledData
         orgs.map((o, index) => {
@@ -1062,7 +1050,6 @@ class InteractiveChart extends Component {
 
         //append click area rect
         var confirmedAreaWidth = confirmedLine.node().getBoundingClientRect().width; //get width of path element containing confirmed data
-        console.log(confirmedAreaWidth)
         var clickAreaWidth = width - confirmedAreaWidth; //the remaining area
         svg.append("rect")
            .attr("id", "click-area")
@@ -1304,7 +1291,6 @@ class InteractiveChart extends Component {
             .attr("fill", "steelblue")
             .attr("d", line(x, y.copy().range([focusHeight - margin.bottom, 4])));*/
         function brushed() {
-            console.log("d")
             if (d3.event.selection) {
                 var extent = d3.event.selection;
                 //console.log([ contextX.invert(extent[0]), contextX.invert(extent[1]) ]);
@@ -1315,7 +1301,6 @@ class InteractiveChart extends Component {
                         .call(d3.axisBottom(x))
                 var newX = x(confirmedData[confirmedData.length - 1].date);
                 newX = newX < 0 ? 0 : newX;
-                console.log(newX);
                 d3
                     .select("#prediction-clip")
                     .select("rect")
@@ -1363,10 +1348,8 @@ class InteractiveChart extends Component {
             predictionData = createDefaultPrediction(predStartDate, predEndDate);
             predictionData[0].value = confirmedLastVal;
             predictionData[0].defined = true;
-            console.log(predictionData)
             //update yourLine
             var filtered = predictionData.filter(predLine.defined())
-            console.log(filtered)
             yourLine.datum(filtered)
                     .attr('d', predLine)
                     
@@ -1377,7 +1360,6 @@ class InteractiveChart extends Component {
         document.querySelector("body").appendChild(deleteButton);
         ////ADD TODAY LINE/////////////////////////////////////////////////////
         const today = d3.timeParse("%Y-%m-%d")(new Date().toISOString().substring(0,10));
-        console.log(today);
         var todayMarker = svg
                             .append("g")
                             .attr("id", "today-marker")
