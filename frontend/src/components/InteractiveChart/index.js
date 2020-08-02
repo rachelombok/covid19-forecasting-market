@@ -288,8 +288,9 @@ class InteractiveChart extends Component {
                 date: predStartDate,
                 value: confirmedData[confirmedData.length - 1].value
             });
-
         }
+        aggregateData = aggregateData.splice(idxOfStartDate, aggregateData.length);
+
 
         //display aggregate data
         var aggregateLine = predictionArea.append("path")
@@ -940,8 +941,8 @@ class InteractiveChart extends Component {
                 date: predStartDate,
                 value: confirmedData[confirmedData.length - 1].value
             });
-
         }
+        aggregateData = aggregateData.splice(idxOfStartDate, aggregateData.length);
 
         //display aggregate data
         var aggregateLine = predictionArea.append("path")
