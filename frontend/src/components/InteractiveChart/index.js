@@ -369,7 +369,7 @@ const forecastPaths = document.querySelectorAll(".forecast");
                 data: forecastData[index]
             })
         })
-        confirmedData = getAllDataPoints(confirmedPath, x, y, confirmedStartDate, predStartDate);
+        //confirmedData = getAllDataPoints(confirmedPath, x, y, confirmedStartDate, predStartDate);
         compiledData.push({
             name: "Daily Confirmed Deaths",
             data: confirmedData
@@ -1039,7 +1039,7 @@ const forecastPaths = document.querySelectorAll(".forecast");
                 data: forecastData[index]
             })
         })
-        confirmedData = getAllDataPoints(confirmedPath, x, y, confirmedStartDate, predStartDate);
+        //confirmedData = getAllDataPoints(confirmedPath, x, y, confirmedStartDate, predStartDate);
         compiledData.push({
             name: "Daily Confirmed Deaths",
             data: confirmedData

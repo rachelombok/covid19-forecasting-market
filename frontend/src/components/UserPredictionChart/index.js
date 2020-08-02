@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import './UserPredictionChart.css';
-import { getMostRecentPrediction, sortDictByDate, sortStringDates } from '../../utils/data';
+import { getMostRecentPrediction, getAllDataPoints, sortDictByDate, sortStringDates } from '../../utils/data';
 
 class UserPredictionChart extends Component {
     constructor(props) {
